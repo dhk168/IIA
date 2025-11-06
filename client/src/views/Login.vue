@@ -48,8 +48,15 @@ export default {
       this.$refs.loginFormRef.validate((valid) => {
         if (valid) {
           // 这里可以添加登录逻辑
-          this.$message.success('登录成功')
           console.log('登录信息:', this.loginForm)
+          
+          // 设置登录状态
+          localStorage.setItem('isLoggedIn', 'true')
+          localStorage.setItem('username', this.loginForm.username)
+          
+          // 模拟登录成功并跳转
+          this.$message.success('登录成功')
+          this.$router.push('/home')
         }
       })
     }

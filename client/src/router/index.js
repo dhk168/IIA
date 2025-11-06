@@ -8,23 +8,77 @@ const routes = [
   {
     path: '/login',
     name: 'Login',
-    component: () => import('../views/Login.vue')
+    component: () => import('../views/Login.vue'),
+    meta: { requiresGuest: true }
   },
   {
     path: '/register',
     name: 'Register',
-    component: () => import('../views/Register.vue')
+    component: () => import('../views/Register.vue'),
+    meta: { requiresGuest: true }
   },
   {
     path: '/forgot-password',
     name: 'ForgotPassword',
-    component: () => import('../views/ForgotPassword.vue')
+    component: () => import('../views/ForgotPassword.vue'),
+    meta: { requiresGuest: true }
+  },
+  {
+    path: '/home',
+    name: 'Home',
+    component: () => import('../views/Home.vue'),
+    meta: { requiresAuth: true },
+      redirect: '/home/projects',
+    children: [
+        {
+          path: 'projects',
+          name: 'Projects',
+          component: () => import('../views/Projects.vue')
+        },
+        {
+          path: 'tasks',
+          name: 'Tasks',
+          component: () => import('../views/Tasks.vue')
+        },
+        {
+          path: 'analytics',
+          name: 'Analytics',
+          component: () => import('../views/Analytics.vue')
+        }
+      ]
   }
 ]
 
 const router = createRouter({
   history: createWebHistory(),
   routes
+})
+
+// 导航守卫
+router.beforeEach((to, from, next) => {
+  const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true'
+  
+  // 需要认证的页面
+  if (to.matched.some(record => record.meta.requiresAuth)) {
+    if (!isLoggedIn) {
+      // 未登录，重定向到登录页
+      next({ path: '/login' })
+    } else {
+      next()
+    }
+  }
+  // 游客页面（已登录用户不能访问）
+  else if (to.matched.some(record => record.meta.requiresGuest)) {
+    if (isLoggedIn) {
+      // 已登录，重定向到主页
+      next({ path: '/home' })
+    } else {
+      next()
+    }
+  }
+  else {
+    next()
+  }
 })
 
 export default router
