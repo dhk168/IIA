@@ -1,0 +1,219 @@
+/* 认证页面共享样式 */
+.auth-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 20px;
+  color: #ffffff;
+}
+
+.auth-form {
+  width: 100%;
+  max-width: 400px;
+  background-color: transparent;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.auth-title {
+  text-align: center;
+  font-size: 32px;
+  font-weight: bold;
+  color: #ffffff;
+  margin-bottom: 40px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  letter-spacing: 1px;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-label {
+  display: block;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.form-input {
+  width: 100%;
+  height: 48px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  color: #ffffff;
+  padding: 0 16px;
+  font-size: 16px;
+  transition: all 0.3s ease;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.5);
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+.form-input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.verification-code-container {
+  display: flex;
+  gap: 12px;
+  align-items: stretch;
+  width: 100%;
+}
+
+.verification-code-input {
+  flex: 1;
+  height: 48px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  color: #ffffff;
+  padding: 0 16px;
+  font-size: 16px;
+  transition: all 0.3s ease;
+}
+
+.verification-code-input:focus {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.5);
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+.send-code-button {
+  height: 48px;
+  min-width: 120px;
+  background-color: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.send-code-button:hover:not(:disabled) {
+  background-color: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+/* 确保Element Plus按钮应用相同的样式 */
+.el-button.send-code-button {
+  background-color: rgba(255, 255, 255, 0.2) !important;
+  border-color: rgba(255, 255, 255, 0.3) !important;
+  color: #ffffff !important;
+}
+
+.el-button.send-code-button:hover:not(:disabled) {
+  background-color: rgba(255, 255, 255, 0.3) !important;
+  border-color: rgba(255, 255, 255, 0.4) !important;
+}
+
+.send-code-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.submit-button {
+  width: 100%;
+  height: 48px;
+  background-color: #6c63ff;
+  border: none;
+  border-radius: 8px;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 8px;
+  margin-bottom: 24px;
+}
+
+.submit-button:hover {
+  background-color: #5a54e8;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(108, 99, 255, 0.4);
+}
+
+.password-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.forgot-password-link {
+  color: #ffffff;
+  text-decoration: none;
+  font-size: 14px;
+  font-style: italic;
+  transition: color 0.3s ease;
+}
+
+.forgot-password-link:hover {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.bottom-text {
+  text-align: center;
+  color: #ffffff;
+  font-size: 14px;
+}
+
+.bottom-text a {
+  color: #ffffff;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+  font-style: italic;
+  transition: color 0.3s ease;
+}
+
+.bottom-text a:hover {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* Element Plus 组件样式覆盖 */
+.el-input__wrapper {
+  background-color: transparent !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+  box-shadow: none !important;
+}
+
+.el-input__wrapper:hover {
+  border-color: rgba(255, 255, 255, 0.3) !important;
+  box-shadow: none !important;
+}
+
+.el-input__wrapper:focus-within {
+  border-color: rgba(255, 255, 255, 0.5) !important;
+  box-shadow: none !important;
+}
+
+.el-input__inner {
+  color: #ffffff !important;
+  background-color: transparent !important;
+}
+
+.el-input__inner::placeholder {
+  color: rgba(255, 255, 255, 0.6) !important;
+}
+
+.el-button--primary {
+  background-color: #6c63ff !important;
+  border-color: #6c63ff !important;
+}
+
+.el-button--primary:hover:not(:disabled) {
+  background-color: #5a54e8 !important;
+  border-color: #5a54e8 !important;
+}

@@ -4,7 +4,7 @@
       <!-- 侧边栏 -->
       <el-aside width="240px" class="sidebar">
         <div class="sidebar-header">
-          <h2>个人信息助手</h2>
+          <h2>Dashboard</h2>
         </div>
         <el-menu
           :default-active="activeMenu"
@@ -14,19 +14,19 @@
         >
           <el-menu-item index="/home/projects">
           <el-icon><Document /></el-icon>
-          <span>项目计划</span>
+          <span>Projects</span>
         </el-menu-item>
         <el-menu-item index="/home/tasks">
           <el-icon><List /></el-icon>
-          <span>任务管理</span>
+          <span>Tasks</span>
         </el-menu-item>
         <el-menu-item index="/home/analytics">
           <el-icon><DataAnalysis /></el-icon>
-          <span>数据分析</span>
+          <span>Analytics</span>
         </el-menu-item>
           <el-menu-item index="" @click="handleLogout">
             <el-icon><SwitchButton /></el-icon>
-            <span>退出登录</span>
+            <span>Logout</span>
           </el-menu-item>
         </el-menu>
       </el-aside>
@@ -36,7 +36,7 @@
         <!-- 顶部导航 -->
         <el-header class="header">
           <div class="header-info">
-            <span class="welcome-text">欢迎回来，{{ username }}</span>
+            <span class="welcome-text">Welcome back, {{ username }}</span>
             <el-avatar :size="36" :icon="UserFilled" />
           </div>
         </el-header>
@@ -65,7 +65,7 @@ export default {
   data() {
     return {
       activeMenu: '/home/analytics',
-      username: '用户'
+      username: 'User'
     }
   },
   created() {

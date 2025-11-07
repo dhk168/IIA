@@ -1,13 +1,13 @@
 <template>
   <div class="tasks-container">
     <div class="page-header">
-      <h1>任务管理</h1>
+      <h1>Tasks Management</h1>
       <div class="header-actions">
         <el-button type="primary" @click="showAddTaskDialog = true">
-          <el-icon><Plus /></el-icon> 新建任务
+          <el-icon><Plus /></el-icon> New Task
         </el-button>
         <el-button @click="showTagsDialog = true">
-          <el-icon><Management /></el-icon> 标签管理
+          <el-icon><Management /></el-icon> Tags Management
         </el-button>
       </div>
     </div>
@@ -16,34 +16,34 @@
     <div class="filter-section">
       <el-row :gutter="20">
         <el-col :md="6" :sm="24">
-          <el-select v-model="filterOptions.status" placeholder="任务状态" clearable>
-            <el-option label="全部" value="" />
-            <el-option label="待处理" value="todo" />
-            <el-option label="已完成" value="done" />
-            <el-option label="已放弃" value="abandoned" />
+          <el-select v-model="filterOptions.status" placeholder="Task Status" clearable>
+            <el-option label="All" value="" />
+            <el-option label="To Do" value="todo" />
+            <el-option label="Completed" value="done" />
+            <el-option label="Abandoned" value="abandoned" />
           </el-select>
         </el-col>
         <el-col :md="6" :sm="24">
-          <el-select v-model="filterOptions.project" placeholder="所属项目" clearable>
-            <el-option label="全部" value="" />
+          <el-select v-model="filterOptions.project" placeholder="Project" clearable>
+            <el-option label="All" value="" />
             <el-option v-for="project in projects" :key="project.project_id" :label="project.name" :value="project.project_id" />
           </el-select>
         </el-col>
         <el-col :md="6" :sm="24">
-          <el-select v-model="filterOptions.priority" placeholder="优先级" clearable>
-            <el-option label="全部" value="" />
-            <el-option label="无" value="none" />
-            <el-option label="低" value="low" />
-            <el-option label="中" value="medium" />
-            <el-option label="高" value="high" />
+          <el-select v-model="filterOptions.priority" placeholder="Priority" clearable>
+            <el-option label="All" value="" />
+            <el-option label="None" value="none" />
+            <el-option label="Low" value="low" />
+            <el-option label="Medium" value="medium" />
+            <el-option label="High" value="high" />
           </el-select>
         </el-col>
         <el-col :md="6" :sm="24">
-          <el-date-picker v-model="filterOptions.dateRange" type="daterange" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期" />
+          <el-date-picker v-model="filterOptions.dateRange" type="daterange" range-separator="to" start-placeholder="Start Date" end-placeholder="End Date" />
         </el-col>
         <el-col :md="6" :sm="24">
-          <el-select v-model="filterOptions.tag" placeholder="标签筛选" clearable>
-            <el-option label="全部" value="" />
+          <el-select v-model="filterOptions.tag" placeholder="Tags Filter" clearable>
+            <el-option label="All" value="" />
             <el-option v-for="tag in tags" :key="tag.tag_id" :label="tag.name" :value="tag.tag_id" />
           </el-select>
         </el-col>
@@ -54,7 +54,7 @@
     <el-card class="tasks-card">
       <template #header>
         <div class="card-header">
-          <span>任务列表</span>
+          <span>Task List</span>
         </div>
       </template>
       <el-table :data="filteredTasks" stripe style="width: 100%" default-expand-all>
@@ -62,27 +62,27 @@
           <template #default="scope">
             <div class="task-detail">
               <div class="detail-item" v-if="scope.row.description">
-                <strong>描述：</strong>
+                <strong>Description:</strong>
                 <p>{{ scope.row.description }}</p>
               </div>
               <div class="detail-item">
-                <strong>创建时间：</strong>
+                <strong>Created At:</strong>
                 <span>{{ formatDate(scope.row.created_at) }}</span>
               </div>
               <div class="detail-item" v-if="scope.row.start_date">
-                <strong>开始日期：</strong>
+                <strong>Start Date:</strong>
                 <span>{{ formatDate(scope.row.start_date) }}</span>
               </div>
               <div class="detail-item" v-if="scope.row.completed_at">
-                <strong>完成时间：</strong>
+                <strong>Completed At:</strong>
                 <span>{{ formatDate(scope.row.completed_at) }}</span>
               </div>
               <div class="detail-item" v-if="scope.row.recurrence_info">
-                <strong>重复规则：</strong>
+                <strong>Recurrence Rule:</strong>
                 <span>{{ getRecurrenceText(scope.row.recurrence_info) }}</span>
               </div>
               <div class="detail-item" v-if="scope.row.tags && scope.row.tags.length > 0">
-                <strong>标签：</strong>
+                <strong>Tags:</strong>
                 <el-tag v-for="tag in scope.row.tags" :key="tag.tag_id" :type="getTagType(tag.color)">
                   {{ tag.name }}
                 </el-tag>
@@ -90,25 +90,25 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column prop="title" label="任务名称" min-width="300">
+        <el-table-column prop="title" label="Task Name" min-width="300">
           <template #default="scope">
             <div class="task-title-container">
               <el-checkbox v-model="scope.row.status" :checked="scope.row.status === 'done'" @change="updateTaskStatus(scope.row)">
                 <span :class="{ 'task-completed': scope.row.status === 'done' }" :style="{ paddingLeft: scope.row.level * 20 + 'px' }">{{ scope.row.title }}</span>
               </el-checkbox>
-              <el-tag v-if="scope.row.category === 'note'" size="small" type="info" style="margin-left: 10px;">笔记</el-tag>
+              <el-tag v-if="scope.row.category === 'note'" size="small" type="info" style="margin-left: 10px;">Note</el-tag>
             </div>
           </template>
         </el-table-column>
-        <el-table-column prop="project_name" label="项目" width="120" />
-        <el-table-column prop="due_date" label="截止日期" width="120">
+        <el-table-column prop="project_name" label="Project" width="120" />
+        <el-table-column prop="due_date" label="Due Date" width="120">
           <template #default="scope">
             <el-tag :type="getTaskDueType(scope.row)">
               {{ formatDate(scope.row.due_date) }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="priority" label="优先级" width="100">
+        <el-table-column prop="priority" label="Priority" width="100">
           <template #default="scope">
             <el-tag :type="getPriorityType(scope.row.priority)">
               {{ getPriorityText(scope.row.priority) }}
@@ -117,8 +117,8 @@
         </el-table-column>
         <el-table-column label="操作" width="150" fixed="right">
           <template #default="scope">
-            <el-button size="small" @click="editTask(scope.row)">编辑</el-button>
-            <el-button size="small" type="danger" @click="deleteTask(scope.row.task_id)">删除</el-button>
+            <el-button size="small" @click="editTask(scope.row)">Edit</el-button>
+            <el-button size="small" type="danger" @click="deleteTask(scope.row.task_id)">Delete</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -127,24 +127,24 @@
     <!-- 添加/编辑任务对话框 -->
     <el-dialog
       v-model="showAddTaskDialog"
-      :title="isEditMode ? '编辑任务' : '新建任务'"
+      :title="isEditMode ? 'Edit Task' : 'New Task'"
       width="600px"
     >
       <el-form :model="taskForm" :rules="taskRules" ref="taskFormRef">
-        <el-form-item label="任务标题" prop="title">
-          <el-input v-model="taskForm.title" placeholder="请输入任务标题" />
+        <el-form-item label="Task Title" prop="title">
+          <el-input v-model="taskForm.title" placeholder="Enter task title" />
         </el-form-item>
-        <el-form-item label="任务类型" prop="category">
+        <el-form-item label="Task Type" prop="category">
           <el-radio-group v-model="taskForm.category">
-            <el-radio value="task">任务</el-radio>
-            <el-radio value="note">笔记</el-radio>
+            <el-radio value="task">Task</el-radio>
+            <el-radio value="note">Note</el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-form-item label="描述" prop="description">
-          <el-input v-model="taskForm.description" type="textarea" placeholder="请输入任务描述" :rows="3" />
+        <el-form-item label="Description" prop="description">
+          <el-input v-model="taskForm.description" type="textarea" placeholder="Enter task description" :rows="3" />
         </el-form-item>
-        <el-form-item label="所属项目" prop="project_id">
-          <el-select v-model="taskForm.project_id" placeholder="选择项目" clearable>
+        <el-form-item label="Project" prop="project_id">
+          <el-select v-model="taskForm.project_id" placeholder="Select project" clearable>
             <el-option v-for="project in projects" :key="project.project_id" :label="project.name" :value="project.project_id" />
           </el-select>
         </el-form-item>
@@ -156,42 +156,42 @@
             style="width: 100%"
           />
         </el-form-item>
-        <el-form-item label="截止日期" prop="due_date">
+        <el-form-item label="Due Date" prop="due_date">
           <el-date-picker
             v-model="taskForm.due_date"
             type="datetime"
-            placeholder="选择截止日期和时间"
+            placeholder="Select due date and time"
             style="width: 100%"
           />
         </el-form-item>
-        <el-form-item label="优先级" prop="priority">
-          <el-select v-model="taskForm.priority" placeholder="选择优先级">
+        <el-form-item label="Priority" prop="priority">
+          <el-select v-model="taskForm.priority" placeholder="Select priority">
             <el-option label="无" value="none" />
-            <el-option label="低" value="low" />
-            <el-option label="中" value="medium" />
-            <el-option label="高" value="high" />
+            <el-option label="Low" value="low" />
+            <el-option label="Medium" value="medium" />
+            <el-option label="High" value="high" />
           </el-select>
         </el-form-item>
-        <el-form-item label="重复设置" prop="has_recurrence">
+        <el-form-item label="Recurrence Settings" prop="has_recurrence">
           <el-switch v-model="taskForm.has_recurrence" />
         </el-form-item>
         <template v-if="taskForm.has_recurrence">
-          <el-form-item label="重复类型" prop="recurrence_category">
-            <el-select v-model="taskForm.recurrence_category" placeholder="选择重复类型">
-              <el-option label="每周" value="weekly" />
-              <el-option label="每月" value="monthly" />
-              <el-option label="每年" value="yearly" />
-              <el-option label="隔N天" value="days" />
-              <el-option label="隔N周" value="weeks" />
-              <el-option label="艾宾浩斯记忆" value="ebinghaus" />
+          <el-form-item label="Recurrence Type" prop="recurrence_category">
+            <el-select v-model="taskForm.recurrence_category" placeholder="Select recurrence type">
+              <el-option label="Weekly" value="weekly" />
+              <el-option label="Monthly" value="monthly" />
+              <el-option label="Yearly" value="yearly" />
+              <el-option label="Every N days" value="days" />
+              <el-option label="Every N weeks" value="weeks" />
+              <el-option label="Ebbinghaus" value="ebinghaus" />
             </el-select>
           </el-form-item>
-          <el-form-item label="重复次数" prop="recurrence_count">
-          <el-input v-model.number="taskForm.recurrence_count" type="number" min="1" placeholder="设置重复次数" />
+          <el-form-item label="Recurrence Count" prop="recurrence_count">
+          <el-input v-model.number="taskForm.recurrence_count" type="number" min="1" placeholder="Set recurrence count" />
         </el-form-item>
       </template>
-      <el-form-item label="标签">
-        <el-select v-model="taskForm.selectedTags" multiple placeholder="选择标签">
+      <el-form-item label="Tags">
+          <el-select v-model="taskForm.selectedTags" multiple placeholder="Select tags">
           <el-option v-for="tag in tags" :key="tag.tag_id" :label="tag.name" :value="tag.tag_id" />
         </el-select>
       </el-form-item>
