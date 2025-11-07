@@ -1,27 +1,32 @@
 <template>
   <div class="auth-container">
     <h1 class="auth-title">Intelligent Information Assistant</h1>
-    <div class="auth-form">
+    <el-form :model="loginForm" :rules="rules" ref="loginFormRef" class="auth-form">
       <div class="form-group">
         <label class="form-label">Email</label>
-        <el-input v-model="loginForm.email" placeholder="" class="form-input"></el-input>
+        <el-form-item prop="email" style="margin: 0;">
+          <el-input v-model="loginForm.email" placeholder="" class="form-input"></el-input>
+        </el-form-item>
       </div>
       <div class="form-group">
         <div class="password-container">
           <label class="form-label">Password</label>
           <router-link to="/forgot-password" class="forgot-password-link">Forgot password?</router-link>
         </div>
-        <el-input v-model="loginForm.password" type="password" placeholder="" class="form-input"></el-input>
+        <el-form-item prop="password" style="margin: 0;">
+          <el-input v-model="loginForm.password" type="password" placeholder="" class="form-input"></el-input>
+        </el-form-item>
       </div>
-      <button class="submit-button" @click="handleLogin">Sign in</button>
+      <el-button type="primary" @click="handleLogin" class="submit-button">Sign in</el-button>
       <div class="bottom-text">
         Don't have an account? <router-link to="/register">Create an account</router-link>
       </div>
-    </div>
+    </el-form>
   </div>
 </template>
 
 <script>
+import { authAPI } from '../api/auth';
 export default {
   name: 'Login',
   data() {
@@ -45,16 +50,23 @@ export default {
     handleLogin() {
       this.$refs.loginFormRef.validate((valid) => {
         if (valid) {
-          // Login logic can be added here
-          console.log('Login info:', this.loginForm)
-          
-          // 设置登录状态
-          localStorage.setItem('isLoggedIn', 'true')
-          localStorage.setItem('email', this.loginForm.email)
-          
-          // Simulate login success and redirect
-          this.$message.success('Login successful')
-          this.$router.push('/home')
+          // 使用authAPI进行登录
+          authAPI.login(this.loginForm)
+            .then(response => {
+              console.log('Login successful:', response)
+              
+              // 设置登录状态和token
+              localStorage.setItem('isLoggedIn', 'true')
+              localStorage.setItem('usernameOrEmail', this.loginForm.email)
+              localStorage.setItem('token', response.token)
+              
+              this.$message.success('Login successful')
+              this.$router.push('/home')
+            })
+            .catch(error => {
+              console.error('Login failed:', error)
+              this.$message.error(error.response?.data?.message || 'Login failed')
+            })
         }
       })
     }

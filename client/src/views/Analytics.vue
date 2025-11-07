@@ -1,17 +1,17 @@
 <template>
   <div class="analytics-container">
     <div class="page-header">
-      <h1>数据分析</h1>
-      <p>查看您的待办事项统计情况</p>
+      <h1>Analytics</h1>
+      <p>View your to-do list statistics</p>
     </div>
     
-    <!-- 统计卡片 -->
+    <!-- Stats Cards -->
     <div class="stats-cards">
       <el-card class="stat-card">
         <div class="stat-icon primary"><Document /></div>
         <div class="stat-content">
           <div class="stat-number">{{ totalTasks }}</div>
-          <div class="stat-label">总待办事项</div>
+          <div class="stat-label">Total Tasks</div>
         </div>
       </el-card>
       
@@ -19,7 +19,7 @@
         <div class="stat-icon success"><Check /></div>
         <div class="stat-content">
           <div class="stat-number">{{ completedTasks }}</div>
-          <div class="stat-label">已完成</div>
+          <div class="stat-label">Completed</div>
         </div>
       </el-card>
       
@@ -27,7 +27,7 @@
         <div class="stat-icon warning"><Clock /></div>
         <div class="stat-content">
           <div class="stat-number">{{ pendingTasks }}</div>
-          <div class="stat-label">待处理</div>
+          <div class="stat-label">Pending</div>
         </div>
       </el-card>
       
@@ -35,17 +35,17 @@
         <div class="stat-icon danger"><Warning /></div>
         <div class="stat-content">
           <div class="stat-number">{{ overdueTasks }}</div>
-          <div class="stat-label">已逾期</div>
+          <div class="stat-label">Overdue</div>
         </div>
       </el-card>
     </div>
     
-    <!-- 图表区域 -->
+    <!-- Charts Area -->
     <div class="charts-container">
       <el-card class="chart-card">
         <template #header>
           <div class="card-header">
-            <span>待办事项进度</span>
+            <span>Task Progress</span>
           </div>
         </template>
         <div class="chart-content">
@@ -58,7 +58,7 @@
       <el-card class="chart-card">
         <template #header>
           <div class="card-header">
-            <span>待办事项类型分布</span>
+            <span>Task Category Distribution</span>
           </div>
         </template>
         <div class="chart-content">
@@ -79,26 +79,26 @@
       </el-card>
     </div>
     
-    <!-- 最近完成的任务 -->
+    <!-- Recently Completed Tasks -->
     <el-card class="recent-tasks-card">
       <template #header>
         <div class="card-header">
-          <span>最近完成的任务</span>
+          <span>Recently Completed Tasks</span>
         </div>
       </template>
       <el-table :data="recentCompletedTasks" stripe style="width: 100%">
-        <el-table-column prop="title" label="任务名称" width="300" />
-        <el-table-column prop="category" label="类别">
+        <el-table-column prop="title" label="Task Name" width="300" />
+        <el-table-column prop="category" label="Category">
           <template #default="scope">
             <el-tag :type="getCategoryType(scope.row.category)">{{ scope.row.category }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="completedTime" label="完成时间">
+        <el-table-column prop="completedTime" label="Completion Time">
           <template #default="scope">
             {{ formatDate(scope.row.completedTime) }}
           </template>
         </el-table-column>
-        <el-table-column prop="priority" label="优先级">
+        <el-table-column prop="priority" label="Priority">
           <template #default="scope">
             <el-tag :type="getPriorityType(scope.row.priority)">{{ scope.row.priority }}</el-tag>
           </template>
@@ -121,22 +121,22 @@ export default {
   },
   data() {
     return {
-      // 模拟数据
+      // Mock data
       totalTasks: 32,
       completedTasks: 18,
       pendingTasks: 14,
       overdueTasks: 2,
       taskCategories: [
-        { name: '工作', count: 12, color: '#409eff' },
-        { name: '学习', count: 8, color: '#67c23a' },
-        { name: '生活', count: 6, color: '#e6a23c' },
-        { name: '健康', count: 4, color: '#f56c6c' }
+        { name: 'Work', count: 12, color: '#409eff' },
+        { name: 'Study', count: 8, color: '#67c23a' },
+        { name: 'Life', count: 6, color: '#e6a23c' },
+        { name: 'Health', count: 4, color: '#f56c6c' }
       ],
       recentCompletedTasks: [
-        { title: '完成项目提案', category: '工作', completedTime: '2023-10-15 14:30', priority: '高' },
-        { title: '阅读技术文档', category: '学习', completedTime: '2023-10-14 09:15', priority: '中' },
-        { title: '购买生活用品', category: '生活', completedTime: '2023-10-13 18:45', priority: '低' },
-        { title: '晨跑30分钟', category: '健康', completedTime: '2023-10-13 07:00', priority: '中' }
+        { title: 'Complete Project Proposal', category: 'Work', completedTime: '2023-10-15 14:30', priority: 'High' },
+        { title: 'Read Technical Documentation', category: 'Study', completedTime: '2023-10-14 09:15', priority: 'Medium' },
+        { title: 'Buy Daily Necessities', category: 'Life', completedTime: '2023-10-13 18:45', priority: 'Low' },
+        { title: 'Morning Run 30 Minutes', category: 'Health', completedTime: '2023-10-13 07:00', priority: 'Medium' }
       ]
     }
   },
@@ -150,22 +150,22 @@ export default {
       return `${percentage}%`
     },
     formatDate(dateString) {
-      return new Date(dateString).toLocaleString('zh-CN')
+      return new Date(dateString).toLocaleString('en-US')
     },
     getCategoryType(category) {
       const typeMap = {
-        '工作': 'primary',
-        '学习': 'success',
-        '生活': 'warning',
-        '健康': 'danger'
+        'Work': 'primary',
+        'Study': 'success',
+        'Life': 'warning',
+        'Health': 'danger'
       }
       return typeMap[category] || 'info'
     },
     getPriorityType(priority) {
       const typeMap = {
-        '高': 'danger',
-        '中': 'warning',
-        '低': 'success'
+        'High': 'danger',
+        'Medium': 'warning',
+        'Low': 'success'
       }
       return typeMap[priority] || 'info'
     }

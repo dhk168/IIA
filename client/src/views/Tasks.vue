@@ -148,11 +148,11 @@
             <el-option v-for="project in projects" :key="project.project_id" :label="project.name" :value="project.project_id" />
           </el-select>
         </el-form-item>
-        <el-form-item label="开始日期" prop="start_date">
+        <el-form-item label="Start Date" prop="start_date">
           <el-date-picker
             v-model="taskForm.start_date"
             type="datetime"
-            placeholder="选择开始日期和时间"
+            placeholder="Select start date and time"
             style="width: 100%"
           />
         </el-form-item>
@@ -166,7 +166,7 @@
         </el-form-item>
         <el-form-item label="Priority" prop="priority">
           <el-select v-model="taskForm.priority" placeholder="Select priority">
-            <el-option label="无" value="none" />
+            <el-option label="None" value="none" />
             <el-option label="Low" value="low" />
             <el-option label="Medium" value="medium" />
             <el-option label="High" value="high" />
@@ -197,39 +197,39 @@
       </el-form-item>
       </el-form>
       <template #footer>
-        <el-button @click="showAddTaskDialog = false">取消</el-button>
-        <el-button type="primary" @click="submitTaskForm">确定</el-button>
-      </template>
+          <el-button @click="showAddTaskDialog = false">Cancel</el-button>
+          <el-button type="primary" @click="submitTaskForm">Confirm</el-button>
+        </template>
     </el-dialog>
-    <!-- 标签管理对话框 -->
+    <!-- Tags Management Dialog -->
     <el-dialog
       v-model="showTagsDialog"
-      title="标签管理"
+      title="Tags Management"
       width="500px"
     >
       <div class="tags-management">
         <el-card class="tags-card">
           <template #header>
             <div class="tags-card-header">
-              <span>标签列表</span>
+              <span>Tags List</span>
               <el-button type="primary" size="small" @click="showAddTagDialog = true">
-                <el-icon><Plus /></el-icon> 新建标签
+                <el-icon><Plus /></el-icon> New Tag
               </el-button>
             </div>
           </template>
           <el-table :data="tags" stripe style="width: 100%">
-            <el-table-column prop="name" label="标签名称" />
-            <el-table-column prop="color" label="颜色" width="120">
+            <el-table-column prop="name" label="Tag Name" />
+            <el-table-column prop="color" label="Color" width="120">
               <template #default="scope">
                 <el-tag :type="getTagType(scope.row.color)">
                   {{ scope.row.color }}
                 </el-tag>
               </template>
             </el-table-column>
-            <el-table-column label="操作" width="120" fixed="right">
+            <el-table-column label="Actions" width="120" fixed="right">
               <template #default="scope">
-                <el-button size="small" @click="editTag(scope.row)">编辑</el-button>
-                <el-button size="small" type="danger" @click="deleteTag(scope.row.tag_id)">删除</el-button>
+                <el-button size="small" @click="editTag(scope.row)">Edit</el-button>
+                <el-button size="small" type="danger" @click="deleteTag(scope.row.tag_id)">Delete</el-button>
               </template>
             </el-table-column>
           </el-table>
@@ -237,24 +237,24 @@
       </div>
     </el-dialog>
     
-    <!-- 添加/编辑标签对话框 -->
+    <!-- Add/Edit Tag Dialog -->
     <el-dialog
       v-model="showAddTagDialog"
-      :title="isEditingTag ? '编辑标签' : '新建标签'"
+      :title="isEditingTag ? 'Edit Tag' : 'New Tag'"
       width="400px"
     >
       <el-form :model="tagForm" :rules="tagRules" ref="tagFormRef">
-        <el-form-item label="标签名称" prop="name">
-          <el-input v-model="tagForm.name" placeholder="请输入标签名称" />
+        <el-form-item label="Tag Name" prop="name">
+          <el-input v-model="tagForm.name" placeholder="Enter tag name" />
         </el-form-item>
-        <el-form-item label="标签颜色" prop="color">
+        <el-form-item label="Tag Color" prop="color">
           <el-color-picker v-model="tagForm.color" show-alpha show-panel-color />
         </el-form-item>
       </el-form>
       <template #footer>
-        <el-button @click="showAddTagDialog = false">取消</el-button>
-        <el-button type="primary" @click="submitTagForm">确定</el-button>
-      </template>
+          <el-button @click="showAddTagDialog = false">Cancel</el-button>
+          <el-button type="primary" @click="submitTagForm">Confirm</el-button>
+        </template>
     </el-dialog>
   </div>
 </template>
@@ -270,15 +270,15 @@ export default {
   },
   data() {
     return {
-      // 模拟数据
+      // Mock data
       tasks: [
         {
           task_id: 1,
           user_id: 1,
           project_id: 1,
-          project_name: '网站开发',
-          title: '设计网站原型',
-          description: '创建网站的初步设计原型，包括首页、产品页等',
+          project_name: 'Website Development',
+          title: 'Design Website Prototype',
+          description: 'Create initial design prototype for the website, including homepage and product pages',
           category: 'task',
           status: 'todo',
           is_archived: false,
@@ -290,7 +290,7 @@ export default {
           created_at: '2023-11-01T10:00:00',
           priority: 'high',
           tags: [
-            { tag_id: 1, name: '设计', color: '#409eff' }
+            { tag_id: 1, name: 'Design', color: '#409eff' }
           ],
           recurrence_info: null
         },
@@ -298,9 +298,9 @@ export default {
           task_id: 2,
           user_id: 1,
           project_id: 1,
-          project_name: '网站开发',
-          title: '前端页面开发',
-          description: '基于设计原型开发前端页面',
+          project_name: 'Website Development',
+          title: 'Frontend Page Development',
+          description: 'Develop frontend pages based on the design prototype',
           category: 'task',
           status: 'todo',
           is_archived: false,
@@ -312,7 +312,7 @@ export default {
           created_at: '2023-11-01T10:00:00',
           priority: 'medium',
           tags: [
-            { tag_id: 2, name: '前端', color: '#67c23a' }
+            { tag_id: 2, name: 'Frontend', color: '#67c23a' }
           ],
           recurrence_info: null
         },
@@ -320,9 +320,9 @@ export default {
           task_id: 3,
           user_id: 1,
           project_id: null,
-          project_name: '无项目',
-          title: '每周健身记录',
-          description: '记录每周健身情况',
+          project_name: 'No Project',
+          title: 'Weekly Fitness Record',
+          description: 'Record weekly fitness activities',
           category: 'note',
           status: 'todo',
           is_archived: false,
@@ -342,14 +342,14 @@ export default {
         }
       ],
       projects: [
-        { project_id: 1, name: '网站开发', color: '#409eff', icon: 'Document' },
-        { project_id: 2, name: '学习计划', color: '#67c23a', icon: 'Book' }
+        { project_id: 1, name: 'Website Development', color: '#409eff', icon: 'Document' },
+        { project_id: 2, name: 'Learning Plan', color: '#67c23a', icon: 'Book' }
       ],
       tags: [
-        { tag_id: 1, name: '设计', color: '#409eff' },
-        { tag_id: 2, name: '前端', color: '#67c23a' },
-        { tag_id: 3, name: '重要', color: '#f56c6c' },
-        { tag_id: 4, name: '紧急', color: '#e6a23c' }
+        { tag_id: 1, name: 'Design', color: '#409eff' },
+        { tag_id: 2, name: 'Frontend', color: '#67c23a' },
+        { tag_id: 3, name: 'Important', color: '#f56c6c' },
+        { tag_id: 4, name: 'Urgent', color: '#e6a23c' }
       ],
       filterOptions: {
         status: '',
@@ -378,7 +378,7 @@ export default {
       },
       taskRules: {
         title: [
-          { required: true, message: '请输入任务标题', trigger: 'blur' }
+          { required: true, message: 'Please enter task title', trigger: 'blur' }
         ]
       },
       tagForm: {
@@ -387,11 +387,11 @@ export default {
       },
       tagRules: {
         name: [
-          { required: true, message: '请输入标签名称', trigger: 'blur' },
-          { min: 1, max: 10, message: '标签名称长度在 1 到 10 个字符', trigger: 'blur' }
+          { required: true, message: 'Please enter tag name', trigger: 'blur' },
+          { min: 1, max: 10, message: 'Tag name length should be between 1 and 10 characters', trigger: 'blur' }
         ],
         color: [
-          { required: true, message: '请选择标签颜色', trigger: 'change' }
+          { required: true, message: 'Please select tag color', trigger: 'change' }
         ]
       }
     }
@@ -437,10 +437,10 @@ export default {
   },
   methods: {
     formatDate(dateString) {
-      if (!dateString) return '无'
-      const date = new Date(dateString)
-      return date.toLocaleString('zh-CN')
-    },
+        if (!dateString) return 'None'
+        const date = new Date(dateString)
+        return date.toLocaleString('en-US')
+      },
     getPriorityType(priority) {
       const typeMap = {
         'none': 'info',
@@ -451,14 +451,14 @@ export default {
       return typeMap[priority] || 'info'
     },
     getPriorityText(priority) {
-      const textMap = {
-        'none': '无',
-        'low': '低',
-        'medium': '中',
-        'high': '高'
-      }
-      return textMap[priority] || '无'
-    },
+        const textMap = {
+          'none': 'None',
+          'low': 'Low',
+          'medium': 'Medium',
+          'high': 'High'
+        }
+        return textMap[priority] || 'None'
+      },
     getTaskDueType(task) {
       if (!task.due_date) return 'info'
       const today = new Date()
@@ -479,21 +479,21 @@ export default {
       
       switch (category) {
         case 'weekly':
-          const days = ['周日', '周一', '周二', '周三', '周四', '周五', '周六']
-          const dayTexts = schedule.map(day => days[day]).join('、')
-          return `每周 ${dayTexts}，共 ${count} 次`
+          const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+          const dayTexts = schedule.map(day => days[day]).join(', ')
+          return `Every ${dayTexts}, ${count} times`
         case 'monthly':
-          return `每月 ${schedule.join('、')} 号，共 ${count} 次`
+          return `Monthly on ${schedule.join(', ')}, ${count} times`
         case 'yearly':
-          return `每年 ${schedule[0]}，共 ${count} 次`
+          return `Yearly on ${schedule[0]}, ${count} times`
         case 'days':
-          return `每 ${schedule || 1} 天，共 ${count} 次`
+          return `Every ${schedule || 1} days, ${count} times`
         case 'weeks':
-          return `每 ${schedule || 1} 周，共 ${count} 次`
+          return `Every ${schedule || 1} weeks, ${count} times`
         case 'ebinghaus':
-          return `艾宾浩斯记忆曲线，共 ${count} 次`
+          return `Ebbinghaus Memory Curve, ${count} times`
         default:
-          return '自定义重复'
+          return 'Custom recurrence'
       }
     },
     getTagType(color) {
@@ -517,7 +517,7 @@ export default {
           this.tasks[taskIndex].status = 'todo'
           this.tasks[taskIndex].completed_at = null
         }
-        this.$message.success('任务状态已更新')
+        this.$message.success('Task status updated successfully')
       }
     },
     editTask(task) {
@@ -539,15 +539,15 @@ export default {
       this.showAddTaskDialog = true
     },
     deleteTask(taskId) {
-      this.$confirm('确定要删除这个任务吗？', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
+        this.$confirm('Are you sure you want to delete this task?', 'Confirmation', {
+          confirmButtonText: 'Confirm',
+          cancelButtonText: 'Cancel',
         type: 'warning'
       }).then(() => {
         const index = this.tasks.findIndex(t => t.task_id === taskId)
         if (index !== -1) {
           this.tasks.splice(index, 1)
-          this.$message.success('任务删除成功')
+          this.$message.success('Task deleted successfully')
         }
       }).catch(() => {
         // 取消删除
@@ -566,7 +566,7 @@ export default {
                 description: this.taskForm.description,
                 category: this.taskForm.category,
                 project_id: this.taskForm.project_id,
-                project_name: this.taskForm.project_id ? this.projects.find(p => p.project_id === this.taskForm.project_id)?.name : '无项目',
+                project_name: this.taskForm.project_id ? this.projects.find(p => p.project_id === this.taskForm.project_id)?.name : 'No Project',
                 start_date: this.taskForm.start_date ? this.taskForm.start_date.toISOString() : null,
                 due_date: this.taskForm.due_date ? this.taskForm.due_date.toISOString() : null,
                 priority: this.taskForm.priority,
@@ -586,7 +586,7 @@ export default {
               }
               
               this.tasks[index] = updatedTask
-              this.$message.success('任务更新成功')
+              this.$message.success('Task updated successfully')
             }
           } else {
             // 创建新任务
@@ -594,7 +594,7 @@ export default {
               task_id: Date.now(),
               user_id: 1, // 模拟用户ID
               project_id: this.taskForm.project_id,
-              project_name: this.taskForm.project_id ? this.projects.find(p => p.project_id === this.taskForm.project_id)?.name : '无项目',
+              project_name: this.taskForm.project_id ? this.projects.find(p => p.project_id === this.taskForm.project_id)?.name : 'No Project',
               title: this.taskForm.title,
               description: this.taskForm.description,
               category: this.taskForm.category,
@@ -621,7 +621,7 @@ export default {
             }
             
             this.tasks.push(newTask)
-            this.$message.success('任务创建成功')
+            this.$message.success('Task created successfully')
           }
           
           // 关闭对话框并重置表单
@@ -669,25 +669,25 @@ export default {
       this.showAddTagDialog = true
     },
     deleteTag(tagId) {
-      // 检查是否有任务使用此标签
-      const hasTasksWithTag = this.tasks.some(task => 
-        task.tags && task.tags.some(tag => tag.tag_id === tagId)
-      )
-      
-      if (hasTasksWithTag) {
-        this.$message.warning('此标签已被任务使用，无法删除')
-        return
-      }
-      
-      this.$confirm('确定要删除这个标签吗？', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
+        // Check if any tasks use this tag
+        const hasTasksWithTag = this.tasks.some(task => 
+          task.tags && task.tags.some(tag => tag.tag_id === tagId)
+        )
+        
+        if (hasTasksWithTag) {
+          this.$message.warning('This tag is being used by tasks, cannot delete')
+          return
+        }
+        
+        this.$confirm('Are you sure you want to delete this tag?', 'Confirmation', {
+        confirmButtonText: 'Confirm',
+          cancelButtonText: 'Cancel',
         type: 'warning'
       }).then(() => {
         const index = this.tags.findIndex(t => t.tag_id === tagId)
         if (index !== -1) {
           this.tags.splice(index, 1)
-          this.$message.success('标签删除成功')
+          this.$message.success('Tag deleted successfully')
         }
       }).catch(() => {
         // 取消删除
@@ -727,13 +727,13 @@ export default {
                   })
                 }
               })
-              this.$message.success('标签更新成功')
+              this.$message.success('Tag updated successfully')
             }
           } else {
             // 检查标签名称是否已存在
             const existingTag = this.tags.find(t => t.name === this.tagForm.name)
             if (existingTag) {
-              this.$message.warning('标签名称已存在')
+              this.$message.warning('Tag name already exists')
               return
             }
             
@@ -745,7 +745,7 @@ export default {
             }
             
             this.tags.push(newTag)
-            this.$message.success('标签创建成功')
+            this.$message.success('Tag created successfully')
           }
           
           // 关闭对话框并重置表单

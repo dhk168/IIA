@@ -1,15 +1,15 @@
 <template>
   <div class="projects-container">
     <div class="page-header">
-      <h1>项目计划</h1>
+      <h1>Project Plan</h1>
       <div class="header-actions">
         <el-button type="primary" @click="showAddProjectDialog = true">
-          <el-icon><Plus /></el-icon> 新建项目
+          <el-icon><Plus /></el-icon> New Project
         </el-button>
       </div>
     </div>
     
-    <!-- 项目列表 -->
+    <!-- Project List -->
     <div class="projects-list">
       <div class="project-cards">
         <el-card 
@@ -28,8 +28,8 @@
                   </el-button>
                   <template #dropdown>
                     <el-dropdown-menu>
-                      <el-dropdown-item @click.stop="editProject(project)">编辑</el-dropdown-item>
-                      <el-dropdown-item @click.stop="deleteProject(project.id)" danger>删除</el-dropdown-item>
+                      <el-dropdown-item @click.stop="editProject(project)">Edit</el-dropdown-item>
+                  <el-dropdown-item @click.stop="deleteProject(project.id)" danger>Delete</el-dropdown-item>
                     </el-dropdown-menu>
                   </template>
                 </el-dropdown>
@@ -39,27 +39,27 @@
           
           <div class="project-content">
             <div class="project-meta">
-              <div class="meta-item">
-                <el-icon class="meta-icon"><Document /></el-icon>
-                <span>{{ project.taskCount }} 个任务</span>
+                <div class="meta-item">
+                  <el-icon class="meta-icon"><Document /></el-icon>
+                  <span>{{ project.taskCount }} Tasks</span>
+                </div>
+                <div class="meta-item">
+                  <el-icon class="meta-icon"><Calendar /></el-icon>
+                  <span>{{ formatDate(project.dueDate) }}</span>
+                </div>
               </div>
-              <div class="meta-item">
-                <el-icon class="meta-icon"><Calendar /></el-icon>
-                <span>{{ formatDate(project.dueDate) }}</span>
-              </div>
-            </div>
             
             <div class="project-progress">
-              <div class="progress-info">
-                <span class="progress-text">进度</span>
-                <span class="progress-percentage">{{ project.progress }}%</span>
+                <div class="progress-info">
+                  <span class="progress-text">Progress</span>
+                  <span class="progress-percentage">{{ project.progress }}%</span>
+                </div>
+                <el-progress 
+                  :percentage="project.progress" 
+                  :color="getProgressColor(project.progress)"
+                  :show-text="false"
+                />
               </div>
-              <el-progress 
-                :percentage="project.progress" 
-                :color="getProgressColor(project.progress)"
-                :show-text="false"
-              />
-            </div>
             
             <div class="project-tags">
               <el-tag size="small" :type="project.priorityType">{{ project.priority }}</el-tag>
@@ -68,55 +68,55 @@
           </div>
         </el-card>
         
-        <!-- 空状态 -->
-        <div v-if="projects.length === 0" class="empty-state">
-          <el-empty description="暂无项目" />
-          <el-button type="primary" style="margin-top: 20px" @click="showAddProjectDialog = true">
-            <el-icon><Plus /></el-icon> 创建第一个项目
-          </el-button>
-        </div>
+        <!-- Empty State -->
+            <div v-if="projects.length === 0" class="empty-state">
+              <el-empty description="No projects" />
+              <el-button type="primary" style="margin-top: 20px" @click="showAddProjectDialog = true">
+                <el-icon><Plus /></el-icon> Create First Project
+              </el-button>
+            </div>
       </div>
     </div>
     
-    <!-- 项目详情模态框 -->
+    <!-- Project Details Modal -->
     <el-dialog
       v-model="showProjectDetails"
-      :title="selectedProject ? selectedProject.title : '项目详情'"
+      :title="selectedProject ? selectedProject.title : 'Project Details'"
       width="800px"
     >
       <div v-if="selectedProject" class="project-details">
         <div class="details-section">
-          <h3>项目信息</h3>
+          <h3>Project Information</h3>
           <div class="detail-row">
-            <span class="detail-label">描述：</span>
-            <span class="detail-value">{{ selectedProject.description || '无描述' }}</span>
+            <span class="detail-label">Description:</span>
+            <span class="detail-value">{{ selectedProject.description || 'No description' }}</span>
           </div>
           <div class="detail-row">
-            <span class="detail-label">类别：</span>
+            <span class="detail-label">Category:</span>
             <el-tag type="info">{{ selectedProject.category }}</el-tag>
           </div>
           <div class="detail-row">
-            <span class="detail-label">优先级：</span>
+            <span class="detail-label">Priority:</span>
             <el-tag :type="selectedProject.priorityType">{{ selectedProject.priority }}</el-tag>
           </div>
           <div class="detail-row">
-            <span class="detail-label">截止日期：</span>
+            <span class="detail-label">Due Date:</span>
             <span>{{ formatDate(selectedProject.dueDate) }}</span>
           </div>
           <div class="detail-row">
-            <span class="detail-label">创建日期：</span>
+            <span class="detail-label">Created Date:</span>
             <span>{{ formatDate(selectedProject.createdAt) }}</span>
           </div>
         </div>
         
         <div class="details-section">
-          <h3>任务列表</h3>
+          <h3>Task List</h3>
           <el-list :data="selectedProject.tasks" class="task-list">
             <template #header>
               <div class="list-header">
-                <span>任务 ({{ selectedProject.tasks.length }})</span>
+                <span>Tasks ({{ selectedProject.tasks.length }})</span>
                 <el-button size="small" type="primary" @click="showAddTaskDialog = true">
-                  <el-icon><Plus /></el-icon> 添加任务
+                  <el-icon><Plus /></el-icon> Add Task
                 </el-button>
               </div>
             </template>
@@ -141,71 +141,71 @@
       </div>
     </el-dialog>
     
-    <!-- 添加/编辑项目模态框 -->
+    <!-- Add/Edit Project Modal -->
     <el-dialog
       v-model="showAddProjectDialog"
-      :title="isEditMode ? '编辑项目' : '新建项目'"
+      :title="isEditMode ? 'Edit Project' : 'New Project'"
       width="600px"
     >
       <el-form :model="projectForm" :rules="projectRules" ref="projectFormRef">
-        <el-form-item label="项目名称" prop="title">
-          <el-input v-model="projectForm.title" placeholder="请输入项目名称" />
+        <el-form-item label="Project Name" prop="title">
+          <el-input v-model="projectForm.title" placeholder="Enter project name" />
         </el-form-item>
-        <el-form-item label="项目描述" prop="description">
-          <el-input v-model="projectForm.description" type="textarea" placeholder="请输入项目描述" :rows="3" />
+        <el-form-item label="Project Description" prop="description">
+          <el-input v-model="projectForm.description" type="textarea" placeholder="Enter project description" :rows="3" />
         </el-form-item>
-        <el-form-item label="类别" prop="category">
-          <el-select v-model="projectForm.category" placeholder="请选择项目类别">
-            <el-option label="工作" value="工作" />
-            <el-option label="学习" value="学习" />
-            <el-option label="生活" value="生活" />
-            <el-option label="健康" value="健康" />
+        <el-form-item label="Category" prop="category">
+          <el-select v-model="projectForm.category" placeholder="Select project category">
+            <el-option label="Work" value="Work" />
+            <el-option label="Learning" value="Learning" />
+            <el-option label="Life" value="Life" />
+            <el-option label="Health" value="Health" />
           </el-select>
         </el-form-item>
-        <el-form-item label="优先级" prop="priority">
-          <el-select v-model="projectForm.priority" placeholder="请选择优先级">
-            <el-option label="高" value="高" />
-            <el-option label="中" value="中" />
-            <el-option label="低" value="低" />
+        <el-form-item label="Priority" prop="priority">
+          <el-select v-model="projectForm.priority" placeholder="Select priority">
+            <el-option label="High" value="High" />
+            <el-option label="Medium" value="Medium" />
+            <el-option label="Low" value="Low" />
           </el-select>
         </el-form-item>
-        <el-form-item label="截止日期" prop="dueDate">
+        <el-form-item label="Due Date" prop="dueDate">
           <el-date-picker
             v-model="projectForm.dueDate"
             type="date"
-            placeholder="选择日期"
+            placeholder="Select date"
             style="width: 100%"
           />
         </el-form-item>
       </el-form>
       <template #footer>
-        <el-button @click="showAddProjectDialog = false">取消</el-button>
-        <el-button type="primary" @click="submitProjectForm">确定</el-button>
+        <el-button @click="showAddProjectDialog = false">Cancel</el-button>
+        <el-button type="primary" @click="submitProjectForm">Confirm</el-button>
       </template>
     </el-dialog>
     
-    <!-- 添加任务模态框 -->
+    <!-- Add Task Modal -->
     <el-dialog
       v-model="showAddTaskDialog"
-      title="添加任务"
+      title="Add Task"
       width="500px"
     >
       <el-form :model="taskForm" :rules="taskRules" ref="taskFormRef">
-        <el-form-item label="任务名称" prop="title">
-          <el-input v-model="taskForm.title" placeholder="请输入任务名称" />
+        <el-form-item label="Task Name" prop="title">
+          <el-input v-model="taskForm.title" placeholder="Enter task name" />
         </el-form-item>
-        <el-form-item label="截止日期" prop="dueDate">
+        <el-form-item label="Due Date" prop="dueDate">
           <el-date-picker
             v-model="taskForm.dueDate"
             type="date"
-            placeholder="选择日期"
+            placeholder="Select date"
             style="width: 100%"
           />
         </el-form-item>
       </el-form>
       <template #footer>
-        <el-button @click="showAddTaskDialog = false">取消</el-button>
-        <el-button type="primary" @click="submitTaskForm">确定</el-button>
+        <el-button @click="showAddTaskDialog = false">Cancel</el-button>
+        <el-button type="primary" @click="submitTaskForm">Confirm</el-button>
       </template>
     </el-dialog>
   </div>
@@ -227,39 +227,39 @@ export default {
       projects: [
         {
           id: 1,
-          title: '网站开发',
-          description: '创建公司官方网站，包含首页、产品展示、关于我们等页面',
-          category: '工作',
-          priority: '高',
+          title: 'Website Development',
+          description: 'Create company official website, including homepage, product display, about us, etc.',
+          category: 'Work',
+          priority: 'High',
           priorityType: 'danger',
           dueDate: '2023-11-30',
           createdAt: '2023-10-01',
           taskCount: 5,
           progress: 60,
           tasks: [
-            { id: 101, title: '设计网站原型', completed: true, dueDate: '2023-10-10' },
-            { id: 102, title: '前端页面开发', completed: true, dueDate: '2023-10-20' },
-            { id: 103, title: '后端接口实现', completed: true, dueDate: '2023-10-25' },
-            { id: 104, title: '数据库设计', completed: false, dueDate: '2023-11-05' },
-            { id: 105, title: '上线部署', completed: false, dueDate: '2023-11-30' }
+            { id: 101, title: 'Design Website Prototype', completed: true, dueDate: '2023-10-10' },
+            { id: 102, title: 'Frontend Page Development', completed: true, dueDate: '2023-10-20' },
+            { id: 103, title: 'Backend API Implementation', completed: true, dueDate: '2023-10-25' },
+            { id: 104, title: 'Database Design', completed: false, dueDate: '2023-11-05' },
+            { id: 105, title: 'Deployment', completed: false, dueDate: '2023-11-30' }
           ]
         },
         {
           id: 2,
-          title: '学习计划',
-          description: '学习Vue 3和TypeScript的基础知识和高级特性',
-          category: '学习',
-          priority: '中',
+          title: 'Learning Plan',
+          description: 'Learn Vue 3 and TypeScript fundamentals and advanced features',
+          category: 'Study',
+          priority: 'Medium',
           priorityType: 'warning',
           dueDate: '2023-12-31',
           createdAt: '2023-10-10',
           taskCount: 4,
           progress: 25,
           tasks: [
-            { id: 201, title: 'Vue 3基础语法', completed: true, dueDate: '2023-10-20' },
-            { id: 202, title: '组合式API', completed: false, dueDate: '2023-11-10' },
-            { id: 203, title: 'TypeScript基础', completed: false, dueDate: '2023-11-30' },
-            { id: 204, title: '实战项目开发', completed: false, dueDate: '2023-12-31' }
+            { id: 201, title: 'Vue 3 Basic Syntax', completed: true, dueDate: '2023-10-20' },
+            { id: 202, title: 'Composition API', completed: false, dueDate: '2023-11-10' },
+            { id: 203, title: 'TypeScript Basics', completed: false, dueDate: '2023-11-30' },
+            { id: 204, title: 'Practical Project Development', completed: false, dueDate: '2023-12-31' }
           ]
         }
       ],
@@ -281,28 +281,28 @@ export default {
       },
       projectRules: {
         title: [
-          { required: true, message: '请输入项目名称', trigger: 'blur' }
+          { required: true, message: 'Please enter project name', trigger: 'blur' }
         ],
         category: [
-          { required: true, message: '请选择项目类别', trigger: 'change' }
+          { required: true, message: 'Please select project category', trigger: 'change' }
         ],
         priority: [
-          { required: true, message: '请选择优先级', trigger: 'change' }
+          { required: true, message: 'Please select priority', trigger: 'change' }
         ],
         dueDate: [
-          { required: true, message: '请选择截止日期', trigger: 'change' }
+          { required: true, message: 'Please select due date', trigger: 'change' }
         ]
       },
       taskRules: {
         title: [
-          { required: true, message: '请输入任务名称', trigger: 'blur' }
+          { required: true, message: 'Please enter task name', trigger: 'blur' }
         ]
       }
     }
   },
   methods: {
     selectProject(project) {
-      // 创建项目的深拷贝，避免直接修改原数据
+      // Create a deep copy of the project to avoid directly modifying the original data
       this.selectedProject = JSON.parse(JSON.stringify(project))
       this.showProjectDetails = true
     },
@@ -319,18 +319,18 @@ export default {
       this.showAddProjectDialog = true
     },
     deleteProject(projectId) {
-      this.$confirm('确定要删除这个项目吗？', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
+      this.$confirm('Are you sure you want to delete this project?', 'Confirmation', {
+        confirmButtonText: 'Confirm',
+        cancelButtonText: 'Cancel',
         type: 'warning'
       }).then(() => {
         const index = this.projects.findIndex(p => p.id === projectId)
         if (index !== -1) {
           this.projects.splice(index, 1)
-          this.$message.success('项目删除成功')
+          this.$message.success('Project deleted successfully')
         }
       }).catch(() => {
-        // 取消删除
+        // Cancel deletion
       })
     },
     submitProjectForm() {
@@ -338,13 +338,13 @@ export default {
         if (valid) {
           // 设置优先级类型
           const priorityTypeMap = {
-            '高': 'danger',
-            '中': 'warning',
-            '低': 'success'
+            'High': 'danger',
+            'Medium': 'warning',
+            'Low': 'success'
           }
           
           if (this.isEditMode) {
-            // 编辑现有项目
+            // Edit existing project
             const index = this.projects.findIndex(p => p.id === this.projectForm.id)
             if (index !== -1) {
               this.projects[index] = {
@@ -356,10 +356,10 @@ export default {
                 priorityType: priorityTypeMap[this.projectForm.priority],
                 dueDate: this.projectForm.dueDate
               }
-              this.$message.success('项目更新成功')
+              this.$message.success('Project updated successfully')
             }
           } else {
-            // 创建新项目
+            // Create new project
             const newProject = {
               id: Date.now(),
               title: this.projectForm.title,
@@ -374,10 +374,10 @@ export default {
               tasks: []
             }
             this.projects.push(newProject)
-            this.$message.success('项目创建成功')
+            this.$message.success('Project created successfully')
           }
           
-          // 关闭对话框并重置表单
+          // Close dialog and reset form
           this.showAddProjectDialog = false
           this.resetProjectForm()
         }
@@ -406,7 +406,7 @@ export default {
             this.updateProjectProgress(this.selectedProject)
           }
           
-          this.$message.success('任务添加成功')
+          this.$message.success('Task added successfully')
           this.showAddTaskDialog = false
           this.resetTaskForm()
         }
@@ -459,9 +459,9 @@ export default {
       }
     },
     formatDate(dateString) {
-      if (!dateString) return '无'
+      if (!dateString) return 'None'
       const date = new Date(dateString)
-      return date.toLocaleDateString('zh-CN')
+      return date.toLocaleDateString('en-US')
     },
     getProgressColor(progress) {
       if (progress === 100) return '#67c23a'

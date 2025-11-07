@@ -1,42 +1,58 @@
 <template>
   <div class="auth-container">
     <h1 class="auth-title">Intelligent Information Assistant</h1>
-    <div class="auth-form">
+    <el-form :model="registerForm" :rules="rules" ref="registerFormRef" class="auth-form">
       <div class="form-group">
-        <label class="form-label">Email</label>
-        <el-input v-model="registerForm.email" placeholder="" class="form-input"></el-input>
+        <label class="form-label">Username</label>
+        <el-form-item prop="username" style="margin: 0;">
+          <el-input v-model="registerForm.username" placeholder="" class="form-input"></el-input>
+        </el-form-item>
       </div>
       <div class="form-group">
-          <label class="form-label">Verification Code</label>
+        <label class="form-label">Email</label>
+        <el-form-item prop="email" style="margin: 0;">
+          <el-input v-model="registerForm.email" placeholder="" class="form-input"></el-input>
+        </el-form-item>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Verification Code</label>
+        <el-form-item prop="verificationCode" style="margin: 0;">
           <div class="verification-code-container">
             <el-input v-model="registerForm.verificationCode" placeholder="" class="verification-code-input"></el-input>
             <el-button type="primary" @click="sendVerificationCode" :disabled="sending" class="send-code-button">
               {{ sending ? 'Sending...' : 'Send Code' }}
             </el-button>
           </div>
-        </div>
+        </el-form-item>
+      </div>
       <div class="form-group">
         <label class="form-label">Password</label>
-        <el-input v-model="registerForm.password" type="password" placeholder="" class="form-input"></el-input>
+        <el-form-item prop="password" style="margin: 0;">
+          <el-input v-model="registerForm.password" type="password" placeholder="" class="form-input"></el-input>
+        </el-form-item>
       </div>
       <div class="form-group">
         <label class="form-label">Confirm Password</label>
-        <el-input v-model="registerForm.confirmPassword" type="password" placeholder="" class="form-input"></el-input>
+        <el-form-item prop="confirmPassword" style="margin: 0;">
+          <el-input v-model="registerForm.confirmPassword" type="password" placeholder="" class="form-input"></el-input>
+        </el-form-item>
       </div>
-      <button class="submit-button" @click="handleRegister">Sign up</button>
+      <el-button type="primary" @click="handleRegister" class="submit-button">Sign up</el-button>
       <div class="bottom-text">
         Already have an account? <router-link to="/login">Sign in</router-link>
       </div>
-    </div>
+    </el-form>
   </div>
 </template>
 
 <script>
+import { authAPI } from '../api/auth';
 export default {
   name: 'Register',
   data() {
     return {
       registerForm: {
+        username: '',
         email: '',
         verificationCode: '',
         password: '',
@@ -44,6 +60,10 @@ export default {
       },
       sending: false,
       rules: {
+        username: [
+          { required: true, message: 'Please enter username', trigger: 'blur' },
+          { min: 3, max: 20, message: 'Username must be between 3 and 20 characters', trigger: 'blur' }
+        ],
         email: [
           { required: true, message: 'Please enter email', trigger: 'blur' },
           { type: 'email', message: 'Please enter a valid email address', trigger: 'blur' }
@@ -88,21 +108,48 @@ export default {
           
           this.sending = true
           
-          // Simulate sending verification code
-          setTimeout(() => {
+          // 使用authAPI发送验证码
+          authAPI.sendVerificationCode({
+            email: this.registerForm.email,
+            type: 'register'
+          })
+          .then(() => {
             this.$message.success('Verification code sent to ' + this.registerForm.email)
             this.sending = false
-          }, 2000)
+          })
+          .catch(error => {
+            console.error('Failed to send verification code:', error)
+            this.$message.error(error.response?.data?.message || 'Failed to send verification code')
+            this.sending = false
+          })
         },
         
         handleRegister() {
           this.$refs.registerFormRef.validate((valid) => {
             if (valid) {
-              // Registration logic can be added here
-              this.$message.success('Registration successful')
-              console.log('Registration info:', this.registerForm)
-              // Redirect to login page after successful registration
-              this.$router.push('/login')
+              // 使用authAPI进行注册
+              authAPI.register({
+                username: this.registerForm.username,
+                email: this.registerForm.email,
+                password: this.registerForm.password,
+                verificationCode: this.registerForm.verificationCode
+              })
+              .then(response => {
+                console.log('Registration successful:', response)
+                
+                // 设置登录状态和token
+                localStorage.setItem('isLoggedIn', 'true')
+                localStorage.setItem('usernameOrEmail', this.registerForm.username)
+                localStorage.setItem('token', response.token)
+                
+                // 显示成功消息并跳转到首页
+                this.$message.success('Registration successful and automatically logged in')
+                this.$router.push('/home')
+              })
+              .catch(error => {
+                console.error('Registration failed:', error)
+                this.$message.error(error.response?.data?.message || 'Registration failed')
+              })
             }
           })
         }
