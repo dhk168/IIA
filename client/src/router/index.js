@@ -8,19 +8,19 @@ const routes = [
   {
     path: '/login',
     name: 'Login',
-    component: () => import('../views/Login.vue'),
+    component: () => import('../views/auth/Login.vue'),
     meta: { requiresGuest: true }
   },
   {
     path: '/register',
     name: 'Register',
-    component: () => import('../views/Register.vue'),
+    component: () => import('../views/auth/Register.vue'),
     meta: { requiresGuest: true }
   },
   {
     path: '/forgot-password',
     name: 'ForgotPassword',
-    component: () => import('../views/ForgotPassword.vue'),
+    component: () => import('../views/auth/ForgotPassword.vue'),
     meta: { requiresGuest: true }
   },
   {
@@ -30,15 +30,11 @@ const routes = [
     meta: { requiresAuth: true },
       redirect: '/home/projects',
     children: [
-        {
-          path: 'blank',
-          name: 'Blank',
-          component: () => import('../views/Black.vue')
-        },
+        {          path: 'blank',          name: 'Blank',          component: () => import('../views/Blank.vue')        },
         {
           path: 'projects',
           name: 'Projects',
-          component: () => import('../views/Projects.vue')
+          component: () => import('../views/projects/Projects.vue')
         }
         // {
         //   path: 'tasks',

@@ -46,25 +46,4 @@ export default {
   position: relative;
   overflow: hidden;
 }
-
-/* 应用背景 */
-.app-background {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: -1;
-  overflow: hidden;
-  background: linear-gradient(
-    135deg, 
-    #1e1b4b 0%, 
-    #312e81 25%, 
-    #4338ca 50%, 
-    #3b82f6 75%, 
-    #60a5fa 100%
-  );
-  background-size: 400% 400%;
-  animation: oceanGradient 15s ease-in-out infinite;
-}
 </style>

@@ -19,7 +19,7 @@
         <el-form-item prop="verificationCode" style="margin: 0;">
           <div class="verification-code-container">
             <el-input v-model="registerForm.verificationCode" placeholder="" class="verification-code-input"></el-input>
-            <el-button type="primary" @click="sendVerificationCode" :disabled="sending" class="send-code-button">
+            <el-button @click="sendVerificationCode" :disabled="sending" class="send-code-button">
               {{ sending ? 'Sending...' : 'Send Code' }}
             </el-button>
           </div>
@@ -46,7 +46,7 @@
 </template>
 
 <script>
-import { authAPI } from '../api/auth';
+import { authAPI } from '../../api/auth';
 export default {
   name: 'Register',
   data() {
@@ -159,7 +159,7 @@ export default {
 
 <style>
 /* 导入共享的认证页面样式 */
-@import '../assets/styles/auth.css';
+@import '../../assets/styles/auth.css';
 
 /* 确保auth-container正确应用样式 */
 .auth-container {
