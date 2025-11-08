@@ -77,4 +77,15 @@ export default {
 <style>
 /* 导入共享的认证页面样式 */
 @import '../assets/styles/auth.css';
+
+/* 确保auth-container正确应用样式 */
+.auth-container {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
 </style>

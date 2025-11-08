@@ -1,9 +1,7 @@
 <template>
-  <div class="projects-container">
     <div class="page-header">
-      <h1>Project Plan</h1>
       <div class="header-actions">
-        <el-button type="primary" @click="showAddProjectDialog = true">
+        <el-button type="primary" @click="showAddProjectDialog = true" class="primary-button">
           <el-icon><Plus /></el-icon> New Project
         </el-button>
       </div>
@@ -29,7 +27,7 @@
                   <template #dropdown>
                     <el-dropdown-menu>
                       <el-dropdown-item @click.stop="editProject(project)">Edit</el-dropdown-item>
-                  <el-dropdown-item @click.stop="deleteProject(project.id)" danger>Delete</el-dropdown-item>
+                      <el-dropdown-item @click.stop="deleteProject(project.id)" danger>Delete</el-dropdown-item>
                     </el-dropdown-menu>
                   </template>
                 </el-dropdown>
@@ -39,28 +37,28 @@
           
           <div class="project-content">
             <div class="project-meta">
-                <div class="meta-item">
-                  <el-icon class="meta-icon"><Document /></el-icon>
-                  <span>{{ project.taskCount }} Tasks</span>
-                </div>
-                <div class="meta-item">
-                  <el-icon class="meta-icon"><Calendar /></el-icon>
-                  <span>{{ formatDate(project.dueDate) }}</span>
-                </div>
+              <div class="meta-item">
+                <el-icon class="meta-icon"><Document /></el-icon>
+                <span>{{ project.taskCount }} Tasks</span>
               </div>
-            
+              <div class="meta-item">
+                <el-icon class="meta-icon"><Calendar /></el-icon>
+                <span>{{ formatDate(project.dueDate) }}</span>
+              </div>
+            </div>
+          
             <div class="project-progress">
-                <div class="progress-info">
-                  <span class="progress-text">Progress</span>
-                  <span class="progress-percentage">{{ project.progress }}%</span>
-                </div>
-                <el-progress 
-                  :percentage="project.progress" 
-                  :color="getProgressColor(project.progress)"
-                  :show-text="false"
-                />
+              <div class="progress-info">
+                <span class="progress-text">Progress</span>
+                <span class="progress-percentage">{{ project.progress }}%</span>
               </div>
-            
+              <el-progress 
+                :percentage="project.progress" 
+                :color="getProgressColor(project.progress)"
+                :show-text="false"
+              />
+            </div>
+          
             <div class="project-tags">
               <el-tag size="small" :type="project.priorityType">{{ project.priority }}</el-tag>
               <el-tag size="small" type="info">{{ project.category }}</el-tag>
@@ -69,146 +67,117 @@
         </el-card>
         
         <!-- Empty State -->
-            <div v-if="projects.length === 0" class="empty-state">
-              <el-empty description="No projects" />
-              <el-button type="primary" style="margin-top: 20px" @click="showAddProjectDialog = true">
-                <el-icon><Plus /></el-icon> Create First Project
-              </el-button>
-            </div>
+        <div v-if="projects.length === 0" class="empty-state">
+          <el-empty description="No projects" />
+          <el-button type="primary" style="margin-top: 20px" @click="showAddProjectDialog = true">
+            <el-icon><Plus /></el-icon> Create First Project
+          </el-button>
+        </div>
       </div>
     </div>
-    
-    <!-- Project Details Modal -->
-    <el-dialog
-      v-model="showProjectDetails"
-      :title="selectedProject ? selectedProject.title : 'Project Details'"
-      width="800px"
-    >
-      <div v-if="selectedProject" class="project-details">
-        <div class="details-section">
-          <h3>Project Information</h3>
-          <div class="detail-row">
-            <span class="detail-label">Description:</span>
-            <span class="detail-value">{{ selectedProject.description || 'No description' }}</span>
-          </div>
-          <div class="detail-row">
-            <span class="detail-label">Category:</span>
-            <el-tag type="info">{{ selectedProject.category }}</el-tag>
-          </div>
-          <div class="detail-row">
-            <span class="detail-label">Priority:</span>
-            <el-tag :type="selectedProject.priorityType">{{ selectedProject.priority }}</el-tag>
-          </div>
-          <div class="detail-row">
-            <span class="detail-label">Due Date:</span>
-            <span>{{ formatDate(selectedProject.dueDate) }}</span>
-          </div>
-          <div class="detail-row">
-            <span class="detail-label">Created Date:</span>
-            <span>{{ formatDate(selectedProject.createdAt) }}</span>
-          </div>
+  
+  <!-- Project Details Modal -->
+  <el-dialog
+    v-model="showProjectDetails"
+    :title="selectedProject ? selectedProject.title : 'Project Details'"
+    width="800px"
+  >
+    <div v-if="selectedProject" class="project-details">
+      <div class="details-section">
+        <h3>Project Information</h3>
+        <div class="detail-row">
+          <span class="detail-label">Description:</span>
+          <span class="detail-value">{{ selectedProject.description || 'No description' }}</span>
         </div>
-        
-        <div class="details-section">
-          <h3>Task List</h3>
-          <el-list :data="selectedProject.tasks" class="task-list">
-            <template #header>
-              <div class="list-header">
-                <span>Tasks ({{ selectedProject.tasks.length }})</span>
-                <el-button size="small" type="primary" @click="showAddTaskDialog = true">
-                  <el-icon><Plus /></el-icon> Add Task
-                </el-button>
-              </div>
-            </template>
-            <el-list-item v-for="task in selectedProject.tasks" :key="task.id" class="task-item">
-              <template #default>
-                <div class="task-content">
-                  <el-checkbox v-model="task.completed" @change="updateTaskStatus(task)">
-                    <span :class="{ 'task-completed': task.completed }">{{ task.title }}</span>
-                  </el-checkbox>
-                </div>
-              </template>
-              <template #extra>
-                <div class="task-extra">
-                  <el-tag v-if="task.dueDate" size="small" :type="getTaskDueType(task)">
-                    {{ formatDate(task.dueDate) }}
-                  </el-tag>
-                </div>
-              </template>
-            </el-list-item>
-          </el-list>
+        <div class="detail-row">
+          <span class="detail-label">Category:</span>
+          <el-tag type="info">{{ selectedProject.category }}</el-tag>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Priority:</span>
+          <el-tag :type="selectedProject.priorityType">{{ selectedProject.priority }}</el-tag>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Due Date:</span>
+          <span>{{ formatDate(selectedProject.dueDate) }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Created Date:</span>
+          <span>{{ formatDate(selectedProject.createdAt) }}</span>
         </div>
       </div>
-    </el-dialog>
-    
-    <!-- Add/Edit Project Modal -->
-    <el-dialog
-      v-model="showAddProjectDialog"
-      :title="isEditMode ? 'Edit Project' : 'New Project'"
-      width="600px"
-    >
-      <el-form :model="projectForm" :rules="projectRules" ref="projectFormRef">
-        <el-form-item label="Project Name" prop="title">
-          <el-input v-model="projectForm.title" placeholder="Enter project name" />
-        </el-form-item>
-        <el-form-item label="Project Description" prop="description">
-          <el-input v-model="projectForm.description" type="textarea" placeholder="Enter project description" :rows="3" />
-        </el-form-item>
-        <el-form-item label="Category" prop="category">
-          <el-select v-model="projectForm.category" placeholder="Select project category">
-            <el-option label="Work" value="Work" />
-            <el-option label="Learning" value="Learning" />
-            <el-option label="Life" value="Life" />
-            <el-option label="Health" value="Health" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="Priority" prop="priority">
-          <el-select v-model="projectForm.priority" placeholder="Select priority">
-            <el-option label="High" value="High" />
-            <el-option label="Medium" value="Medium" />
-            <el-option label="Low" value="Low" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="Due Date" prop="dueDate">
-          <el-date-picker
-            v-model="projectForm.dueDate"
-            type="date"
-            placeholder="Select date"
-            style="width: 100%"
-          />
-        </el-form-item>
-      </el-form>
-      <template #footer>
-        <el-button @click="showAddProjectDialog = false">Cancel</el-button>
-        <el-button type="primary" @click="submitProjectForm">Confirm</el-button>
-      </template>
-    </el-dialog>
-    
-    <!-- Add Task Modal -->
-    <el-dialog
-      v-model="showAddTaskDialog"
-      title="Add Task"
-      width="500px"
-    >
-      <el-form :model="taskForm" :rules="taskRules" ref="taskFormRef">
-        <el-form-item label="Task Name" prop="title">
-          <el-input v-model="taskForm.title" placeholder="Enter task name" />
-        </el-form-item>
-        <el-form-item label="Due Date" prop="dueDate">
-          <el-date-picker
-            v-model="taskForm.dueDate"
-            type="date"
-            placeholder="Select date"
-            style="width: 100%"
-          />
-        </el-form-item>
-      </el-form>
-      <template #footer>
-        <el-button @click="showAddTaskDialog = false">Cancel</el-button>
-        <el-button type="primary" @click="submitTaskForm">Confirm</el-button>
-      </template>
-    </el-dialog>
-  </div>
+    </div>
+    <template #footer>
+      <el-button @click="showProjectDetails = false">Close</el-button>
+    </template>
+  </el-dialog>
+  
+  <!-- Add Project Modal -->
+  <el-dialog
+    v-model="showAddProjectDialog"
+    :title="isEditMode ? 'Edit Project' : 'Add Project'"
+    width="600px"
+  >
+    <el-form :model="projectForm" :rules="projectRules" ref="projectFormRef">
+      <el-form-item label="Project Name" prop="title">
+        <el-input v-model="projectForm.title" placeholder="Enter project name" />
+      </el-form-item>
+      <el-form-item label="Description" prop="description">
+        <el-input v-model="projectForm.description" type="textarea" rows="4" placeholder="Enter project description" />
+      </el-form-item>
+      <el-form-item label="Category" prop="category">
+        <el-select v-model="projectForm.category" placeholder="Select category">
+          <el-option label="Work" value="Work" />
+          <el-option label="Study" value="Study" />
+          <el-option label="Personal" value="Personal" />
+        </el-select>
+      </el-form-item>
+      <el-form-item label="Priority" prop="priority">
+        <el-select v-model="projectForm.priority" placeholder="Select priority">
+          <el-option label="High" value="High" />
+          <el-option label="Medium" value="Medium" />
+          <el-option label="Low" value="Low" />
+        </el-select>
+      </el-form-item>
+      <el-form-item label="Due Date" prop="dueDate">
+        <el-date-picker
+          v-model="projectForm.dueDate"
+          type="date"
+          placeholder="Select due date"
+          style="width: 100%"
+        />
+      </el-form-item>
+    </el-form>
+    <template #footer>
+      <el-button @click="showAddProjectDialog = false">Cancel</el-button>
+      <el-button type="primary" @click="submitProjectForm">Confirm</el-button>
+    </template>
+  </el-dialog>
+  
+  <!-- Add Task Modal -->
+  <el-dialog
+    v-model="showAddTaskDialog"
+    title="Add Task"
+    width="500px"
+  >
+    <el-form :model="taskForm" :rules="taskRules" ref="taskFormRef">
+      <el-form-item label="Task Name" prop="title">
+        <el-input v-model="taskForm.title" placeholder="Enter task name" />
+      </el-form-item>
+      <el-form-item label="Due Date" prop="dueDate">
+        <el-date-picker
+          v-model="taskForm.dueDate"
+          type="date"
+          placeholder="Select date"
+          style="width: 100%"
+        />
+      </el-form-item>
+    </el-form>
+    <template #footer>
+      <el-button @click="showAddTaskDialog = false">Cancel</el-button>
+      <el-button type="primary" @click="submitTaskForm">Confirm</el-button>
+    </template>
+  </el-dialog>
 </template>
 
 <script>
@@ -483,7 +452,18 @@ export default {
 
 <style scoped>
 .projects-container {
-  padding: 20px;
+  min-height: 100%;
+  background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%);
+  padding: 0;
+  margin: -30px;
+}
+
+.content-wrapper {
+  padding: 30px;
+  min-height: 100%;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 20px;
+  margin: 20px;
 }
 
 .page-header {
@@ -491,12 +471,36 @@ export default {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 }
 
-.page-header h1 {
+.header-left h1 {
+  margin: 0 0 5px 0;
+  color: #333;
+  font-size: 32px;
+  font-weight: 700;
+}
+
+.header-subtitle {
   margin: 0;
-  color: #303133;
-  font-size: 24px;
+  color: #666;
+  font-size: 16px;
+}
+
+.primary-button {
+  background: linear-gradient(135deg, #7e57c2 0%, #5e35b1 100%);
+  border: none;
+  padding: 12px 24px;
+  font-size: 16px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.primary-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(126, 87, 194, 0.3);
+  background: linear-gradient(135deg, #5e35b1 0%, #4527a0 100%);
 }
 
 .header-actions {
@@ -510,32 +514,39 @@ export default {
 
 .project-cards {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 24px;
 }
 
 .project-card {
-  border-radius: 8px;
+  border-radius: 16px;
   transition: all 0.3s ease;
   cursor: pointer;
+  border: none;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
 }
 
 .project-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+  transform: translateY(-8px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
 }
 
 .project-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding-bottom: 15px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .project-title {
   margin: 0;
-  font-size: 18px;
-  font-weight: 500;
-  color: #303133;
+  font-size: 20px;
+  font-weight: 600;
+  color: #333;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -549,50 +560,61 @@ export default {
 }
 
 .project-content {
-  padding: 10px 0;
+  padding: 20px 0 0 0;
 }
 
 .project-meta {
   display: flex;
-  gap: 20px;
-  margin-bottom: 15px;
+  gap: 25px;
+  margin-bottom: 20px;
 }
 
 .meta-item {
   display: flex;
   align-items: center;
   font-size: 14px;
-  color: #606266;
+  color: #666;
 }
 
 .meta-icon {
-  margin-right: 5px;
+  margin-right: 8px;
+  color: #7e57c2;
 }
 
 .project-progress {
-  margin-bottom: 15px;
+  margin-bottom: 20px;
 }
 
 .progress-info {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 5px;
+  margin-bottom: 8px;
   font-size: 14px;
 }
 
 .progress-text {
-  color: #606266;
+  color: #666;
+  font-weight: 500;
 }
 
 .progress-percentage {
-  font-weight: 500;
-  color: #303133;
+  font-weight: 600;
+  color: #333;
+  font-size: 16px;
 }
 
 .project-tags {
   display: flex;
-  gap: 10px;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.project-tags .el-tag {
+  border-radius: 20px;
+  padding: 6px 16px;
+  font-size: 13px;
+  font-weight: 500;
 }
 
 .empty-state {
@@ -600,10 +622,24 @@ export default {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 60px 20px;
-  background-color: #fafafa;
+  padding: 80px 30px;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 16px;
+  border: 1px dashed rgba(126, 87, 194, 0.3);
+  margin-top: 40px;
+}
+
+.empty-state .el-button {
+  margin-top: 25px;
+  background: linear-gradient(135deg, #7e57c2 0%, #5e35b1 100%);
+  border: none;
+  padding: 12px 24px;
+  font-size: 16px;
   border-radius: 8px;
-  border: 1px dashed #dcdfe6;
+}
+
+.empty-state .el-button:hover {
+  background: linear-gradient(135deg, #5e35b1 0%, #4527a0 100%);
 }
 
 .project-details {
@@ -682,14 +718,37 @@ export default {
 
 /* 响应式设计 */
 @media (max-width: 768px) {
+  .projects-container {
+    margin: -20px;
+  }
+  
+  .content-wrapper {
+    padding: 20px;
+    margin: 10px;
+    border-radius: 12px;
+  }
+  
   .page-header {
     flex-direction: column;
     align-items: flex-start;
-    gap: 15px;
+    gap: 20px;
+  }
+  
+  .header-left h1 {
+    font-size: 28px;
   }
   
   .project-cards {
     grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  
+  .project-card {
+    border-radius: 12px;
+  }
+  
+  .primary-button {
+    width: 100%;
   }
 }
 </style>

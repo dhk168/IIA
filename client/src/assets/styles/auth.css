@@ -1,78 +1,6 @@
 /* 认证页面共享样式 */
-/* 海洋波浪动态渐变背景 */
-@keyframes oceanGradient {
-  0% {
-    background-position: 0% 50%;
-  }
-  25% {
-    background-position: 50% 60%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  75% {
-    background-position: 50% 40%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
-}
-
-/* 波浪纹理动画 - 主要波浪层 */
-@keyframes waveTexture {
-  0% {
-    opacity: 0.3;
-    transform: translateX(-50%) translateY(-50%) rotate(0deg) scale(1);
-  }
-  25% {
-    opacity: 0.4;
-    transform: translateX(-45%) translateY(-50%) rotate(5deg) scale(1.05);
-  }
-  50% {
-    opacity: 0.3;
-    transform: translateX(-50%) translateY(-50%) rotate(0deg) scale(1);
-  }
-  75% {
-    opacity: 0.4;
-    transform: translateX(-55%) translateY(-50%) rotate(-5deg) scale(1.05);
-  }
-  100% {
-    opacity: 0.3;
-    transform: translateX(-50%) translateY(-50%) rotate(0deg) scale(1);
-  }
-}
-
-/* 波浪呼吸效果 - 次要波浪层 */
-@keyframes waveBreathe {
-  0% {
-    opacity: 0.2;
-    transform: translateX(-50%) translateY(-50%) rotate(0deg) scale(0.8);
-  }
-  50% {
-    opacity: 0.3;
-    transform: translateX(-50%) translateY(-50%) rotate(0deg) scale(1);
-  }
-  100% {
-    opacity: 0.2;
-    transform: translateX(-50%) translateY(-50%) rotate(0deg) scale(0.8);
-  }
-}
-
-/* 波浪起伏动画 */
-@keyframes waveRiseFall {
-  0% {
-    top: 50%;
-    opacity: 0.25;
-  }
-  50% {
-    top: 40%;
-    opacity: 0.35;
-  }
-  100% {
-    top: 50%;
-    opacity: 0.25;
-  }
-}
+/* 导入可复用的背景样式 */
+@import './background.css';
 
 .auth-container {
   display: flex;
@@ -80,6 +8,14 @@
   justify-content: center;
   align-items: center;
   min-height: 100vh;
+  padding: 20px;
+  color: #ffffff;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
   background: linear-gradient(
     135deg, 
     #1e1b4b 0%, 
@@ -90,60 +26,6 @@
   );
   background-size: 400% 400%;
   animation: oceanGradient 15s ease-in-out infinite;
-  padding: 20px;
-  color: #ffffff;
-  position: relative;
-  overflow: hidden;
-}
-
-/* 添加第一层波浪纹理 - 柔和光斑效果 */
-.auth-container::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: radial-gradient(circle at 30% 20%, 
-    rgba(255, 255, 255, 0.1) 0%, 
-    rgba(255, 255, 255, 0) 60%),
-    radial-gradient(circle at 70% 80%, 
-    rgba(255, 255, 255, 0.12) 0%, 
-    rgba(255, 255, 255, 0) 70%);
-  z-index: 0;
-}
-
-/* 添加第二层波浪纹理 - 主要波浪效果 */
-.auth-container::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 300%;
-  height: 300%;
-  background: 
-    radial-gradient(circle at 30% 40%, rgba(79, 70, 229, 0.2) 0%, transparent 40%),
-    radial-gradient(circle at 70% 60%, rgba(59, 130, 246, 0.15) 0%, transparent 50%),
-    radial-gradient(circle at 45% 80%, rgba(96, 165, 250, 0.1) 0%, transparent 30%);
-  opacity: 0.3;
-  transform: translateX(-50%) translateY(-50%);
-  animation: waveTexture 18s ease-in-out infinite;
-  z-index: 0;
-}
-
-/* 添加第三层波浪纹理 - 呼吸效果 */
-.auth-container > div:first-child {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: 
-    radial-gradient(circle at 20% 30%, rgba(67, 56, 202, 0.15) 0%, transparent 35%),
-    radial-gradient(circle at 80% 70%, rgba(59, 130, 246, 0.1) 0%, transparent 45%);
-  opacity: 0.2;
-  z-index: 0;
-  animation: waveBreathe 10s ease-in-out infinite;
 }
 
 .auth-form {

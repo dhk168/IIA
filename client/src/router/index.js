@@ -31,20 +31,25 @@ const routes = [
       redirect: '/home/projects',
     children: [
         {
+          path: 'blank',
+          name: 'Blank',
+          component: () => import('../views/Black.vue')
+        },
+        {
           path: 'projects',
           name: 'Projects',
           component: () => import('../views/Projects.vue')
-        },
-        {
-          path: 'tasks',
-          name: 'Tasks',
-          component: () => import('../views/Tasks.vue')
-        },
-        {
-          path: 'analytics',
-          name: 'Analytics',
-          component: () => import('../views/Analytics.vue')
         }
+        // {
+        //   path: 'tasks',
+        //   name: 'Tasks',
+        //   component: () => import('../views/Tasks.vue')
+        // },
+        // {
+        //   path: 'analytics',
+        //   name: 'Analytics',
+        //   component: () => import('../views/Analytics.vue')
+        // }
       ]
   }
 ]
