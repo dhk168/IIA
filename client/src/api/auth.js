@@ -31,11 +31,10 @@ export const authAPI = {
    * 发送验证码
    * @param {Object} data - 发送验证码数据
    * @param {string} data.email - 邮箱地址
-   * @param {string} data.type - 验证码类型(register/reset)
    * @returns {Promise} 发送结果
    */
   sendVerificationCode: (data) => {
-    return api.post('/auth/send-code', data);
+    return api.post('/auth/send-code', { email: data.email });
   },
 
   /**
@@ -63,7 +62,7 @@ export const authAPI = {
    * @returns {Promise} 用户信息
    */
   getCurrentUser: () => {
-    return api.get('/auth/me');
+    return api.get('/auth/profile');
   },
 
   /**

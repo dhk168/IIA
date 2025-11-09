@@ -41,6 +41,7 @@
 
 <script>
 import { authAPI } from '../../api/auth';
+import '../../assets/styles/glass-toast.css';
 export default {
   name: 'ForgotPassword',
   data() {
@@ -82,14 +83,14 @@ export default {
   methods: {
     sendVerificationCode() {
       if (!this.forgotForm.email) {
-        this.$message.warning('Please enter email first')
+        this.createGlassToast('warning', 'Please enter email first');
         return
       }
       
       // Validate email format
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
       if (!emailRegex.test(this.forgotForm.email)) {
-        this.$message.warning('Please enter a valid email address')
+        this.createGlassToast('warning', 'Please enter a valid email address');
         return
       }
       
@@ -103,11 +104,11 @@ export default {
       })
       .then(() => {
         this.sending = false
-        this.$message.success('Verification code sent successfully')
+        this.createGlassToast('success', 'Verification code sent successfully');
       })
       .catch(error => {
         console.error('Failed to send verification code:', error)
-        this.$message.error(error.response?.data?.message || 'Failed to send verification code')
+        this.createGlassToast('error', error.response?.data?.message || 'Failed to send verification code');
         this.sending = false
       })
     },
@@ -115,38 +116,86 @@ export default {
     handleResetPassword() {
       this.$refs.forgotFormRef.validate((valid) => {
         if (valid) {
-          // 使用authAPI进行密码重置
-          authAPI.resetPassword({
+          // 准备密码重置数据
+          const resetData = {
             email: this.forgotForm.email,
             verificationCode: this.forgotForm.verificationCode,
             newPassword: this.forgotForm.newPassword
-          })
+          };
+          
+          // 使用authAPI进行密码重置
+          authAPI.resetPassword(resetData)
           .then(response => {
-            this.$message.success('Password reset successful')
-            console.log('Password reset info:', this.forgotForm.email)
+            this.createGlassToast('success', 'Password reset successful');
+            console.log('Password reset info:', this.forgotForm.email);
             
-            // 自动登录逻辑
-            if (response.data && response.data.token) {
+            // 自动登录逻辑 - 从不同的响应结构中尝试获取token
+            const token = response.data?.token || response.token;
+            
+            if (token) {
               // 存储token
-              localStorage.setItem('token', response.data.token)
+              localStorage.setItem('token', token);
               // 设置登录状态
-              localStorage.setItem('isLoggedIn', 'true')
+              localStorage.setItem('isLoggedIn', 'true');
               // 设置用户名/邮箱（使用邮箱）
-              localStorage.setItem('usernameOrEmail', this.forgotForm.email)
+              localStorage.setItem('usernameOrEmail', this.forgotForm.email);
               
-              // 重置成功后自动跳转到首页
-              this.$router.push('/')
+              // 重置成功后延迟跳转到首页，确保用户能看到成功提示
+              setTimeout(() => {
+                this.$router.push('/');
+              }, 1500);
             } else {
-              // 如果没有返回token，仍然跳转到登录页
-              this.$router.push('/login')
+              // 如果没有返回token，延迟跳转到登录页
+              setTimeout(() => {
+                this.$router.push('/login');
+              }, 1500);
             }
           })
           .catch(error => {
-            console.error('Password reset failed:', error)
-            this.$message.error(error.response?.data?.message || 'Password reset failed')
+            console.error('Password reset failed:', error);
+            // 尝试从不同结构中获取错误信息
+            let errorMsg = 'Password reset failed';
+            if (error.response) {
+              errorMsg = error.response.data?.message || error.response.data || errorMsg;
+            } else if (error.message) {
+              errorMsg = error.message;
+            }
+            this.createGlassToast('error', errorMsg);
           })
         }
       })
+    },
+    
+    // 毛玻璃效果提示函数
+    createGlassToast(type, message) {
+      // 创建提示元素
+      const toast = document.createElement('div');
+      toast.className = `glass-toast glass-toast-${type}`;
+      toast.textContent = message;
+      
+      // 添加到body
+      document.body.appendChild(toast);
+      
+      // 自动移除
+      setTimeout(() => {
+        // 添加淡出动画
+        toast.style.opacity = '0';
+        setTimeout(() => {
+          if (document.body.contains(toast)) {
+            document.body.removeChild(toast);
+          }
+        }, 300);
+      }, 3000);
+      
+      // 点击移除
+      toast.addEventListener('click', () => {
+        toast.style.opacity = '0';
+        setTimeout(() => {
+          if (document.body.contains(toast)) {
+            document.body.removeChild(toast);
+          }
+        }, 300);
+      });
     }
   }
 }

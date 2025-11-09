@@ -50,25 +50,83 @@ export default {
     handleLogin() {
       this.$refs.loginFormRef.validate((valid) => {
         if (valid) {
+          // 准备登录数据
+          const loginData = {
+            email: this.loginForm.email,
+            password: this.loginForm.password
+          }
+          
           // 使用authAPI进行登录
-          authAPI.login(this.loginForm)
+          authAPI.login(loginData)
             .then(response => {
               console.log('Login successful:', response)
               
-              // 设置登录状态和token
-              localStorage.setItem('isLoggedIn', 'true')
-              localStorage.setItem('usernameOrEmail', this.loginForm.email)
-              localStorage.setItem('token', response.token)
+              // 根据后端响应结构获取数据
+              const responseData = response.data || response;
+              const result = responseData.result || responseData.data || responseData;
               
-              this.$message.success('Login successful')
-              this.$router.push('/home')
+              // 检查token是否存在
+              const token = result.token;
+              
+              if (token) {
+                // 设置登录状态和token
+                localStorage.setItem('isLoggedIn', 'true')
+                localStorage.setItem('usernameOrEmail', this.loginForm.email)
+                localStorage.setItem('token', token)
+                
+                // 使用毛玻璃效果显示成功提示
+                this.createGlassToast('success', 'Login successful, redirecting to home page...');
+                
+                // 延迟跳转，让用户看到成功提示
+                setTimeout(() => {
+                  this.$router.push('/home')
+                }, 1000);
+              } else {
+                this.createGlassToast('error', 'Login failed, token not returned');
+              }
             })
             .catch(error => {
               console.error('Login failed:', error)
-              this.$message.error(error.response?.data?.message || 'Login failed')
+              // 错误处理，尝试从不同结构中获取错误信息
+              let errorMsg = 'Login failed, please try again later';
+              if (error.response) {
+                errorMsg = error.response.data?.message || 
+                           error.response.data?.error || 
+                           error.response.data?.msg || 
+                           errorMsg;
+              } else if (error.message) {
+                errorMsg = error.message;
+              }
+              this.createGlassToast('error', errorMsg);
             })
         }
       })
+    },
+    
+    // 毛玻璃提示方法
+    createGlassToast(type, message) {
+      const toast = document.createElement('div');
+      toast.className = `glass-toast glass-toast-${type}`;
+      toast.textContent = message;
+      document.body.appendChild(toast);
+      
+      // 自动移除
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(100%)';
+      }, 4000);
+      
+      setTimeout(() => {
+        if (document.body.contains(toast)) {
+          document.body.removeChild(toast);
+        }
+      }, 4500);
+      
+      toast.addEventListener('click', () => {
+        if (document.body.contains(toast)) {
+          document.body.removeChild(toast);
+        }
+      });
     }
   }
 }
