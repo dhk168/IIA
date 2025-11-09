@@ -134,5 +134,5 @@ export default {
 
 <style>
 /* 导入共享的认证页面样式 */
-@import '../../assets/styles/auth.css';
+@import '../../assets/styles/page/auth.css';
 </style>

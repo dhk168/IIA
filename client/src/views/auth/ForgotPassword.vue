@@ -203,6 +203,6 @@ export default {
 
 <style>
 /* 导入共享的认证页面样式 */
-@import '../../assets/styles/auth.css';
+@import '../../assets/styles/page/auth.css';
 /* light-button.css已通过auth.css导入，此处不再重复导入 */
 </style>

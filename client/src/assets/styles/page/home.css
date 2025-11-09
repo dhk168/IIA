@@ -1,0 +1,311 @@
+/* 主容器样式 */
+.main-container {
+  height: 100vh;
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+}
+
+/* 呼吸效果背景容器 */
+.home-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: -1;
+  overflow: hidden;
+  background: linear-gradient(
+    135deg, 
+    #1e1b4b 0%, 
+    #312e81 25%, 
+    #4338ca 50%, 
+    #3b82f6 75%, 
+    #60a5fa 100%
+  );
+  background-size: 400% 400%;
+  animation: oceanGradient 15s ease-in-out infinite;
+}
+
+.layout-wrapper {
+  display: flex;
+  height: 100vh;
+  width: 100%;
+}
+
+.right-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+  z-index: 1;
+}
+
+/* 侧边栏样式 */
+.sidebar {
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(12px);
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.15);
+  position: relative;
+  transition: all 0.3s ease;
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  margin: 16px 0 16px 16px;
+  height: calc(100vh - 32px);
+}
+
+.el-menu-vertical {
+  border-right: none;
+  background-color: transparent;
+}
+
+.el-menu-vertical .el-menu-item {
+  width: 56px;
+  height: 56px;
+  line-height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(8px);
+  transition: all 0.3s ease;
+  border-radius: 50%;
+  margin: 12px auto;
+  color: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.el-menu-vertical .el-menu-item:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  backdrop-filter: blur(12px);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.el-menu-vertical .el-menu-item.is-active {
+  background: rgba(91, 33, 182, 0.25);
+  color: #ffffff;
+  backdrop-filter: blur(12px);
+  border-radius: 50%;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.menu-icon {
+  font-size: 24px;
+}
+
+/* 顶部导航样式 */
+.header {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  padding: 0 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 88px;
+  border-radius: 16px;
+  margin: 16px 16px 8px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  position: relative;
+  z-index: 100;
+}
+
+.header-left .page-title {
+  margin: 0;
+  color: #ffffff;
+  font-size: 28px;
+  font-weight: 700;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  position: relative;
+  z-index: 200;
+}
+
+.welcome-text {
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 500;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  white-space: nowrap;
+}
+
+.user-avatar {
+  cursor: pointer;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(8px);
+}
+
+.user-avatar:hover {
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+}
+
+/* 主内容区域 */
+.main-content {
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(12px);
+  padding: 32px;
+  overflow-y: auto;
+  flex: 1;
+  border-radius: 16px;
+  margin: 8px 16px 16px 16px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+/* 自定义滚动条 */
+.main-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.main-content::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+}
+
+.main-content::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+  transition: background 0.3s ease;
+}
+
+.main-content::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+/* 自定义下拉菜单样式 */
+.custom-dropdown {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+  /* 确保父容器不会限制下拉菜单的层级 */
+  z-index: 300;
+}
+
+.custom-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 12px);
+  right: -20px;
+  min-width: 180px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  /* 增加z-index确保显示在最顶层 - 使用更高的值避免被任何元素覆盖 */
+  z-index: 2147483647; /* 最大安全z-index值 */
+  /* 为箭头留出空间 */
+  padding-top: 8px;
+}
+
+/* 毛玻璃背景 - 进一步增加不透明度使其更加清晰可见 */
+.custom-dropdown-menu::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  z-index: -1;
+}
+
+/* 添加箭头指示器 - 与菜单背景不透明度保持一致 */
+.custom-dropdown-menu::after {
+  content: '';
+  position: absolute;
+  top: -8px;
+  right: 40px;
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-bottom: 8px solid rgba(255, 255, 255, 0.7);
+  /* 箭头边框 */
+  filter: drop-shadow(0 -1px 0 rgba(255, 255, 255, 0.2));
+}
+
+.custom-dropdown-item {
+  padding: 12px 20px;
+  color: #333333; /* 将文字颜色改为黑色，提高在浅色背景上的可读性 */
+  font-weight: bold; /* 文字加粗 */
+  text-align: center; /* 文字居中 */
+  transition: all 0.3s ease;
+  position: relative;
+  z-index: 1;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05); /* 边框也改为深色，与深色文字协调 */
+}
+
+.custom-dropdown-item:last-child {
+  border-bottom: none;
+}
+
+.custom-dropdown-item:hover {
+  background: rgba(0, 0, 0, 0.08); /* 悬停背景改为深色半透明，与黑色文字协调 */
+  transform: translateX(4px);
+}
+
+/* 下拉菜单动画 */
+.dropdown-enter-active,
+.dropdown-leave-active {
+  transition: all 0.3s ease;
+}
+
+.dropdown-enter-from {
+  opacity: 0;
+  transform: translateY(-10px) scale(0.95);
+}
+
+.dropdown-leave-to {
+  opacity: 0;
+  transform: translateY(-10px) scale(0.95);
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 60px;
+    margin: 12px 0 12px 12px;
+    height: calc(100vh - 24px);
+  }
+  
+  .el-menu-vertical .el-menu-item {
+    width: 48px;
+    height: 48px;
+    line-height: 48px;
+    margin: 8px auto;
+  }
+  
+  .menu-icon {
+    font-size: 20px;
+  }
+  
+  .header {
+    padding: 0 16px;
+    height: 72px;
+    margin: 12px 12px 6px 12px;
+  }
+  
+  .header-left .page-title {
+    font-size: 24px;
+  }
+  
+  .main-content {
+    padding: 16px;
+    height: calc(100vh - 90px);
+    margin: 6px 12px 12px 12px;
+  }
+}

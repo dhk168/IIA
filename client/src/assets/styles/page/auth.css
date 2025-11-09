@@ -1,8 +1,8 @@
 /* 认证页面共享样式 */
 /* 导入可复用的背景样式 */
-@import './background.css';
+@import '../components/background.css';
 /* 导入轻量级毛玻璃按钮样式 */
-@import './light-button.css';
+@import '../components/light-button.css';
 
 .auth-container {
   display: flex;

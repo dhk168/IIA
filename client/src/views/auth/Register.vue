@@ -270,7 +270,7 @@ export default {
 </script>
 
 <style>
-@import '../../assets/styles/auth.css';
+@import '../../assets/styles/page/auth.css';
 
 
 </style>
