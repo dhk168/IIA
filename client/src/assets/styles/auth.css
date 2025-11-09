@@ -1,6 +1,8 @@
 /* 认证页面共享样式 */
 /* 导入可复用的背景样式 */
 @import './background.css';
+/* 导入轻量级毛玻璃按钮样式 */
+@import './light-button.css';
 
 .auth-container {
   display: flex;
@@ -135,27 +137,7 @@
   transform: translateY(-1px);
 }
 
-/* 确保Element Plus按钮应用相同的样式 */
-.el-button.send-code-button {
-  background-color: rgba(255, 255, 255, 0.15) !important;
-  border-color: rgba(255, 255, 255, 0.25) !important;
-  color: rgba(255, 255, 255, 0.9) !important;
-  backdrop-filter: blur(10px) !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
-}
-
-.el-button.send-code-button:hover:not(:disabled) {
-  background-color: rgba(255, 255, 255, 0.25) !important;
-  border-color: rgba(255, 255, 255, 0.4) !important;
-  color: #ffffff !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
-  transform: translateY(-1px) !important;
-}
-
-.send-code-button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
+/* send-code-button 样式已被light-button样式替代，此处已删除旧样式 */
 
 .submit-button {
   width: 100%;

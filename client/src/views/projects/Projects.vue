@@ -2,7 +2,7 @@
   <div class="projects-page">
     <div class="page-header">
       <el-button type="primary" @click="showAddProjectModal" class="light-button">
-        <el-icon><Plus /></el-icon> New Project
+        New Project
       </el-button>
     </div>
     
@@ -19,7 +19,7 @@
       <div v-if="projects.length === 0" class="empty-state">
         <el-empty description="No projects" />
         <el-button type="primary" style="margin-top: 20px" class="light-button" @click="showAddProjectModal">
-          <el-icon><Plus /></el-icon> Create First Project
+          Create First Project
         </el-button>
       </div>
     </div>
@@ -45,7 +45,7 @@
 </template>
 
 <script>
-import { Plus } from '@element-plus/icons-vue'
+
 import ProjectCard from './components/ProjectCard.vue'
 import ProjectDetailsModal from './components/ProjectDetailsModal.vue'
 import ProjectFormModal from './components/ProjectFormModal.vue'
@@ -53,7 +53,6 @@ import ProjectFormModal from './components/ProjectFormModal.vue'
 export default {
   name: 'Projects',
   components: {
-    Plus,
     ProjectCard,
     ProjectDetailsModal,
     ProjectFormModal

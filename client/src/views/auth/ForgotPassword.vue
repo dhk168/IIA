@@ -13,7 +13,7 @@
         <el-form-item prop="verificationCode" style="margin: 0;">
           <div class="verification-code-container">
             <el-input v-model="forgotForm.verificationCode" placeholder="" class="verification-code-input"></el-input>
-            <el-button @click="sendVerificationCode" :disabled="sending" class="send-code-button">
+            <el-button @click="sendVerificationCode" :disabled="sending" class="light-button">
               {{ sending ? 'Sending...' : 'Send Code' }}
             </el-button>
           </div>
@@ -155,15 +155,5 @@ export default {
 <style>
 /* 导入共享的认证页面样式 */
 @import '../../assets/styles/auth.css';
-
-/* 确保auth-container正确应用样式 */
-.auth-container {
-  position: relative;
-  width: 100%;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-}
+/* light-button.css已通过auth.css导入，此处不再重复导入 */
 </style>

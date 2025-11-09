@@ -19,8 +19,8 @@
         <el-form-item prop="verificationCode" style="margin: 0;">
           <div class="verification-code-container">
             <el-input v-model="registerForm.verificationCode" placeholder="" class="verification-code-input"></el-input>
-            <el-button @click="sendVerificationCode" :disabled="sending" class="send-code-button">
-              {{ sending ? 'Sending...' : 'Send Code' }}
+            <el-button @click="sendVerificationCode" :disabled="sending" class="light-button">
+              {{ countDownSeconds > 0 ? `${countDownSeconds}秒后重发` : '发送验证码' }}
             </el-button>
           </div>
         </el-form-item>
@@ -59,6 +59,7 @@ export default {
         confirmPassword: ''
       },
       sending: false,
+      countDownSeconds: 0,
       rules: {
         username: [
           { required: true, message: 'Please enter username', trigger: 'blur' },
@@ -94,61 +95,83 @@ export default {
   },
   methods: {
         sendVerificationCode() {
-          if (!this.registerForm.email) {
-            this.$message.error('Please enter your email first')
-            return
-          }
-          
-          // Validate email format
-          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-          if (!emailRegex.test(this.registerForm.email)) {
-            this.$message.error('Please enter a valid email address')
-            return
-          }
-          
+          // 使用表单验证来验证邮箱
+          this.$refs.registerFormRef.validateField('email', (error) => {
+            if (error) {
+              return
+            }
+            
+            this.sending = true
+            
+            // 使用authAPI发送验证码
+            authAPI.sendVerificationCode({
+              email: this.registerForm.email,
+              type: 'register'
+            })
+            .then(() => {
+              this.$message.success('验证码已发送至 ' + this.registerForm.email)
+              // 添加倒计时功能
+              this.countDown()
+            })
+            .catch(error => {
+              console.error('发送验证码失败:', error)
+              this.$message.error(error.response?.data?.message || '发送验证码失败')
+              this.sending = false
+            })
+          })
+        },
+        
+        // 验证码倒计时功能
+        countDown() {
+          this.countDownSeconds = 60
           this.sending = true
           
-          // 使用authAPI发送验证码
-          authAPI.sendVerificationCode({
-            email: this.registerForm.email,
-            type: 'register'
-          })
-          .then(() => {
-            this.$message.success('Verification code sent to ' + this.registerForm.email)
-            this.sending = false
-          })
-          .catch(error => {
-            console.error('Failed to send verification code:', error)
-            this.$message.error(error.response?.data?.message || 'Failed to send verification code')
-            this.sending = false
-          })
+          const timer = setInterval(() => {
+            this.countDownSeconds--
+            if (this.countDownSeconds <= 0) {
+              clearInterval(timer)
+              this.sending = false
+            }
+          }, 1000)
         },
         
         handleRegister() {
           this.$refs.registerFormRef.validate((valid) => {
             if (valid) {
-              // 使用authAPI进行注册
-              authAPI.register({
+              // 准备注册数据
+              const registerData = {
                 username: this.registerForm.username,
                 email: this.registerForm.email,
                 password: this.registerForm.password,
                 verificationCode: this.registerForm.verificationCode
-              })
+              }
+              
+              // 使用authAPI进行注册
+              authAPI.register(registerData)
               .then(response => {
-                console.log('Registration successful:', response)
+                console.log('注册成功:', response)
                 
-                // 设置登录状态和token
-                localStorage.setItem('isLoggedIn', 'true')
-                localStorage.setItem('usernameOrEmail', this.registerForm.username)
-                localStorage.setItem('token', response.token)
+                // 检查token是否在response.data中（根据axios拦截器配置）
+                const token = response.token || (response.data && response.data.token)
                 
-                // 显示成功消息并跳转到首页
-                this.$message.success('Registration successful and automatically logged in')
-                this.$router.push('/home')
+                if (token) {
+                  // 设置登录状态和token
+                  localStorage.setItem('isLoggedIn', 'true')
+                  localStorage.setItem('usernameOrEmail', this.registerForm.username)
+                  localStorage.setItem('token', token)
+                  
+                  // 显示成功消息并跳转到首页
+                  this.$message.success('注册成功并自动登录')
+                  this.$router.push('/home')
+                } else {
+                  // 即使没有token，注册成功后也跳转到登录页
+                  this.$message.success('注册成功，请登录')
+                  this.$router.push('/login')
+                }
               })
               .catch(error => {
-                console.error('Registration failed:', error)
-                this.$message.error(error.response?.data?.message || 'Registration failed')
+                console.error('注册失败:', error)
+                this.$message.error(error.response?.data?.message || '注册失败')
               })
             }
           })
@@ -158,17 +181,5 @@ export default {
 </script>
 
 <style>
-/* 导入共享的认证页面样式 */
 @import '../../assets/styles/auth.css';
-
-/* 确保auth-container正确应用样式 */
-.auth-container {
-  position: relative;
-  width: 100%;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-}
 </style>
