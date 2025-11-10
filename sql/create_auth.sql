@@ -1,4 +1,5 @@
 -- 用户认证部分
+use iia;
 
 -- 删除旧的表
 drop table if exists iia_mail;

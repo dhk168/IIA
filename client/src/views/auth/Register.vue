@@ -49,7 +49,6 @@
 
 <script>
 import { authAPI } from '../../api/auth';
-import '../../assets/styles/glass-toast.css';
 export default {
   name: 'Register',
   data() {
@@ -271,6 +270,4 @@ export default {
 
 <style>
 @import '../../assets/styles/page/auth.css';
-
-
 </style>

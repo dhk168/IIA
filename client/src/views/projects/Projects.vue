@@ -1,235 +1,201 @@
 <template>
-  <div class="projects-page">
-    <div class="page-header">
+  <div class="reminder-projects-page">
+    <!-- Add Project Button (Empty State) -->
+    <EmptyProjects v-if="projects.length === 0" @create-project="showAddProjectModal" />
+
+    <!-- Page Header (Non-Empty State) -->
+    <div class="page-header" v-if="projects.length > 0">
       <el-button type="primary" @click="showAddProjectModal" class="light-button">
         New Project
       </el-button>
     </div>
     
-    <!-- Project List -->
+    <!-- Project List (Non-Empty State) -->
     <div class="project-cards">
-      <ProjectCard
-        v-for="project in projects"
-        :key="project.id"
+      <ProjectCard 
+        v-for="project in projects" 
+        :key="project.projectId"
         :project="project"
-        @click="selectProject(project)"
+        @select="selectProject"
+        @toggle-archive="toggleArchive"
       />
-      
-      <!-- Empty State -->
-      <div v-if="projects.length === 0" class="empty-state">
-        <el-empty description="No projects" />
-        <el-button type="primary" style="margin-top: 20px" class="light-button" @click="showAddProjectModal">
-          Create First Project
-        </el-button>
-      </div>
     </div>
-    
-    <!-- Project Details Modal -->
-    <ProjectDetailsModal
-      :show="showProjectDetails"
-      :project="selectedProject"
-      @update:show="showProjectDetails = $event"
-      @edit="editProject(selectedProject)"
-      @delete="deleteProject(selectedProject.id)"
-    />
     
     <!-- Project Form Modal -->
     <ProjectFormModal
-      :show="showProjectForm"
+      :visible="showProjectForm"
+      :project-data="projectFormData"
       :is-edit-mode="isEditMode"
-      :project="projectFormData"
-      @update:show="showProjectForm = $event"
-      @submit="handleFormSubmit"
+      @close="showProjectForm = false"
+      @success="handleFormSuccess"
+      @error="handleFormError"
     />
+    
   </div>
 </template>
 
 <script>
+import { reminderProjectAPI } from '../../api/reminder';
+import { OfficeBuilding, Document } from '@element-plus/icons-vue';
+import EmptyProjects from './components/EmptyProjects.vue';
+import { Vue3IconPicker } from 'vue3-icon-picker';
+import ProjectCard from './components/ProjectCard.vue';
+import ProjectFormModal from './components/ProjectFormModal.vue';
 
-import ProjectCard from './components/ProjectCard.vue'
-import ProjectDetailsModal from './components/ProjectDetailsModal.vue'
-import ProjectFormModal from './components/ProjectFormModal.vue'
+
 
 export default {
-  name: 'Projects',
+  name: 'ReminderProjects',
   components: {
+    Vue3IconPicker,
+    OfficeBuilding,
     ProjectCard,
-    ProjectDetailsModal,
+    Document,
+    EmptyProjects,
     ProjectFormModal
   },
   data() {
     return {
-      projects: [
-        {
-          id: 1,
-          title: 'Website Development',
-          description: 'Create company official website, including homepage, product display, about us, etc.',
-          category: 'Work',
-          priority: 'High',
-          priorityType: 'danger',
-          tasks: [],
-          taskCount: 0,
-          progress: 10
-        },
-        {
-          id: 2,
-          title: 'Learning Plan',
-          description: 'Study Vue 3 and Element Plus for frontend development',
-          category: 'Study',
-          priority: 'Medium',
-          priorityType: 'warning',
-          tasks: [],
-          taskCount: 0,
-          progress: 30
-        },
-        {
-          id: 3,
-          title: 'Fitness Program',
-          description: 'Daily exercise routine and nutrition plan',
-          category: 'Personal',
-          priority: 'Low',
-          priorityType: 'info',
-          tasks: [],
-          taskCount: 0,
-          progress: 50
-        }
-      ],
+      projects: [], // 空数组，不使用mock数据
       selectedProject: null,
-      showProjectDetails: false,
       showProjectForm: false,
       isEditMode: false,
-      projectFormData: {}
+      projectFormData: {
+        name: '',
+        description: '',
+        color: '#1890ff',
+        icon: '',
+        isArchived: false
+      },
+      rules: {
+        name: [
+          { required: true, message: 'Please enter project name', trigger: 'blur' },
+          { min: 1, max: 255, message: 'Length should be 1 to 255 characters', trigger: 'blur' }
+        ]
+      }
     }
   },
-  methods: {
-    selectProject(project) {
-      this.selectedProject = { ...project }
-      this.showProjectDetails = true
-    },
-    showAddProjectModal() {
-      this.isEditMode = false
-      this.projectFormData = {}
-      this.showProjectForm = true
-    },
-    editProject(project) {
-      this.isEditMode = true
-      this.projectFormData = { ...project }
-      this.showProjectForm = true
-    },
-    deleteProject(projectId) {
-      this.$confirm('Are you sure you want to delete this project?', 'Confirm', {
-        confirmButtonText: 'OK',
-        cancelButtonText: 'Cancel',
-        type: 'warning'
-      }).then(() => {
-        const index = this.projects.findIndex(p => p.id === projectId)
-        if (index !== -1) {
-          this.projects.splice(index, 1)
-          this.$message.success('Project deleted successfully')
-          
-          // 如果删除的是当前选中的项目，关闭详情页
-          if (this.selectedProject && this.selectedProject.id === projectId) {
-            this.selectedProject = null
-            this.showProjectDetails = false
-          }
-        }
-      }).catch(() => {
-        // 用户取消删除
-      })
-    },
-
-    handleFormSubmit(formData) {
-      if (this.isEditMode) {
-        // 更新项目
-        const index = this.projects.findIndex(p => p.id === this.projectFormData.id)
-        if (index !== -1) {
-          // 保留原始的tasks和计算字段
-          const updatedProject = {
-            ...formData,
-            id: this.projectFormData.id,
-            tasks: this.projectFormData.tasks || [],
-            taskCount: this.projectFormData.taskCount || 0,
-            progress: this.projectFormData.progress || 0,
-            priorityType: this.getPriorityType(formData.priority)
-          }
-          this.projects[index] = updatedProject
-          
-          // 如果更新的是当前选中的项目，同步更新
-          if (this.selectedProject && this.selectedProject.id === updatedProject.id) {
-            this.selectedProject = { ...updatedProject }
-          }
-          
-          this.$message.success('Project updated successfully')
-        }
-      } else {
-        // 创建新项目
-        const newProject = {
-          ...formData,
-          id: Date.now(),
-          tasks: [],
-          taskCount: 0,
-          progress: 0,
-          priorityType: this.getPriorityType(formData.priority)
-        }
-        this.projects.push(newProject)
-        this.$message.success('Project created successfully')
-      }
-      
-      this.showProjectForm = false
-    },
-    getPriorityType(priority) {
-      switch (priority) {
-        case 'High':
-          return 'danger'
-        case 'Medium':
-          return 'warning'
-        case 'Low':
-          return 'info'
-        default:
-          return 'info'
-      }
-    },
-    updateProjectProgress(project) {
-      if (project.tasks.length === 0) {
-        project.progress = 0
-        return
-      }
-      
-      const completedTasks = project.tasks.filter(task => task.completed).length
-      project.progress = Math.round((completedTasks / project.tasks.length) * 100)
+  created() {
+    // 打印localStorage中存储的token信息
+    const storedToken = localStorage.getItem('token')
+    console.log('localStorage中的token:', storedToken)
+    console.log('isLoggedIn状态:', localStorage.getItem('isLoggedIn'))
+    
+    if (!storedToken) {
+      console.log('请先登录获取真实token')
     }
+    
+    this.fetchProjects()
+  },
+  methods: {
+    // 添加毛玻璃提示方法
+    createGlassToast(type, message) {
+      const toast = document.createElement('div');
+      toast.className = `glass-toast glass-toast-${type}`;
+      toast.textContent = message;
+      document.body.appendChild(toast);
+      
+      // 自动移除
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(100%)';
+      }, 4000);
+      
+      setTimeout(() => {
+        if (document.body.contains(toast)) {
+          document.body.removeChild(toast);
+        }
+      }, 4500);
+      
+      toast.addEventListener('click', () => {
+        if (document.body.contains(toast)) {
+          document.body.removeChild(toast);
+        }
+      });
+    },
+    
+    async fetchProjects() {
+      try {
+        console.log('准备调用API，检查请求头中的token')
+        const response = await reminderProjectAPI.getAllProjects();
+        // 修改成功响应的检测逻辑，与后端响应格式匹配
+        if (response && response.code === 200) {
+          this.projects = response.data || [];
+          // 移除查询成功的弹窗提示
+        } else {
+          console.warn('API returned non-success response:', response);
+          this.projects = []; // 清空projects数组
+          // 显示失败弹窗
+          this.createGlassToast('error', response?.msg || 'Failed to load projects');
+        }
+      } catch (error) {
+        console.error('API call failed:', error);
+        this.projects = []; // 清空projects数组
+        // 显示失败弹窗
+        this.createGlassToast('error', 'Failed to load projects');
+      }
+    },
+    
+    selectProject(project) {
+      // 显示项目详情弹窗
+      this.selectedProject = project;
+      // 这里暂时使用项目表单弹窗来展示项目详情
+      // 后续可以创建专门的详情弹窗
+      this.isEditMode = true;
+      this.projectFormData = { ...project };
+      this.showProjectForm = true;
+    },
+    
+    showAddProjectModal() {
+      this.isEditMode = false;
+      this.projectFormData = {
+        name: '',
+        description: '',
+        color: '#1890ff',
+        icon: '',
+        isArchived: false
+      };
+      this.showProjectForm = true;
+    },
+    
+    handleFormSuccess(result) {
+      // 处理表单提交成功
+      this.createGlassToast('success', result.message);
+      this.showProjectForm = false;
+      this.fetchProjects(); // 重新获取项目列表
+    },
+    
+    handleFormError(error) {
+      // 处理表单提交错误
+      this.createGlassToast('error', error.message);
+    },
+    
+    async toggleArchive(project) {
+      try {
+        const updatedProject = { ...project };
+        updatedProject.isArchived = !updatedProject.isArchived;
+        
+        const response = await reminderProjectAPI.updateProject(updatedProject);
+        // 修改成功响应的检测逻辑，与后端响应格式匹配
+        if (response?.code === 200) {
+          // 保留归档/取消归档成功的弹窗
+          this.createGlassToast('success', response?.msg || (updatedProject.isArchived ? 'Project archived' : 'Project unarchived'));
+          this.fetchProjects(); // 重新获取项目列表
+        } else {
+          this.createGlassToast('error', response?.msg || 'Operation failed');
+        }
+      } catch (error) {
+        console.error('Error toggling archive status:', error);
+        this.createGlassToast('error', 'An error occurred while updating project');
+      }
+    },
+    
+
   }
 }
 </script>
 
-<style scoped>
-.projects-page {
-  padding: 20px;
-}
-
-.page-header {
-  margin-bottom: 24px;
-  display: flex;
-  justify-content: flex-start;
-}
-
-/* 使用全局定义的light-button样式 */
-/* 无需在此处重复定义样式，已在light-button.css中统一管理 */
-
-.project-cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 20px;
-}
-
-.empty-state {
-  grid-column: 1 / -1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 60px 20px;
-  border: 1px dashed #dcdfe6;
-  border-radius: 8px;
-}
+<style>
+/* 导入共享的认证页面样式 */
+@import '../../assets/styles/page/projects.css';
 </style>

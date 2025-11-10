@@ -12,7 +12,8 @@
     "axios": "^1.13.2",
     "element-plus": "^2.11.7",
     "vue": "^3.5.22",
-    "vue-router": "4"
+    "vue-router": "4",
+    "vue3-icon-picker": "^0.2.1"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^6.0.1",

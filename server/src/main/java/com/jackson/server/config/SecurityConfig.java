@@ -10,6 +10,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.http.HttpMethod;
 
 @Configuration
 @EnableWebSecurity
@@ -37,6 +40,9 @@ public class SecurityConfig {
             // 禁用CSRF保护（对于API通常不需要）
             .csrf(csrf -> csrf.disable())
             
+            // 配置CORS，确保在认证过滤器之前处理
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+            
             // 添加JWT过滤器
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
             
@@ -44,10 +50,35 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 // 允许所有用户访问认证端点
                 .requestMatchers("/api/auth/**").permitAll()
+                // 允许预检请求
+                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 // 其他所有请求都需要认证
                 .anyRequest().authenticated()
             );
         
         return http.build();
+    }
+    
+    /**
+     * 配置CORS源，确保与Spring Security正确集成
+     */
+    @Bean
+    public UrlBasedCorsConfigurationSource corsConfigurationSource() {
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        CorsConfiguration config = new CorsConfiguration();
+        
+        // 开放所有端口的访问
+        config.addAllowedOriginPattern("*");
+        // 允许的请求方法
+        config.addAllowedMethod("*");
+        // 允许的请求头
+        config.addAllowedHeader("*");
+        // 允许携带认证信息
+        config.setAllowCredentials(true);
+        // 预检请求的有效期
+        config.setMaxAge(3600L);
+        
+        source.registerCorsConfiguration("/**", config);
+        return source;
     }
 }

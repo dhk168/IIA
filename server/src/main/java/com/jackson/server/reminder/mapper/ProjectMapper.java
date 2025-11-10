@@ -40,8 +40,8 @@ public interface ProjectMapper {
             "WHERE project_id = #{projectId}")
     int update(Project project);
     
-    // 查询项目是否存在（根据用户ID和项目名称）
-    @Select("SELECT COUNT(*) FROM reminder_project WHERE user_id = #{userId} AND name = #{name}")
+    // 查询项目是否存在（根据用户ID和项目名称）- 只检查未归档的项目
+    @Select("SELECT EXISTS(SELECT 1 FROM reminder_project WHERE user_id = #{userId} AND name = #{name} AND is_archived = false)")
     boolean existsByNameAndUserId(@Param("name") String name, @Param("userId") Long userId);
     
     // 更新项目排序位置

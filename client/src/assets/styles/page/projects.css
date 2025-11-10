@@ -1,0 +1,129 @@
+
+/* 导入毛玻璃提示样式 */
+@import '../components/glass-toast.css';
+/* 导入图标选择器样式 */
+@import 'vue3-icon-picker/dist/style.css';
+
+.reminder-projects-page {
+  padding: 20px;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.project-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.project-card {
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: white;
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+}
+
+.project-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+  background-color: rgba(255, 255, 255, 0.6);
+}
+
+.project-card .project-title {
+  color: white;
+  font-weight: 600;
+}
+
+.project-card .project-description {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.project-card .project-meta {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* 确保按钮文字颜色在卡片上清晰可见 */
+.project-card .el-button--text {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.project-card .el-button--text:hover {
+  color: white;
+}
+
+.project-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.project-title {
+  font-size: 18px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.project-description {
+  color: #606266;
+  margin-bottom: 12px;
+  line-height: 1.5;
+}
+
+.project-meta {
+  color: #909399;
+  font-size: 14px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  grid-column: 1 / -1;
+}
+
+.empty-state-enhanced {
+  text-align: center;
+  padding: 80px 20px;
+  grid-column: 1 / -1;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.empty-icon {
+  margin-bottom: 24px;
+  opacity: 0.8;
+}
+
+.empty-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: #303133;
+  margin-bottom: 8px;
+}
+
+.empty-description {
+  font-size: 16px;
+  color: #606266;
+  margin-bottom: 32px;
+  line-height: 1.5;
+}
+
+.empty-button {
+  padding: 12px 24px;
+  font-size: 16px;
+  transition: all 0.3s ease;
+}
+
+.empty-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(24, 144, 255, 0.3);
+}

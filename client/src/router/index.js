@@ -26,27 +26,29 @@ const routes = [
   {
     path: '/home',
     name: 'Home',
-    component: () => import('../views/Home.vue'),
+    component: () => import('../views/home/Home.vue'),
     meta: { requiresAuth: true },
-      redirect: '/home/projects',
+    redirect: '/home/projects',
     children: [
-        {          path: 'blank',          name: 'Blank',          component: () => import('../views/Blank.vue')        },
-        {
-          path: 'projects',
-          name: 'Projects',
-          component: () => import('../views/projects/Projects.vue')
-        }
-        // {
-        //   path: 'tasks',
-        //   name: 'Tasks',
-        //   component: () => import('../views/Tasks.vue')
-        // },
-        // {
-        //   path: 'analytics',
-        //   name: 'Analytics',
-        //   component: () => import('../views/Analytics.vue')
-        // }
-      ]
+      {
+        path: 'blank',
+        name: 'Blank',
+        component: () => import('../views/Blank.vue')
+      },
+      // Projects module routes
+      {
+        path: 'projects',
+        name: 'Projects',
+        component: () => import('../views/projects/Projects.vue')
+      },
+      { path: 'projects/:projectId/tasks', name: 'ProjectTasks', component: () => import('../views/projects/Tasks.vue') },
+      { path: 'tasks', name: 'Tasks', component: () => import('../views/tasks/Tasks.vue') }
+      // {
+      //   path: 'analytics',
+      //   name: 'Analytics',
+      //   component: () => import('../views/Analytics.vue')
+      // }
+    ]
   }
 ]
 

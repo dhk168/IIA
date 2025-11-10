@@ -67,6 +67,7 @@ export default {
               
               // 检查token是否存在
               const token = result.token;
+              console.log('服务器返回的token:', token);
               
               if (token) {
                 // 设置登录状态和token

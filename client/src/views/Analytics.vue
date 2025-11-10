@@ -121,24 +121,16 @@ export default {
   },
   data() {
     return {
-      // Mock data
-      totalTasks: 32,
-      completedTasks: 18,
-      pendingTasks: 14,
-      overdueTasks: 2,
-      taskCategories: [
-        { name: 'Work', count: 12, color: '#409eff' },
-        { name: 'Study', count: 8, color: '#67c23a' },
-        { name: 'Life', count: 6, color: '#e6a23c' },
-        { name: 'Health', count: 4, color: '#f56c6c' }
-      ],
-      recentCompletedTasks: [
-        { title: 'Complete Project Proposal', category: 'Work', completedTime: '2023-10-15 14:30', priority: 'High' },
-        { title: 'Read Technical Documentation', category: 'Study', completedTime: '2023-10-14 09:15', priority: 'Medium' },
-        { title: 'Buy Daily Necessities', category: 'Life', completedTime: '2023-10-13 18:45', priority: 'Low' },
-        { title: 'Morning Run 30 Minutes', category: 'Health', completedTime: '2023-10-13 07:00', priority: 'Medium' }
-      ]
+      totalTasks: 0,
+      completedTasks: 0,
+      pendingTasks: 0,
+      overdueTasks: 0,
+      taskCategories: [],
+      recentCompletedTasks: []
     }
+  },
+  created() {
+    this.loadAnalyticsData();
   },
   computed: {
     completionRate() {
@@ -146,6 +138,15 @@ export default {
     }
   },
   methods: {
+    async loadAnalyticsData() {
+      try {
+        // TODO: 实现真实的数据分析API调用
+        console.log('Loading analytics data from API');
+        // 这里将在API实现后替换为实际调用
+      } catch (error) {
+        console.error('Failed to load analytics data:', error);
+      }
+    },
     formatRate(percentage) {
       return `${percentage}%`
     },

@@ -1,4 +1,5 @@
 -- 提醒模块
+use iia;
 
 drop table if exists reminder_project;
 drop table if exists reminder_task;

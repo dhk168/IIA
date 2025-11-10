@@ -95,7 +95,8 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public boolean existsByName(Long userId, String name) {
-        return projectMapper.findByName(userId, name) != null;
+        // 使用专门的existsByNameAndUserId方法来检查项目名称是否存在，并且只检查未归档的项目
+        return projectMapper.existsByNameAndUserId(name, userId);
     }
 
     @Override

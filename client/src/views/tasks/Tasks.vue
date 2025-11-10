@@ -1,7 +1,6 @@
 <template>
   <div class="tasks-container">
     <div class="page-header">
-      <h1>Tasks Management</h1>
       <div class="header-actions">
         <el-button type="primary" @click="showAddTaskDialog = true">
           <el-icon><Plus /></el-icon> New Task
@@ -268,89 +267,37 @@ export default {
     Plus,
     Management
   },
+  created() {
+    this.init()
+  },
   data() {
     return {
-      // Mock data
-      tasks: [
-        {
-          task_id: 1,
-          user_id: 1,
-          project_id: 1,
-          project_name: 'Website Development',
-          title: 'Design Website Prototype',
-          description: 'Create initial design prototype for the website, including homepage and product pages',
-          category: 'task',
-          status: 'todo',
-          is_archived: false,
-          parent_task_id: null,
-          level: 0,
-          due_date: '2023-11-10T18:00:00',
-          start_date: '2023-11-05T09:00:00',
-          completed_at: null,
-          created_at: '2023-11-01T10:00:00',
-          priority: 'high',
-          tags: [
-            { tag_id: 1, name: 'Design', color: '#409eff' }
-          ],
-          recurrence_info: null
-        },
-        {
-          task_id: 2,
-          user_id: 1,
-          project_id: 1,
-          project_name: 'Website Development',
-          title: 'Frontend Page Development',
-          description: 'Develop frontend pages based on the design prototype',
-          category: 'task',
-          status: 'todo',
-          is_archived: false,
-          parent_task_id: null,
-          level: 0,
-          due_date: '2023-11-20T18:00:00',
-          start_date: '2023-11-11T09:00:00',
-          completed_at: null,
-          created_at: '2023-11-01T10:00:00',
-          priority: 'medium',
-          tags: [
-            { tag_id: 2, name: 'Frontend', color: '#67c23a' }
-          ],
-          recurrence_info: null
-        },
-        {
-          task_id: 3,
-          user_id: 1,
-          project_id: null,
-          project_name: 'No Project',
-          title: 'Weekly Fitness Record',
-          description: 'Record weekly fitness activities',
-          category: 'note',
-          status: 'todo',
-          is_archived: false,
-          parent_task_id: null,
-          level: 0,
-          due_date: null,
-          start_date: null,
-          completed_at: null,
-          created_at: '2023-11-01T10:00:00',
-          priority: 'low',
-          tags: [],
-          recurrence_info: {
-            category: 'weekly',
-            schedule: [1, 3, 5],
-            count: 52
-          }
+      tasks: [{
+        task_id: 3,
+        user_id: 1,
+        project_id: null,
+        project_name: 'No Project',
+        title: 'Weekly Fitness Record',
+        description: 'Record weekly fitness activities',
+        category: 'note',
+        status: 'todo',
+        is_archived: false,
+        parent_task_id: null,
+        level: 0,
+        due_date: null,
+        start_date: null,
+        completed_at: null,
+        created_at: '2023-11-01T10:00:00',
+        priority: 'low',
+        tags: [],
+        recurrence_info: {
+          category: 'weekly',
+          schedule: [1, 3, 5],
+          count: 52
         }
-      ],
-      projects: [
-        { project_id: 1, name: 'Website Development', color: '#409eff', icon: 'Document' },
-        { project_id: 2, name: 'Learning Plan', color: '#67c23a', icon: 'Book' }
-      ],
-      tags: [
-        { tag_id: 1, name: 'Design', color: '#409eff' },
-        { tag_id: 2, name: 'Frontend', color: '#67c23a' },
-        { tag_id: 3, name: 'Important', color: '#f56c6c' },
-        { tag_id: 4, name: 'Urgent', color: '#e6a23c' }
-      ],
+      }],
+      projects: [],
+      tags: [],
       filterOptions: {
         status: '',
         project: '',
@@ -436,6 +383,18 @@ export default {
     }
   },
   methods: {
+    async init() {
+      await this.loadTasks();
+    },
+    async loadTasks() {
+      try {
+        // TODO: 实现真实的任务数据加载API调用
+        console.log('Loading tasks data from API');
+        // 这里将在API实现后替换为实际调用
+      } catch (error) {
+        console.error('Failed to load tasks data:', error);
+      }
+    },
     formatDate(dateString) {
         if (!dateString) return 'None'
         const date = new Date(dateString)

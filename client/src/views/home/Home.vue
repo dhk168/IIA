@@ -16,7 +16,13 @@
           active-text-color="#fff"
         >
           <el-menu-item index="/home/projects">
-            <el-icon class="menu-icon"><Document /></el-icon>
+            <el-icon class="menu-icon"><Box /></el-icon>
+          </el-menu-item>
+          <el-menu-item index="/home/tasks">
+            <el-icon class="menu-icon"><List /></el-icon>
+          </el-menu-item>
+          <el-menu-item index="/home/reminder/projects">
+            <el-icon class="menu-icon"><Bell /></el-icon>
           </el-menu-item>
         </el-menu>
       </el-aside>
@@ -56,13 +62,16 @@
 </template>
 
 <script>
-import { Document, UserFilled } from '@element-plus/icons-vue'
-import { authAPI } from '../api/auth'
+import { UserFilled, List, Bell, Box } from '@element-plus/icons-vue'
+import { authAPI } from '../../api/auth'
 
 export default {
   name: 'Home',
   components: {
-    Document, UserFilled
+    UserFilled,
+    List,
+    Bell,
+    Box
   },
   data() {
     return {
@@ -75,8 +84,10 @@ export default {
     currentPageTitle() {
       const path = this.$route.path
       if (path.includes('/blank')) return 'Blank Page'
+      if (path.includes('/reminder/projects')) return 'Reminder Projects'
+      if (path.includes('/reminder/tasks')) return 'Reminder Tasks'
       if (path.includes('/projects')) return 'Project Plan'
-      // if (path.includes('/tasks')) return 'Tasks'
+      if (path.includes('/tasks')) return 'Tasks'
       // if (path.includes('/analytics')) return 'Analytics'
       return 'Blank Page'
     }
@@ -162,6 +173,6 @@ export default {
 </script>
 
 <style scoped>
+@import '../../assets/styles/page/home.css';
 /* 导入页面级样式文件 */
-@import '../assets/styles/page/home.css';
 </style>
