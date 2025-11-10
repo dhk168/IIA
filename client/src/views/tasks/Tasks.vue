@@ -2,11 +2,11 @@
   <div class="tasks-container">
     <div class="page-header">
       <div class="header-actions">
-        <el-button type="primary" @click="showAddTaskDialog = true">
-          <el-icon><Plus /></el-icon> New Task
+        <el-button type="primary" light @click="showAddTaskDialog = true"  class="light-button">
+          New Task
         </el-button>
-        <el-button @click="showTagsDialog = true">
-          <el-icon><Management /></el-icon> Tags Management
+        <el-button light @click="showTagsDialog = true" class="light-button">
+          Tags Management
         </el-button>
       </div>
     </div>
@@ -82,9 +82,17 @@
               </div>
               <div class="detail-item" v-if="scope.row.tags && scope.row.tags.length > 0">
                 <strong>Tags:</strong>
-                <el-tag v-for="tag in scope.row.tags" :key="tag.tag_id" :type="getTagType(tag.color)">
-                  {{ tag.name }}
-                </el-tag>
+                <div class="task-tags">
+                  <el-tag 
+                    v-for="tag in scope.row.tags" 
+                    :key="tag.tagId" 
+                    :type="getTagType(tag.color)" 
+                    size="small" 
+                    effect="plain"
+                  >
+                    {{ tag.name }}
+                  </el-tag>
+                </div>
               </div>
             </div>
           </template>
@@ -191,7 +199,7 @@
       </template>
       <el-form-item label="Tags">
           <el-select v-model="taskForm.selectedTags" multiple placeholder="Select tags">
-          <el-option v-for="tag in tags" :key="tag.tag_id" :label="tag.name" :value="tag.tag_id" />
+          <el-option v-for="tag in tags" :key="tag.tagId" :label="tag.name" :value="tag.tagId" />
         </el-select>
       </el-form-item>
       </el-form>
@@ -206,66 +214,22 @@
       title="Tags Management"
       width="500px"
     >
-      <div class="tags-management">
-        <el-card class="tags-card">
-          <template #header>
-            <div class="tags-card-header">
-              <span>Tags List</span>
-              <el-button type="primary" size="small" @click="showAddTagDialog = true">
-                <el-icon><Plus /></el-icon> New Tag
-              </el-button>
-            </div>
-          </template>
-          <el-table :data="tags" stripe style="width: 100%">
-            <el-table-column prop="name" label="Tag Name" />
-            <el-table-column prop="color" label="Color" width="120">
-              <template #default="scope">
-                <el-tag :type="getTagType(scope.row.color)">
-                  {{ scope.row.color }}
-                </el-tag>
-              </template>
-            </el-table-column>
-            <el-table-column label="Actions" width="120" fixed="right">
-              <template #default="scope">
-                <el-button size="small" @click="editTag(scope.row)">Edit</el-button>
-                <el-button size="small" type="danger" @click="deleteTag(scope.row.tag_id)">Delete</el-button>
-              </template>
-            </el-table-column>
-          </el-table>
-        </el-card>
-      </div>
-    </el-dialog>
-    
-    <!-- Add/Edit Tag Dialog -->
-    <el-dialog
-      v-model="showAddTagDialog"
-      :title="isEditingTag ? 'Edit Tag' : 'New Tag'"
-      width="400px"
-    >
-      <el-form :model="tagForm" :rules="tagRules" ref="tagFormRef">
-        <el-form-item label="Tag Name" prop="name">
-          <el-input v-model="tagForm.name" placeholder="Enter tag name" />
-        </el-form-item>
-        <el-form-item label="Tag Color" prop="color">
-          <el-color-picker v-model="tagForm.color" show-alpha show-panel-color />
-        </el-form-item>
-      </el-form>
-      <template #footer>
-          <el-button @click="showAddTagDialog = false">Cancel</el-button>
-          <el-button type="primary" @click="submitTagForm">Confirm</el-button>
-        </template>
+      <tag-management 
+        :tags="tags" 
+        :tasks="tasks" 
+        @tags-updated="handleTagsUpdated"
+      />
     </el-dialog>
   </div>
 </template>
 
 <script>
-import { Plus, Management } from '@element-plus/icons-vue'
-
+import TagManagement from './components/TagManagement.vue'
+import { reminderTaskAPI, tagAPI, taskTagAPI } from '../../api/reminder';
 export default {
   name: 'Tasks',
   components: {
-    Plus,
-    Management
+    TagManagement
   },
   created() {
     this.init()
@@ -308,8 +272,6 @@ export default {
       showAddTaskDialog: false,
       isEditMode: false,
       showTagsDialog: false,
-      showAddTagDialog: false,
-      isEditingTag: false,
       taskForm: {
         title: '',
         description: '',
@@ -326,19 +288,6 @@ export default {
       taskRules: {
         title: [
           { required: true, message: 'Please enter task title', trigger: 'blur' }
-        ]
-      },
-      tagForm: {
-        name: '',
-        color: '#409eff'
-      },
-      tagRules: {
-        name: [
-          { required: true, message: 'Please enter tag name', trigger: 'blur' },
-          { min: 1, max: 10, message: 'Tag name length should be between 1 and 10 characters', trigger: 'blur' }
-        ],
-        color: [
-          { required: true, message: 'Please select tag color', trigger: 'change' }
         ]
       }
     }
@@ -375,7 +324,7 @@ export default {
       // 标签筛选
       if (this.filterOptions.tag) {
         filtered = filtered.filter(task => 
-          task.tags && task.tags.some(tag => tag.tag_id === this.filterOptions.tag)
+          task.tags && task.tags.some(tag => tag.tagId === this.filterOptions.tag)
         )
       }
       
@@ -383,21 +332,95 @@ export default {
     }
   },
   methods: {
-    async init() {
-      await this.loadTasks();
+    // 添加毛玻璃提示方法
+    createGlassToast(type, message) {
+      const toast = document.createElement('div');
+      toast.className = `glass-toast glass-toast-${type}`;
+      toast.textContent = message;
+      document.body.appendChild(toast);
+      
+      // 自动移除
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(100%)';
+      }, 4000);
+      
+      setTimeout(() => {
+        if (document.body.contains(toast)) {
+          document.body.removeChild(toast);
+        }
+      }, 4500);
+      
+      toast.addEventListener('click', () => {
+        if (document.body.contains(toast)) {
+          document.body.removeChild(toast);
+        }
+      });
     },
-    async loadTasks() {
+    
+    async init() {
+      // 并行加载标签和任务数据
+      await Promise.all([
+        this.loadTags(),
+        this.loadTasks()
+      ]);
+    },
+    
+    async loadTags() {
       try {
-        // TODO: 实现真实的任务数据加载API调用
-        console.log('Loading tasks data from API');
-        // 这里将在API实现后替换为实际调用
+        const response = await tagAPI.getAllTags();
+        // 根据Projects.vue的判断逻辑，检查response.code === 200
+        if (response && response.code === 200) {
+          this.tags = response.data || [];
+        } else {
+          console.warn('API returned non-success response:', response);
+            this.tags = [];
+            this.createGlassToast('error', 'Failed to load tags');
+        } 
       } catch (error) {
-        console.error('Failed to load tasks data:', error);
+        console.error('Failed to load tags:', error);
+        this.createGlassToast('error', 'Failed to load tags');
       }
     },
+    
+    async loadTasks() {
+      try {
+        const response = await reminderTaskAPI.getTasks();
+        // 根据Projects.vue的判断逻辑，检查response.code === 200
+        if (response && response.code === 200) {
+          this.tasks = response.data || [];
+          console.log('Tasks loaded successfully:', this.tasks);
+        } else {
+          console.warn('API returned non-success response:', response);
+            this.tasks = [];
+            this.createGlassToast('error', 'Failed to load tasks');
+        } 
+      } catch (error) {
+        console.error('Failed to load tasks data:', error);
+        this.createGlassToast('error', 'Failed to load tasks');
+      }
+    },
+    
+    handleTagsUpdated(updatedTags) {
+      // 更新本地标签数据
+      this.tags = updatedTags;
+    },
+    
+    getTagType(color) {
+      // 根据颜色返回对应的Element Plus标签类型
+      const colorMap = {
+        '#409eff': 'primary',
+        '#67c23a': 'success',
+        '#e6a23c': 'warning',
+        '#f56c6c': 'danger',
+        '#909399': 'info'
+      }
+      return colorMap[color] || 'info'
+    },
+    
     formatDate(dateString) {
-        if (!dateString) return 'None'
-        const date = new Date(dateString)
+      if (!dateString) return 'None'
+      const date = new Date(dateString)
         return date.toLocaleString('en-US')
       },
     getPriorityType(priority) {
@@ -455,17 +478,7 @@ export default {
           return 'Custom recurrence'
       }
     },
-    getTagType(color) {
-      // 根据颜色返回对应的Element Plus标签类型
-      const colorMap = {
-        '#409eff': 'primary',
-        '#67c23a': 'success',
-        '#e6a23c': 'warning',
-        '#f56c6c': 'danger',
-        '#909399': 'info'
-      }
-      return colorMap[color] || 'info'
-    },
+
     updateTaskStatus(task) {
       const taskIndex = this.tasks.findIndex(t => t.task_id === task.task_id)
       if (taskIndex !== -1) {
@@ -476,7 +489,7 @@ export default {
           this.tasks[taskIndex].status = 'todo'
           this.tasks[taskIndex].completed_at = null
         }
-        this.$message.success('Task status updated successfully')
+        this.createGlassToast('success', 'Task status updated successfully')
       }
     },
     editTask(task) {
@@ -493,7 +506,7 @@ export default {
         has_recurrence: !!task.recurrence_info,
         recurrence_category: task.recurrence_info?.category || 'weekly',
         recurrence_count: task.recurrence_info?.count || 1,
-        selectedTags: task.tags ? task.tags.map(tag => tag.tag_id) : []
+        selectedTags: task.tags ? task.tags.map(tag => tag.tagId) : []
       }
       this.showAddTaskDialog = true
     },
@@ -506,86 +519,108 @@ export default {
         const index = this.tasks.findIndex(t => t.task_id === taskId)
         if (index !== -1) {
           this.tasks.splice(index, 1)
-          this.$message.success('Task deleted successfully')
+          this.createGlassToast('success', 'Task deleted successfully')
         }
       }).catch(() => {
         // 取消删除
       })
     },
-    submitTaskForm() {
-      this.$refs.taskFormRef.validate((valid) => {
+    async submitTaskForm() {
+      this.$refs.taskFormRef.validate(async (valid) => {
         if (valid) {
-          if (this.isEditMode) {
-            // 编辑现有任务
-            const index = this.tasks.findIndex(t => t.task_id === this.taskForm.task_id)
-            if (index !== -1) {
-              const updatedTask = {
-                ...this.tasks[index],
-                title: this.taskForm.title,
-                description: this.taskForm.description,
-                category: this.taskForm.category,
-                project_id: this.taskForm.project_id,
-                project_name: this.taskForm.project_id ? this.projects.find(p => p.project_id === this.taskForm.project_id)?.name : 'No Project',
-                start_date: this.taskForm.start_date ? this.taskForm.start_date.toISOString() : null,
-                due_date: this.taskForm.due_date ? this.taskForm.due_date.toISOString() : null,
-                priority: this.taskForm.priority,
-                tags: this.taskForm.selectedTags.map(tagId => 
-                  this.tags.find(tag => tag.tag_id === tagId)
-                ).filter(Boolean)
-              }
-              
-              if (this.taskForm.has_recurrence) {
-                updatedTask.recurrence_info = {
-                  category: this.taskForm.recurrence_category,
-                  count: this.taskForm.recurrence_count
-                  // schedule会根据category在后端生成
-                }
-              } else {
-                updatedTask.recurrence_info = null
-              }
-              
-              this.tasks[index] = updatedTask
-              this.$message.success('Task updated successfully')
-            }
-          } else {
-            // 创建新任务
-            const newTask = {
-              task_id: Date.now(),
-              user_id: 1, // 模拟用户ID
-              project_id: this.taskForm.project_id,
-              project_name: this.taskForm.project_id ? this.projects.find(p => p.project_id === this.taskForm.project_id)?.name : 'No Project',
+          try {
+            const taskData = {
               title: this.taskForm.title,
               description: this.taskForm.description,
               category: this.taskForm.category,
-              status: 'todo',
-              is_archived: false,
-              parent_task_id: null,
-              level: 0,
-              due_date: this.taskForm.due_date ? this.taskForm.due_date.toISOString() : null,
+              project_id: this.taskForm.project_id,
               start_date: this.taskForm.start_date ? this.taskForm.start_date.toISOString() : null,
-              completed_at: null,
-              created_at: new Date().toISOString(),
-              priority: this.taskForm.priority,
-              tags: this.taskForm.selectedTags.map(tagId => 
-                this.tags.find(tag => tag.tag_id === tagId)
-              ).filter(Boolean),
-              recurrence_info: null
+              due_date: this.taskForm.due_date ? this.taskForm.due_date.toISOString() : null,
+              priority: this.taskForm.priority
             }
             
+            // 处理重复设置
             if (this.taskForm.has_recurrence) {
-              newTask.recurrence_info = {
-                category: this.taskForm.recurrence_category,
-                count: this.taskForm.recurrence_count
-              }
+              taskData.has_recurrence = true
+              taskData.recurrence_category = this.taskForm.recurrence_category
+              taskData.recurrence_count = this.taskForm.recurrence_count
             }
             
-            this.tasks.push(newTask)
-            this.$message.success('Task created successfully')
+            let savedTask
+            
+            if (this.isEditMode) {
+              // 编辑现有任务
+              taskData.task_id = this.taskForm.task_id
+              // 注意：reminderTaskAPI中可能没有updateTask方法，暂时使用createTask
+              const response = await reminderTaskAPI.createTask(taskData)
+              
+              // 根据Projects.vue的判断逻辑，检查response.code === 200
+              if (response && response.code === 200) {
+                savedTask = response.data || {};
+                
+                // 更新标签关联：先删除现有关联，再创建新关联
+                await taskTagAPI.deleteTaskTagsByTaskId(this.taskForm.task_id)
+                if (this.taskForm.selectedTags.length > 0) {
+                  await taskTagAPI.createTaskTagBatch({
+                    taskId: this.taskForm.task_id,
+                    tagIds: this.taskForm.selectedTags
+                  })
+                }
+              } else {
+                this.createGlassToast('error', 'Failed to update task');
+              throw new Error('Failed to update task')
+              }
+              
+              // 更新本地任务列表
+              const index = this.tasks.findIndex(t => t.task_id === savedTask.task_id)
+              if (index !== -1) {
+                this.tasks[index] = {
+                  ...savedTask,
+                  tags: this.taskForm.selectedTags.map(tagId => 
+                    this.tags.find(tag => tag.tagId === tagId)
+                  ).filter(Boolean)
+                }
+              }
+              
+              this.createGlassToast('success', 'Task updated successfully')
+            } else {
+              // 创建新任务
+              const response = await reminderTaskAPI.createTask(taskData)
+              
+              // 根据Projects.vue的判断逻辑，检查response.code === 200
+              if (response && response.code === 200) {
+                savedTask = response.data || {};
+                
+                // 创建标签关联
+                if (this.taskForm.selectedTags.length > 0) {
+                  await taskTagAPI.createTaskTagBatch({
+                    taskId: savedTask.task_id,
+                    tagIds: this.taskForm.selectedTags
+                  })
+                }
+              } else {
+                this.createGlassToast('error', 'Failed to create task');
+              throw new Error('Failed to create task')
+              }
+              
+              // 添加到本地任务列表
+              this.tasks.push({
+                ...savedTask,
+                tags: this.taskForm.selectedTags.map(tagId => 
+                  this.tags.find(tag => tag.tagId === tagId)
+                ).filter(Boolean)
+              })
+              
+              this.createGlassToast('success', 'Task created successfully')
+            }
+            
+            // 关闭对话框并重置表单
+            this.showAddTaskDialog = false
+            this.resetTaskForm()
+          } catch (error) {
+            console.error('Failed to save task:', error)
+            this.createGlassToast('error', 'Failed to save task: ' + (error.response?.data?.message || error.message))
           }
-          
-          // 关闭对话框并重置表单
-          this.showAddTaskDialog = false
-          this.resetTaskForm()
         }
       })
     },
@@ -608,194 +643,11 @@ export default {
         this.$refs.taskFormRef.resetFields()
       }
     },
-    resetTagForm() {
-      this.tagForm = {
-        name: '',
-        color: '#409eff'
-      }
-      this.isEditingTag = false
-      if (this.$refs.tagFormRef) {
-        this.$refs.tagFormRef.resetFields()
-      }
-    },
-    editTag(tag) {
-      this.isEditingTag = true
-      this.tagForm = {
-        tag_id: tag.tag_id,
-        name: tag.name,
-        color: tag.color
-      }
-      this.showAddTagDialog = true
-    },
-    deleteTag(tagId) {
-        // Check if any tasks use this tag
-        const hasTasksWithTag = this.tasks.some(task => 
-          task.tags && task.tags.some(tag => tag.tag_id === tagId)
-        )
-        
-        if (hasTasksWithTag) {
-          this.$message.warning('This tag is being used by tasks, cannot delete')
-          return
-        }
-        
-        this.$confirm('Are you sure you want to delete this tag?', 'Confirmation', {
-        confirmButtonText: 'Confirm',
-          cancelButtonText: 'Cancel',
-        type: 'warning'
-      }).then(() => {
-        const index = this.tags.findIndex(t => t.tag_id === tagId)
-        if (index !== -1) {
-          this.tags.splice(index, 1)
-          this.$message.success('Tag deleted successfully')
-        }
-      }).catch(() => {
-        // 取消删除
-      })
-    },
-    getTagType(color) {
-      // 根据颜色值判断对应的el-tag类型
-      const colorMap = {
-        '#409eff': 'primary',
-        '#67c23a': 'success',
-        '#f56c6c': 'danger',
-        '#e6a23c': 'warning',
-        '#909399': 'info'
-      }
-      return colorMap[color] || 'info'
-    },
-    submitTagForm() {
-      this.$refs.tagFormRef.validate((valid) => {
-        if (valid) {
-          if (this.isEditingTag) {
-            // 编辑现有标签
-            const index = this.tags.findIndex(t => t.tag_id === this.tagForm.tag_id)
-            if (index !== -1) {
-              this.tags[index] = {
-                ...this.tags[index],
-                name: this.tagForm.name,
-                color: this.tagForm.color
-              }
-              // 更新使用此标签的任务
-              this.tasks.forEach(task => {
-                if (task.tags && task.tags.length > 0) {
-                  task.tags.forEach(tag => {
-                    if (tag.tag_id === this.tagForm.tag_id) {
-                      tag.name = this.tagForm.name
-                      tag.color = this.tagForm.color
-                    }
-                  })
-                }
-              })
-              this.$message.success('Tag updated successfully')
-            }
-          } else {
-            // 检查标签名称是否已存在
-            const existingTag = this.tags.find(t => t.name === this.tagForm.name)
-            if (existingTag) {
-              this.$message.warning('Tag name already exists')
-              return
-            }
-            
-            // 创建新标签
-            const newTag = {
-              tag_id: Date.now(),
-              name: this.tagForm.name,
-              color: this.tagForm.color
-            }
-            
-            this.tags.push(newTag)
-            this.$message.success('Tag created successfully')
-          }
-          
-          // 关闭对话框并重置表单
-          this.showAddTagDialog = false
-          this.resetTagForm()
-        }
-      })
-    }
+
   }
 }
 </script>
 
-<style scoped>
-.tasks-container {
-  padding: 20px;
-}
-
-.page-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 30px;
-}
-
-.page-header h1 {
-  margin: 0;
-  color: #303133;
-  font-size: 24px;
-}
-
-.filter-section {
-  margin-bottom: 20px;
-}
-
-.tasks-card {
-  border-radius: 8px;
-}
-
-.tags-card {
-  margin-bottom: 20px;
-}
-
-.tags-card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.tags-management {
-  padding: 10px 0;
-}
-
-.card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-weight: 500;
-  color: #303133;
-}
-
-.task-title-container {
-  display: flex;
-  align-items: center;
-}
-
-.task-completed {
-  text-decoration: line-through;
-  color: #909399;
-}
-
-.task-detail {
-  padding: 10px;
-  background-color: #f5f7fa;
-  border-radius: 4px;
-}
-
-.detail-item {
-  margin-bottom: 8px;
-}
-
-.detail-item:last-child {
-  margin-bottom: 0;
-}
-
-.detail-item strong {
-  color: #606266;
-  margin-right: 8px;
-}
-
-.detail-item p {
-  margin: 5px 0 0 0;
-  color: #303133;
-}
+<style>
+@import '../../assets/styles/page/tasks.css';
 </style>

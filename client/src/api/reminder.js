@@ -67,9 +67,95 @@ export const recurrenceAPI = {
 
 // 标签管理API
 export const tagAPI = {
-  // 获取所有标签（可以根据后续controller补充）
+  // 获取所有标签
   getAllTags: async () => {
-    const response = await axiosInstance.get('/reminder/tags');
+    const response = await axiosInstance.get('/reminder/tags/get-all');
+    return response;
+  },
+  
+  // 获取单个标签
+  getTagById: async (tagId) => {
+    const response = await axiosInstance.get(`/reminder/tags/get/${tagId}`);
+    return response;
+  },
+  
+  // 创建标签
+  createTag: async (tagData) => {
+    const response = await axiosInstance.post('/reminder/tags/create', tagData);
+    return response;
+  },
+  
+  // 更新标签
+  updateTag: async (tagId, tagData) => {
+    const response = await axiosInstance.put(`/reminder/tags/update/${tagId}`, tagData);
+    return response;
+  },
+  
+  // 检查标签名称是否存在
+  existsByName: async (name) => {
+    // 这个接口可能需要在后端补充，这里暂时通过获取所有标签来检查
+    const response = await axiosInstance.get('/reminder/tags/get-all');
+    return response.data.some(tag => tag.name === name);
+  }
+};
+
+// 任务标签关联API
+export const taskTagAPI = {
+  // 创建任务-标签关联
+  createTaskTag: async (taskTagData) => {
+    const response = await axiosInstance.post('/reminder/task-tags/create', taskTagData);
+    return response;
+  },
+  
+  // 批量创建任务-标签关联
+  createTaskTagBatch: async (batchData) => {
+    // 转换为后端期望的List<TaskTag>格式
+    const taskTagList = batchData.tagIds.map(tagId => ({
+      taskId: batchData.taskId,
+      tagId: tagId
+    }));
+    const response = await axiosInstance.post('/reminder/task-tags/create-batch', taskTagList);
+    return response;
+  },
+  
+  // 获取任务的所有标签关联
+  getTaskTagsByTaskId: async (taskId) => {
+    const response = await axiosInstance.get(`/reminder/task-tags/get-by-task/${taskId}`);
+    return response;
+  },
+  
+  // 获取标签的所有任务关联
+  getTaskTagsByTagId: async (tagId) => {
+    const response = await axiosInstance.get(`/reminder/task-tags/get-by-tag/${tagId}`);
+    return response;
+  },
+  
+  // 删除特定的任务-标签关联
+  deleteTaskTag: async (taskId, tagId) => {
+    const response = await axiosInstance.delete('/reminder/task-tags/delete', {
+      params: { taskId, tagId }
+    });
+    return response;
+  },
+  
+  // 批量删除任务-标签关联
+  deleteTaskTagBatch: async (taskId, tagIds) => {
+    const response = await axiosInstance.delete('/reminder/task-tags/delete-batch', {
+      params: { taskId },
+      data: tagIds
+    });
+    return response;
+  },
+  
+  // 根据任务ID删除所有关联
+  deleteTaskTagsByTaskId: async (taskId) => {
+    const response = await axiosInstance.delete(`/reminder/task-tags/delete-by-task/${taskId}`);
+    return response;
+  },
+  
+  // 根据标签ID删除所有关联
+  deleteTaskTagsByTagId: async (tagId) => {
+    const response = await axiosInstance.delete(`/reminder/task-tags/delete-by-tag/${tagId}`);
     return response;
   }
 };

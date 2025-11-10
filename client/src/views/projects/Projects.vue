@@ -196,6 +196,5 @@ export default {
 </script>
 
 <style>
-/* 导入共享的认证页面样式 */
 @import '../../assets/styles/page/projects.css';
 </style>

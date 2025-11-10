@@ -22,7 +22,7 @@
             <el-icon class="menu-icon"><List /></el-icon>
           </el-menu-item>
           <el-menu-item index="/home/reminder/projects">
-            <el-icon class="menu-icon"><Bell /></el-icon>
+            <el-icon class="menu-icon"><DataLine /></el-icon>
           </el-menu-item>
         </el-menu>
       </el-aside>
@@ -62,7 +62,7 @@
 </template>
 
 <script>
-import { UserFilled, List, Bell, Box } from '@element-plus/icons-vue'
+import { UserFilled, List, DataLine, Box } from '@element-plus/icons-vue'
 import { authAPI } from '../../api/auth'
 
 export default {
@@ -70,7 +70,7 @@ export default {
   components: {
     UserFilled,
     List,
-    Bell,
+    DataLine,
     Box
   },
   data() {
@@ -86,7 +86,7 @@ export default {
       if (path.includes('/blank')) return 'Blank Page'
       if (path.includes('/reminder/projects')) return 'Reminder Projects'
       if (path.includes('/reminder/tasks')) return 'Reminder Tasks'
-      if (path.includes('/projects')) return 'Project Plan'
+      if (path.includes('/projects')) return 'Projects'
       if (path.includes('/tasks')) return 'Tasks'
       // if (path.includes('/analytics')) return 'Analytics'
       return 'Blank Page'

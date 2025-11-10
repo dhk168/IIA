@@ -35,19 +35,21 @@ const routes = [
         name: 'Blank',
         component: () => import('../views/Blank.vue')
       },
-      // Projects module routes
       {
         path: 'projects',
         name: 'Projects',
         component: () => import('../views/projects/Projects.vue')
       },
-      { path: 'projects/:projectId/tasks', name: 'ProjectTasks', component: () => import('../views/projects/Tasks.vue') },
-      { path: 'tasks', name: 'Tasks', component: () => import('../views/tasks/Tasks.vue') }
-      // {
-      //   path: 'analytics',
-      //   name: 'Analytics',
-      //   component: () => import('../views/Analytics.vue')
-      // }
+      { 
+        path: 'tasks', 
+        name: 'Tasks', 
+        component: () => import('../views/tasks/Tasks.vue') 
+      },
+      {
+        path: 'analytics',
+        name: 'Analytics',
+        component: () => import('../views/analytics/Analytics.vue')
+      }
     ]
   }
 ]

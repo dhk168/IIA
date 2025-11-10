@@ -1,0 +1,87 @@
+
+/* 导入毛玻璃提示样式 */
+@import '../components/glass-toast.css';
+/* 导入图标选择器样式 */
+@import 'vue3-icon-picker/dist/style.css';
+
+
+.tasks-container {
+  padding: 20px;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.page-header h1 {
+  margin: 0;
+  color: #303133;
+  font-size: 24px;
+}
+
+.filter-section {
+  margin-bottom: 20px;
+}
+
+.tasks-card {
+  border-radius: 8px;
+}
+
+.tags-card {
+  margin-bottom: 20px;
+}
+
+.tags-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.tags-management {
+  padding: 10px 0;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 500;
+  color: #303133;
+}
+
+.task-title-container {
+  display: flex;
+  align-items: center;
+}
+
+.task-completed {
+  text-decoration: line-through;
+  color: #909399;
+}
+
+.task-detail {
+  padding: 10px;
+  background-color: #f5f7fa;
+  border-radius: 4px;
+}
+
+.detail-item {
+  margin-bottom: 8px;
+}
+
+.detail-item:last-child {
+  margin-bottom: 0;
+}
+
+.detail-item strong {
+  color: #606266;
+  margin-right: 8px;
+}
+
+.detail-item p {
+  margin: 5px 0 0 0;
+  color: #303133;
+}
