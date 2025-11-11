@@ -76,15 +76,6 @@ export default {
     }
   },
   created() {
-    // 打印localStorage中存储的token信息
-    const storedToken = localStorage.getItem('token')
-    console.log('localStorage中的token:', storedToken)
-    console.log('isLoggedIn状态:', localStorage.getItem('isLoggedIn'))
-    
-    if (!storedToken) {
-      console.log('请先登录获取真实token')
-    }
-    
     this.fetchProjects()
   },
   methods: {
@@ -116,20 +107,17 @@ export default {
     
     async fetchProjects() {
       try {
-        console.log('准备调用API，检查请求头中的token')
         const response = await reminderProjectAPI.getAllProjects();
         // 修改成功响应的检测逻辑，与后端响应格式匹配
         if (response && response.code === 200) {
           this.projects = response.data || [];
           // 移除查询成功的弹窗提示
         } else {
-          console.warn('API returned non-success response:', response);
           this.projects = []; // 清空projects数组
           // 显示失败弹窗
           this.createGlassToast('error', response?.msg || 'Failed to load projects');
         }
       } catch (error) {
-        console.error('API call failed:', error);
         this.projects = []; // 清空projects数组
         // 显示失败弹窗
         this.createGlassToast('error', 'Failed to load projects');

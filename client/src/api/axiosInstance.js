@@ -17,17 +17,12 @@ const api = axios.create({
 api.interceptors.request.use(
   config => {
     const token = localStorage.getItem('token');
-    console.log('请求拦截器获取到的token:', token);
     if (token) {
       config.headers['Authorization'] = `Bearer ${token}`;
-      console.log('添加到请求头的Authorization:', config.headers['Authorization']);
-    } else {
-      console.log('未找到token，请求头中未添加Authorization');
     }
     return config;
   },
   error => {
-    console.error('请求错误:', error);
     return Promise.reject(error);
   }
 );
@@ -49,7 +44,8 @@ api.interceptors.response.use(
           window.location.href = '/login';
           break;
         case 403:
-          console.error('Forbidden');
+          // 403 Forbidden - 清理认证信息但不自动重定向
+          // 让应用层决定如何处理（显示登录提示等）
           break;
         case 404:
           console.error('Not Found');

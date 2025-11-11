@@ -14,22 +14,22 @@
     <!-- 任务筛选 -->
     <div class="filter-section">
       <el-row :gutter="20">
-        <el-col :md="6" :sm="24">
-          <el-select v-model="filterOptions.status" placeholder="Task Status" clearable>
+        <el-col :md="6" :sm="12">
+          <el-select v-model="filterOptions.status" placeholder="Task Status" clearable class="glass-filter">
             <el-option label="All" value="" />
             <el-option label="To Do" value="todo" />
             <el-option label="Completed" value="done" />
             <el-option label="Abandoned" value="abandoned" />
           </el-select>
         </el-col>
-        <el-col :md="6" :sm="24">
-          <el-select v-model="filterOptions.project" placeholder="Project" clearable>
+        <el-col :md="6" :sm="12">
+          <el-select v-model="filterOptions.project" placeholder="Project" clearable class="glass-filter">
             <el-option label="All" value="" />
-            <el-option v-for="project in projects" :key="project.project_id" :label="project.name" :value="project.project_id" />
+            <el-option v-for="project in projects" :key="project?.project_id || 'invalid'" :label="project?.name || 'Invalid Project'" :value="project?.project_id || ''" v-if="project" />
           </el-select>
         </el-col>
-        <el-col :md="6" :sm="24">
-          <el-select v-model="filterOptions.priority" placeholder="Priority" clearable>
+        <el-col :md="6" :sm="12">
+          <el-select v-model="filterOptions.priority" placeholder="Priority" clearable class="glass-filter">
             <el-option label="All" value="" />
             <el-option label="None" value="none" />
             <el-option label="Low" value="low" />
@@ -37,14 +37,14 @@
             <el-option label="High" value="high" />
           </el-select>
         </el-col>
-        <el-col :md="6" :sm="24">
-          <el-date-picker v-model="filterOptions.dateRange" type="daterange" range-separator="to" start-placeholder="Start Date" end-placeholder="End Date" />
-        </el-col>
-        <el-col :md="6" :sm="24">
-          <el-select v-model="filterOptions.tag" placeholder="Tags Filter" clearable>
+        <el-col :md="6" :sm="12">
+          <el-select v-model="filterOptions.tag" placeholder="Tags Filter" clearable class="glass-filter">
             <el-option label="All" value="" />
             <el-option v-for="tag in tags" :key="tag.tag_id" :label="tag.name" :value="tag.tag_id" />
           </el-select>
+        </el-col>
+        <el-col :md="6" :sm="12">
+          <el-date-picker v-model="filterOptions.dateRange" type="daterange" range-separator="to" start-placeholder="Start Date" end-placeholder="End Date" class="glass-filter" />
         </el-col>
       </el-row>
     </div>
@@ -151,8 +151,24 @@
           <el-input v-model="taskForm.description" type="textarea" placeholder="Enter task description" :rows="3" />
         </el-form-item>
         <el-form-item label="Project" prop="project_id">
-          <el-select v-model="taskForm.project_id" placeholder="Select project" clearable>
-            <el-option v-for="project in projects" :key="project.project_id" :label="project.name" :value="project.project_id" />
+          <el-select 
+            v-model="taskForm.project_id" 
+            placeholder="Select project" 
+            clearable
+            filterable
+            :loading="isLoadingProjects"
+            @focus="handleProjectSelectFocus"
+          >
+            <!-- 添加空选项，解决第一个选项无法选择的问题 -->
+            <el-option :value="null" :label="'Select a project'" disabled />
+            <!-- 确保每个项目都有唯一的key和正确格式化的值 -->
+            <el-option 
+              v-for="(project, index) in projects" 
+              :key="`project-${project?.project_id || 'invalid'}-${index}`" 
+              :label="project?.name || 'Unnamed Project'" 
+              :value="String(project?.project_id || '')" 
+              v-if="project?.project_id && project?.name"
+            />
           </el-select>
         </el-form-item>
         <el-form-item label="Start Date" prop="start_date">
@@ -225,7 +241,7 @@
 
 <script>
 import TagManagement from './components/TagManagement.vue'
-import { reminderTaskAPI, tagAPI, taskTagAPI } from '../../api/reminder';
+import { reminderTaskAPI, tagAPI, taskTagAPI, reminderProjectAPI } from '../../api/reminder';
 export default {
   name: 'Tasks',
   components: {
@@ -261,6 +277,8 @@ export default {
         }
       }],
       projects: [],
+      isLoadingProjects: false,
+      lastLoadTime: 0,
       tags: [],
       filterOptions: {
         status: '',
@@ -303,7 +321,7 @@ export default {
       
       // 项目筛选
       if (this.filterOptions.project) {
-        filtered = filtered.filter(task => task.project_id === this.filterOptions.project)
+        filtered = filtered.filter(task => task && task.project_id === this.filterOptions.project)
       }
       
       // 优先级筛选
@@ -358,12 +376,152 @@ export default {
       });
     },
     
+    // 重新设计的项目加载逻辑
+    async loadProjects() {
+      // 重置项目列表
+      this.projects = [];
+      
+      try {
+        // 防止重复请求
+        if (this.isLoadingProjects) return;
+        this.isLoadingProjects = true;
+        
+        // 添加请求超时处理
+        const timeoutPromise = new Promise((_, reject) => {
+          setTimeout(() => reject(new Error('Request timeout')), 10000);
+        });
+        
+        const response = await Promise.race([
+          reminderProjectAPI.getAllProjects(),
+          timeoutPromise
+        ]);
+        
+        // 验证响应格式
+        if (!response || typeof response !== 'object') {
+          throw new Error('Invalid API response');
+        }
+        
+        // 检查响应码
+        if (response.code === 200 && Array.isArray(response.data)) {
+          // 预处理项目数据，确保格式正确
+          this.projects = response.data.map(project => ({
+            ...project,
+            // 确保project_id存在且为字符串类型
+            project_id: String(project?.project_id || ''),
+            name: project?.name || 'Unnamed Project'
+          })).filter(project => project && project.project_id && project.name); // 过滤无效项目
+          
+          // 存储到本地缓存，提高下次加载速度
+          try {
+            localStorage.setItem('cachedProjects', JSON.stringify({
+              data: this.projects,
+              timestamp: Date.now()
+            }));
+          } catch (e) {
+            // 忽略localStorage错误
+          }
+          
+        } else {
+          throw new Error(`API error: ${response.code || 'Unknown'}`);
+        }
+      } catch (error) {
+        // 详细的错误处理
+        const errorMessage = error.response?.status === 403 
+          ? 'Authentication required. Please log in.' 
+          : error.response?.status === 404 
+            ? 'Projects endpoint not found.'
+            : error.message === 'Request timeout'
+              ? 'Request timed out. Please try again.'
+              : 'Failed to load projects. Please try again.';
+        
+        // 尝试使用缓存数据
+        const cacheLoaded = this.loadProjectsFromCache();
+        
+        // 根据错误类型和缓存状态显示不同的提示
+        if (error.response?.status === 403) {
+          // 403错误时，尝试刷新令牌或重定向到登录
+          this.createGlassToast('error', errorMessage);
+          // 可选：在实际应用中可以在这里实现令牌刷新逻辑
+        } else if (cacheLoaded) {
+          this.createGlassToast('warning', 'Using cached project data. ' + errorMessage);
+        } else {
+          this.createGlassToast('error', errorMessage);
+        }
+      } finally {
+        this.isLoadingProjects = false;
+      }
+    },
+    
+    // 处理项目选择器聚焦事件
+    handleProjectSelectFocus() {
+      // 仅在数据为空或加载完成后尝试重新加载
+      if (!this.isLoadingProjects && (this.projects.length === 0 || Date.now() - this.lastLoadTime > 60000)) {
+        this.loadProjects();
+        this.lastLoadTime = Date.now();
+      }
+    },
+    
+    // 从缓存加载项目数据
+    loadProjectsFromCache() {
+      try {
+        const cachedData = localStorage.getItem('cachedProjects');
+        if (cachedData) {
+          const { data, timestamp } = JSON.parse(cachedData);
+          const now = Date.now();
+          const cacheExpiry = 30 * 60 * 1000; // 30分钟缓存
+          
+          if (now - timestamp < cacheExpiry && Array.isArray(data)) {
+            this.projects = data;
+            return true;
+          }
+        }
+      } catch (e) {
+        // 忽略解析错误
+      }
+      return false;
+    }
+  },
+  
+  methods: {
     async init() {
-      // 并行加载标签和任务数据
+      // 并行加载标签、任务和项目数据
       await Promise.all([
         this.loadTags(),
-        this.loadTasks()
+        this.loadTasks(),
+        this.loadProjects()
       ]);
+    },
+    
+    createGlassToast(type, message) {
+      const toast = document.createElement('div');
+      toast.className = `glass-toast glass-toast-${type}`;
+      toast.textContent = message;
+      
+      document.body.appendChild(toast);
+      
+      // 添加动画
+      setTimeout(() => {
+        toast.style.opacity = '1';
+        toast.style.transform = 'translateX(0)';
+      }, 10);
+      
+      // 自动移除
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(100%)';
+      }, 4000);
+      
+      setTimeout(() => {
+        if (document.body.contains(toast)) {
+          document.body.removeChild(toast);
+        }
+      }, 4500);
+      
+      toast.addEventListener('click', () => {
+        if (document.body.contains(toast)) {
+          document.body.removeChild(toast);
+        }
+      });
     },
     
     async loadTags() {
@@ -374,9 +532,9 @@ export default {
           this.tags = response.data || [];
         } else {
           console.warn('API returned non-success response:', response);
-            this.tags = [];
-            this.createGlassToast('error', 'Failed to load tags');
-        } 
+          this.tags = [];
+          this.createGlassToast('error', 'Failed to load tags');
+        }
       } catch (error) {
         console.error('Failed to load tags:', error);
         this.createGlassToast('error', 'Failed to load tags');
@@ -392,9 +550,9 @@ export default {
           console.log('Tasks loaded successfully:', this.tasks);
         } else {
           console.warn('API returned non-success response:', response);
-            this.tasks = [];
-            this.createGlassToast('error', 'Failed to load tasks');
-        } 
+          this.tasks = [];
+          this.createGlassToast('error', 'Failed to load tasks');
+        }
       } catch (error) {
         console.error('Failed to load tasks data:', error);
         this.createGlassToast('error', 'Failed to load tasks');
@@ -414,33 +572,33 @@ export default {
         '#e6a23c': 'warning',
         '#f56c6c': 'danger',
         '#909399': 'info'
-      }
-      return colorMap[color] || 'info'
+      };
+      return colorMap[color] || 'info';
     },
     
     formatDate(dateString) {
-      if (!dateString) return 'None'
-      const date = new Date(dateString)
-        return date.toLocaleString('en-US')
-      },
+      if (!dateString) return 'None';
+      const date = new Date(dateString);
+      return date.toLocaleString('en-US');
+    },
     getPriorityType(priority) {
       const typeMap = {
         'none': 'info',
         'low': 'success',
         'medium': 'warning',
         'high': 'danger'
-      }
-      return typeMap[priority] || 'info'
+      };
+      return typeMap[priority] || 'info';
     },
     getPriorityText(priority) {
-        const textMap = {
-          'none': 'None',
-          'low': 'Low',
-          'medium': 'Medium',
-          'high': 'High'
-        }
-        return textMap[priority] || 'None'
-      },
+      const textMap = {
+        'none': 'None',
+        'low': 'Low',
+        'medium': 'Medium',
+        'high': 'High'
+      };
+      return textMap[priority] || 'None';
+    },
     getTaskDueType(task) {
       if (!task.due_date) return 'info'
       const today = new Date()
@@ -455,27 +613,27 @@ export default {
       return 'info'
     },
     getRecurrenceText(recurrenceInfo) {
-      if (!recurrenceInfo) return ''
+      if (!recurrenceInfo) return '';
       
-      const { category, schedule, count } = recurrenceInfo
+      const { category, schedule, count } = recurrenceInfo;
       
       switch (category) {
         case 'weekly':
-          const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
-          const dayTexts = schedule.map(day => days[day]).join(', ')
-          return `Every ${dayTexts}, ${count} times`
+          const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+          const dayTexts = schedule.map(day => days[day]).join(', ');
+          return `Every ${dayTexts}, ${count} times`;
         case 'monthly':
-          return `Monthly on ${schedule.join(', ')}, ${count} times`
+          return `Monthly on ${schedule.join(', ')}, ${count} times`;
         case 'yearly':
-          return `Yearly on ${schedule[0]}, ${count} times`
+          return `Yearly on ${schedule[0]}, ${count} times`;
         case 'days':
-          return `Every ${schedule || 1} days, ${count} times`
+          return `Every ${schedule || 1} days, ${count} times`;
         case 'weeks':
-          return `Every ${schedule || 1} weeks, ${count} times`
+          return `Every ${schedule || 1} weeks, ${count} times`;
         case 'ebinghaus':
-          return `Ebbinghaus Memory Curve, ${count} times`
+          return `Ebbinghaus Memory Curve, ${count} times`;
         default:
-          return 'Custom recurrence'
+          return 'Custom recurrence';
       }
     },
 
@@ -511,31 +669,34 @@ export default {
       this.showAddTaskDialog = true
     },
     deleteTask(taskId) {
-        this.$confirm('Are you sure you want to delete this task?', 'Confirmation', {
-          confirmButtonText: 'Confirm',
-          cancelButtonText: 'Cancel',
+      this.$confirm('Are you sure you want to delete this task?', 'Confirmation', {
+        confirmButtonText: 'Confirm',
+        cancelButtonText: 'Cancel',
         type: 'warning'
       }).then(() => {
-        const index = this.tasks.findIndex(t => t.task_id === taskId)
+        const index = this.tasks.findIndex(t => t.task_id === taskId);
         if (index !== -1) {
-          this.tasks.splice(index, 1)
-          this.createGlassToast('success', 'Task deleted successfully')
+          this.tasks.splice(index, 1);
+          this.createGlassToast('success', 'Task deleted successfully');
         }
       }).catch(() => {
         // 取消删除
-      })
+      });
     },
     async submitTaskForm() {
       this.$refs.taskFormRef.validate(async (valid) => {
         if (valid) {
           try {
+            // 根据后端CreateTaskRequest结构构建任务数据
             const taskData = {
               title: this.taskForm.title,
               description: this.taskForm.description,
               category: this.taskForm.category,
-              project_id: this.taskForm.project_id,
-              start_date: this.taskForm.start_date ? this.taskForm.start_date.toISOString() : null,
-              due_date: this.taskForm.due_date ? this.taskForm.due_date.toISOString() : null,
+              projectId: this.taskForm.project_id || null,
+              parentTaskId: null, // 暂时不支持子任务
+              startDate: this.taskForm.start_date ? this.taskForm.start_date.toISOString() : null,
+              dueDate: this.taskForm.due_date ? this.taskForm.due_date.toISOString() : null,
+              reminderSentAt: null,
               priority: this.taskForm.priority
             }
             
@@ -550,7 +711,7 @@ export default {
             
             if (this.isEditMode) {
               // 编辑现有任务
-              taskData.task_id = this.taskForm.task_id
+              taskData.taskId = this.taskForm.task_id
               // 注意：reminderTaskAPI中可能没有updateTask方法，暂时使用createTask
               const response = await reminderTaskAPI.createTask(taskData)
               
@@ -568,13 +729,14 @@ export default {
                 }
               } else {
                 this.createGlassToast('error', 'Failed to update task');
-              throw new Error('Failed to update task')
+                throw new Error('Failed to update task')
               }
               
               // 更新本地任务列表
               const index = this.tasks.findIndex(t => t.task_id === savedTask.task_id)
               if (index !== -1) {
                 this.tasks[index] = {
+                  ...this.tasks[index],
                   ...savedTask,
                   tags: this.taskForm.selectedTags.map(tagId => 
                     this.tags.find(tag => tag.tagId === tagId)
@@ -592,37 +754,52 @@ export default {
                 savedTask = response.data || {};
                 
                 // 创建标签关联
-                if (this.taskForm.selectedTags.length > 0) {
-                  await taskTagAPI.createTaskTagBatch({
-                    taskId: savedTask.task_id,
-                    tagIds: this.taskForm.selectedTags
-                  })
-                }
-              } else {
-                this.createGlassToast('error', 'Failed to create task');
-              throw new Error('Failed to create task')
+              if (this.taskForm.selectedTags.length > 0) {
+                await taskTagAPI.createTaskTagBatch({
+                  taskId: savedTask.taskId,
+                  tagIds: this.taskForm.selectedTags
+                });
               }
-              
-              // 添加到本地任务列表
-              this.tasks.push({
-                ...savedTask,
-                tags: this.taskForm.selectedTags.map(tagId => 
-                  this.tags.find(tag => tag.tagId === tagId)
-                ).filter(Boolean)
-              })
+            } else {
+              this.createGlassToast('error', 'Failed to create task');
+              throw new Error('Failed to create task');
+            }
+            
+            // 添加到本地任务列表
+            this.tasks.push({
+              task_id: savedTask.taskId, // 保持前端使用task_id的习惯
+              user_id: savedTask.userId,
+              project_id: savedTask.projectId,
+              project_name: savedTask.projectName || 'No Project',
+              title: savedTask.title,
+              description: savedTask.description,
+              category: savedTask.category,
+              status: 'todo', // 默认状态
+              is_archived: false,
+              parent_task_id: savedTask.parentTaskId,
+              level: 0,
+              due_date: savedTask.dueDate,
+              start_date: savedTask.startDate,
+              completed_at: null,
+              created_at: new Date().toISOString(),
+              priority: savedTask.priority,
+              tags: this.taskForm.selectedTags.map(tagId => 
+                this.tags.find(tag => tag.tagId === tagId)
+              ).filter(Boolean)
+            })
               
               this.createGlassToast('success', 'Task created successfully')
             }
             
             // 关闭对话框并重置表单
-            this.showAddTaskDialog = false
-            this.resetTaskForm()
+            this.showAddTaskDialog = false;
+            this.resetTaskForm();
           } catch (error) {
-            console.error('Failed to save task:', error)
-            this.createGlassToast('error', 'Failed to save task: ' + (error.response?.data?.message || error.message))
+            console.error('Failed to save task:', error);
+            this.createGlassToast('error', 'Failed to save task: ' + (error.response?.data?.message || error.message));
           }
         }
-      })
+      });
     },
     resetTaskForm() {
       this.taskForm = {
@@ -637,12 +814,12 @@ export default {
         recurrence_category: 'weekly',
         recurrence_count: 1,
         selectedTags: []
-      }
-      this.isEditMode = false
+      };
+      this.isEditMode = false;
       if (this.$refs.taskFormRef) {
-        this.$refs.taskFormRef.resetFields()
+        this.$refs.taskFormRef.resetFields();
       }
-    },
+    }
 
   }
 }

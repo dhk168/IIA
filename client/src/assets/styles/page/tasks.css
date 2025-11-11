@@ -1,6 +1,10 @@
 
 /* 导入毛玻璃提示样式 */
 @import '../components/glass-toast.css';
+/* 导入下拉菜单毛玻璃样式 */
+@import '../components/dropdown-glass.css';
+/* 导入下拉列表毛玻璃样式 */
+@import '../components/light-toast.css';
 /* 导入图标选择器样式 */
 @import 'vue3-icon-picker/dist/style.css';
 
@@ -18,20 +22,57 @@
 
 .page-header h1 {
   margin: 0;
-  color: #303133;
+  color: rgba(255, 255, 255, 0.9);
   font-size: 24px;
+  font-weight: 600;
 }
 
 .filter-section {
   margin-bottom: 20px;
+  padding: 20px;
+}
+
+/* 为每个筛选器组件添加毛玻璃效果 */
+.filter-section .el-select,
+.filter-section .el-date-picker {
+  width: 100%;
+}
+
+/* 确保选择器和日期选择器都应用毛玻璃效果 */
+.filter-section .el-select,
+.filter-section .el-date-editor {
+  width: 100%;
+}
+
+/* 为筛选区域中的每个元素添加外边距 */
+.filter-section .el-col {
+  margin-bottom: 16px;
+}
+
+/* 基础筛选区域样式 */
+.filter-section {
+  margin-bottom: 20px;
+  padding: 20px;
 }
 
 .tasks-card {
-  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.15) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15) !important;
+  overflow: hidden !important;
 }
 
 .tags-card {
   margin-bottom: 20px;
+  background: rgba(255, 255, 255, 0.15) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15) !important;
 }
 
 .tags-card-header {
@@ -48,8 +89,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-weight: 500;
-  color: #303133;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
 }
 
 .task-title-container {
@@ -59,13 +100,14 @@
 
 .task-completed {
   text-decoration: line-through;
-  color: #909399;
+  color: rgba(255, 255, 255, 0.5);
 }
 
 .task-detail {
   padding: 10px;
-  background-color: #f5f7fa;
-  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 .detail-item {
@@ -77,11 +119,11 @@
 }
 
 .detail-item strong {
-  color: #606266;
+  color: rgba(255, 255, 255, 0.8);
   margin-right: 8px;
 }
 
 .detail-item p {
   margin: 5px 0 0 0;
-  color: #303133;
+  color: rgba(255, 255, 255, 0.9);
 }
