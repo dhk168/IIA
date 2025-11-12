@@ -432,8 +432,32 @@ export default {
         const response = await reminderTaskAPI.getTasks();
         // 响应拦截器已经返回了response.data，直接检查code
         if (response && response.code === 200) {
-          this.tasks = response.data || [];
+          // 处理任务数据，确保字段格式与前端组件匹配
+          this.tasks = (response.data || []).map(task => ({
+            // 前端使用的字段名
+            task_id: task.taskId,
+            user_id: task.userId,
+            project_id: task.projectId,
+            project_name: task.projectName || 'No Project',
+            title: task.title,
+            description: task.description,
+            category: task.category,
+            status: task.status || 'todo',
+            is_archived: task.isArchived || false,
+            parent_task_id: task.parentTaskId,
+            level: 0,
+            due_date: task.dueDate,
+            start_date: task.startDate,
+            completed_at: task.completedAt,
+            created_at: task.createdAt,
+            priority: task.priority || 'none',
+            tags: task.tags || [],
+            recurrence_info: task.recurrenceInfo,
+            // 保留原始字段
+            ...task
+          }));
           console.log('Tasks loaded successfully:', this.tasks);
+          this.createGlassToast('success', `成功加载 ${this.tasks.length} 个任务`);
         } else {
           console.warn('API returned non-success response:', response);
           this.tasks = [];
@@ -640,16 +664,16 @@ export default {
                 savedTask = response.data || {};
                 
                 // 创建标签关联
-              if (this.taskForm.selectedTags.length > 0) {
-                await taskTagAPI.createTaskTagBatch({
-                  taskId: savedTask.taskId,
-                  tagIds: this.taskForm.selectedTags
-                });
+                if (this.taskForm.selectedTags.length > 0) {
+                  await taskTagAPI.createTaskTagBatch({
+                    taskId: savedTask.taskId,
+                    tagIds: this.taskForm.selectedTags
+                  });
+                }
+              } else {
+                this.createGlassToast('error', 'Failed to create task');
+                throw new Error('Failed to create task');
               }
-            } else {
-              this.createGlassToast('error', 'Failed to create task');
-              throw new Error('Failed to create task');
-            }
             
             // 添加到本地任务列表
             this.tasks.push({

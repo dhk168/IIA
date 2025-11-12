@@ -3,9 +3,9 @@ package com.jackson.server.reminder.service.impl;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import com.jackson.server.reminder.dto.CreateTaskRequest;
 import org.springframework.stereotype.Service;
 
+import com.jackson.server.reminder.dto.CreateTaskRequest;
 import com.jackson.server.reminder.entity.Task;
 import com.jackson.server.reminder.mapper.TaskMapper;
 import com.jackson.server.reminder.service.TaskService;
@@ -21,13 +21,13 @@ public class TaskServiceImpl implements TaskService {
     private final TaskMapper taskMapper;
 
     @Override
-    public void create(Long userId, CreateTaskRequest dto) {
+    public Task create(Long userId, CreateTaskRequest dto) {
         log.info("Creating task for user: {}", userId);
-        Task task = new Task(dto);
+        // 先设置userId到dto中，再创建Task对象
         dto.setUserId(userId);
+        Task task = new Task(dto);
         task.setStatus("todo");
         task.setIsArchived(false);
-        Long projectId = task.getProjectId();
         Long parentTaskId = task.getParentTaskId();
         int count;
         if(parentTaskId == null){
@@ -41,8 +41,10 @@ public class TaskServiceImpl implements TaskService {
         int result = taskMapper.insert(task);
         if (result > 0) {
             log.info("Task created successfully with id: {}", task.getTaskId());
+            return task;
         }
         log.error("Failed to create task");
+        throw new RuntimeException("Failed to create task");
     }
 
     @Override

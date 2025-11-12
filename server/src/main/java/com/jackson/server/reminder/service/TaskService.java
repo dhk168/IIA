@@ -8,7 +8,7 @@ import com.jackson.server.reminder.entity.Task;
 
 public interface TaskService {
     // 创建任务
-    void create(Long userId, CreateTaskRequest dto);
+    Task create(Long userId, CreateTaskRequest dto);
     
     // 获取用户所有任务
     List<Task> getAll(Long userId);

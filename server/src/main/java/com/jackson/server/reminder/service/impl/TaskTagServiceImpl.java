@@ -27,6 +27,19 @@ public class TaskTagServiceImpl implements TaskTagService {
     @Override
     public int createBatch(List<TaskTag> taskTagList) {
         log.info("Creating batch task-tag associations, size: {}", taskTagList.size());
+        
+        // 验证taskId不为null
+        for (TaskTag taskTag : taskTagList) {
+            if (taskTag.getTaskId() == null) {
+                log.error("TaskTag has null taskId in batch creation");
+                throw new IllegalArgumentException("任务ID不能为空");
+            }
+            if (taskTag.getTagId() == null) {
+                log.error("TaskTag has null tagId in batch creation");
+                throw new IllegalArgumentException("标签ID不能为空");
+            }
+        }
+        
         int result = taskTagMapper.insertBatch(taskTagList);
         log.info("Created {} task-tag associations in batch", result);
         return result;

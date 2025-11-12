@@ -19,6 +19,7 @@ public interface TaskTagMapper {
             "(#{item.taskId}, #{item.tagId})" +
             "</foreach>" +
             "</script>")
+    @Options(useGeneratedKeys = true, keyProperty = "list.id", keyColumn = "id")
     int insertBatch(@Param("list") List<TaskTag> taskTagList);
     
     // 根据ID查询关联

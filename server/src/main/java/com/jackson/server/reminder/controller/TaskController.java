@@ -26,7 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/reminder/task")
+@RequestMapping({"/api/reminder/task", "/reminder/task"}) // 支持两种路径格式，兼容前端调用
 @RequiredArgsConstructor
 public class TaskController {
 
@@ -38,10 +38,23 @@ public class TaskController {
     public Map<String, Object> create(@RequestBody @Valid CreateTaskRequest dto, HttpServletRequest request) {
         try {
             Long userId = tokenService.getUserIdFromRequest(request);
-            taskService.create(userId, dto);
-            return ResponseUtils.buildSuccessResponse(null, "任务创建成功");
+            Task createdTask = taskService.create(userId, dto);
+            return ResponseUtils.buildSuccessResponse(createdTask, "任务创建成功");
         } catch (Exception e) {
             log.error("创建任务失败: {}", e.getMessage(), e);
+            return ResponseUtils.buildErrorResponse(e.getMessage());
+        }
+    }
+
+    // 默认GET端点，用于前端getTasks()调用
+    @GetMapping
+    public Map<String, Object> getTasks(HttpServletRequest request) {
+        try {
+            Long userId = tokenService.getUserIdFromRequest(request);
+            List<Task> tasks = taskService.getAll(userId);
+            return ResponseUtils.buildSuccessResponse(tasks, "任务查询成功");
+        } catch (Exception e) {
+            log.error("获取任务列表失败: {}", e.getMessage(), e);
             return ResponseUtils.buildErrorResponse(e.getMessage());
         }
     }
