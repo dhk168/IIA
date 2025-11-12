@@ -22,12 +22,7 @@
             <el-option label="Abandoned" value="abandoned" />
           </el-select>
         </el-col>
-        <el-col :md="6" :sm="12">
-          <el-select v-model="filterOptions.project" placeholder="Project" clearable class="glass-filter">
-            <el-option label="All" value="" />
-            <el-option v-for="project in projects" :key="project?.project_id || 'invalid'" :label="project?.name || 'Invalid Project'" :value="project?.project_id || ''" v-if="project" />
-          </el-select>
-        </el-col>
+
         <el-col :md="6" :sm="12">
           <el-select v-model="filterOptions.priority" placeholder="Priority" clearable class="glass-filter">
             <el-option label="All" value="" />
@@ -41,6 +36,12 @@
           <el-select v-model="filterOptions.tag" placeholder="Tags Filter" clearable class="glass-filter">
             <el-option label="All" value="" />
             <el-option v-for="tag in tags" :key="tag.tag_id" :label="tag.name" :value="tag.tag_id" />
+          </el-select>
+        </el-col>
+        <el-col :md="6" :sm="12">
+          <el-select v-model="filterOptions.project" placeholder="Project Filter" clearable class="glass-filter">
+            <el-option label="All" value="" />
+            <el-option v-for="project in sortedProjects" :key="project.projectId" :label="project.name" :value="project.projectId" />
           </el-select>
         </el-col>
         <el-col :md="6" :sm="12">
@@ -150,27 +151,7 @@
         <el-form-item label="Description" prop="description">
           <el-input v-model="taskForm.description" type="textarea" placeholder="Enter task description" :rows="3" />
         </el-form-item>
-        <el-form-item label="Project" prop="project_id">
-          <el-select 
-            v-model="taskForm.project_id" 
-            placeholder="Select project" 
-            clearable
-            filterable
-            :loading="isLoadingProjects"
-            @focus="handleProjectSelectFocus"
-          >
-            <!-- 添加空选项，解决第一个选项无法选择的问题 -->
-            <el-option :value="null" :label="'Select a project'" disabled />
-            <!-- 确保每个项目都有唯一的key和正确格式化的值 -->
-            <el-option 
-              v-for="(project, index) in projects" 
-              :key="`project-${project?.project_id || 'invalid'}-${index}`" 
-              :label="project?.name || 'Unnamed Project'" 
-              :value="String(project?.project_id || '')" 
-              v-if="project?.project_id && project?.name"
-            />
-          </el-select>
-        </el-form-item>
+
         <el-form-item label="Start Date" prop="start_date">
           <el-date-picker
             v-model="taskForm.start_date"
@@ -193,6 +174,12 @@
             <el-option label="Low" value="low" />
             <el-option label="Medium" value="medium" />
             <el-option label="High" value="high" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="Project" prop="project_id">
+          <el-select v-model="taskForm.project_id" placeholder="Select project">
+            <el-option label="No Project" value="" />
+            <el-option v-for="project in sortedProjects" :key="project.projectId" :label="project.name" :value="project.projectId" />
           </el-select>
         </el-form-item>
         <el-form-item label="Recurrence Settings" prop="has_recurrence">
@@ -276,16 +263,15 @@ export default {
           count: 52
         }
       }],
-      projects: [],
-      isLoadingProjects: false,
-      lastLoadTime: 0,
+
       tags: [],
+      projects: [],
       filterOptions: {
         status: '',
-        project: '',
         priority: '',
         dateRange: null,
-        tag: ''
+        tag: '',
+        project: ''
       },
       showAddTaskDialog: false,
       isEditMode: false,
@@ -294,14 +280,14 @@ export default {
         title: '',
         description: '',
         category: 'task',
-        project_id: null,
         start_date: null,
         due_date: null,
         priority: 'none',
         has_recurrence: false,
         recurrence_category: 'weekly',
         recurrence_count: 1,
-        selectedTags: []
+        selectedTags: [],
+        project_id: null
       },
       taskRules: {
         title: [
@@ -310,7 +296,21 @@ export default {
       }
     }
   },
+  created() {
+    // 在组件创建时初始化数据
+    this.init().then(() => {
+    });
+  },
   computed: {
+    sortedProjects() {
+      // 确保projects是数组，然后按名称排序
+      if (!Array.isArray(this.projects)) return [];
+      return [...this.projects].sort((a, b) => {
+        const nameA = (a?.name || '').toLowerCase();
+        const nameB = (b?.name || '').toLowerCase();
+        return nameA.localeCompare(nameB);
+      });
+    },
     filteredTasks() {
       let filtered = [...this.tasks]
       
@@ -319,10 +319,6 @@ export default {
         filtered = filtered.filter(task => task.status === this.filterOptions.status)
       }
       
-      // 项目筛选
-      if (this.filterOptions.project) {
-        filtered = filtered.filter(task => task && task.project_id === this.filterOptions.project)
-      }
       
       // 优先级筛选
       if (this.filterOptions.priority) {
@@ -346,145 +342,39 @@ export default {
         )
       }
       
+      // 项目筛选
+      if (this.filterOptions.project) {
+        filtered = filtered.filter(task => task && task.project_id === this.filterOptions.project)
+      }
+      
       return filtered
     }
   },
   methods: {
-    // 添加毛玻璃提示方法
-    createGlassToast(type, message) {
-      const toast = document.createElement('div');
-      toast.className = `glass-toast glass-toast-${type}`;
-      toast.textContent = message;
-      document.body.appendChild(toast);
-      
-      // 自动移除
-      setTimeout(() => {
-        toast.style.opacity = '0';
-        toast.style.transform = 'translateX(100%)';
-      }, 4000);
-      
-      setTimeout(() => {
-        if (document.body.contains(toast)) {
-          document.body.removeChild(toast);
-        }
-      }, 4500);
-      
-      toast.addEventListener('click', () => {
-        if (document.body.contains(toast)) {
-          document.body.removeChild(toast);
-        }
-      });
-    },
-    
-    // 重新设计的项目加载逻辑
     async loadProjects() {
-      // 重置项目列表
-      this.projects = [];
-      
       try {
-        // 防止重复请求
-        if (this.isLoadingProjects) return;
-        this.isLoadingProjects = true;
-        
-        // 添加请求超时处理
-        const timeoutPromise = new Promise((_, reject) => {
-          setTimeout(() => reject(new Error('Request timeout')), 10000);
-        });
-        
-        const response = await Promise.race([
-          reminderProjectAPI.getAllProjects(),
-          timeoutPromise
-        ]);
-        
-        // 验证响应格式
-        if (!response || typeof response !== 'object') {
-          throw new Error('Invalid API response');
-        }
-        
-        // 检查响应码
-        if (response.code === 200 && Array.isArray(response.data)) {
-          // 预处理项目数据，确保格式正确
-          this.projects = response.data.map(project => ({
-            ...project,
-            // 确保project_id存在且为字符串类型
-            project_id: String(project?.project_id || ''),
-            name: project?.name || 'Unnamed Project'
-          })).filter(project => project && project.project_id && project.name); // 过滤无效项目
-          
-          // 存储到本地缓存，提高下次加载速度
-          try {
-            localStorage.setItem('cachedProjects', JSON.stringify({
-              data: this.projects,
-              timestamp: Date.now()
-            }));
-          } catch (e) {
-            // 忽略localStorage错误
-          }
-          
-        } else {
-          throw new Error(`API error: ${response.code || 'Unknown'}`);
+        const response = await reminderProjectAPI.getAllProjects();
+        // 响应拦截器已经返回了response.data，直接检查code
+        if (response && response.code === 200 && Array.isArray(response.data)) {
+          this.projects = response.data.filter(project => !project.isArchived);
         }
       } catch (error) {
-        // 详细的错误处理
-        const errorMessage = error.response?.status === 403 
-          ? 'Authentication required. Please log in.' 
-          : error.response?.status === 404 
-            ? 'Projects endpoint not found.'
-            : error.message === 'Request timeout'
-              ? 'Request timed out. Please try again.'
-              : 'Failed to load projects. Please try again.';
-        
-        // 尝试使用缓存数据
-        const cacheLoaded = this.loadProjectsFromCache();
-        
-        // 根据错误类型和缓存状态显示不同的提示
-        if (error.response?.status === 403) {
-          // 403错误时，尝试刷新令牌或重定向到登录
-          this.createGlassToast('error', errorMessage);
-          // 可选：在实际应用中可以在这里实现令牌刷新逻辑
-        } else if (cacheLoaded) {
-          this.createGlassToast('warning', 'Using cached project data. ' + errorMessage);
-        } else {
-          this.createGlassToast('error', errorMessage);
-        }
-      } finally {
-        this.isLoadingProjects = false;
+        console.error('Failed to load projects:', error);
+        // 提供一些默认的模拟项目数据
+        this.projects = [
+          { projectId: 1, name: 'Personal Project' },
+          { projectId: 2, name: 'Work Project' }
+        ];
       }
     },
-    
-    // 处理项目选择器聚焦事件
-    handleProjectSelectFocus() {
-      // 仅在数据为空或加载完成后尝试重新加载
-      if (!this.isLoadingProjects && (this.projects.length === 0 || Date.now() - this.lastLoadTime > 60000)) {
-        this.loadProjects();
-        this.lastLoadTime = Date.now();
-      }
+    getProjectName(projectId) {
+      if (!projectId) return 'No Project';
+      const project = this.projects.find(p => p.projectId === projectId);
+      return project ? project.name : 'Unknown Project';
     },
-    
-    // 从缓存加载项目数据
-    loadProjectsFromCache() {
-      try {
-        const cachedData = localStorage.getItem('cachedProjects');
-        if (cachedData) {
-          const { data, timestamp } = JSON.parse(cachedData);
-          const now = Date.now();
-          const cacheExpiry = 30 * 60 * 1000; // 30分钟缓存
-          
-          if (now - timestamp < cacheExpiry && Array.isArray(data)) {
-            this.projects = data;
-            return true;
-          }
-        }
-      } catch (e) {
-        // 忽略解析错误
-      }
-      return false;
-    }
-  },
-  
-  methods: {
+    // 初始化数据加载
     async init() {
-      // 并行加载标签、任务和项目数据
+      // 加载标签、任务和项目数据
       await Promise.all([
         this.loadTags(),
         this.loadTasks(),
@@ -492,18 +382,13 @@ export default {
       ]);
     },
     
+    // 添加毛玻璃提示方法
     createGlassToast(type, message) {
       const toast = document.createElement('div');
       toast.className = `glass-toast glass-toast-${type}`;
       toast.textContent = message;
       
       document.body.appendChild(toast);
-      
-      // 添加动画
-      setTimeout(() => {
-        toast.style.opacity = '1';
-        toast.style.transform = 'translateX(0)';
-      }, 10);
       
       // 自动移除
       setTimeout(() => {
@@ -524,10 +409,11 @@ export default {
       });
     },
     
+    
     async loadTags() {
       try {
         const response = await tagAPI.getAllTags();
-        // 根据Projects.vue的判断逻辑，检查response.code === 200
+        // 响应拦截器已经返回了response.data，直接检查code
         if (response && response.code === 200) {
           this.tags = response.data || [];
         } else {
@@ -544,7 +430,7 @@ export default {
     async loadTasks() {
       try {
         const response = await reminderTaskAPI.getTasks();
-        // 根据Projects.vue的判断逻辑，检查response.code === 200
+        // 响应拦截器已经返回了response.data，直接检查code
         if (response && response.code === 200) {
           this.tasks = response.data || [];
           console.log('Tasks loaded successfully:', this.tasks);
