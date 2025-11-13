@@ -2,13 +2,17 @@ package com.jackson.server.reminder.service.impl;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.jackson.server.reminder.dto.CreateTaskRequest;
 import com.jackson.server.reminder.entity.Task;
+import com.jackson.server.reminder.entity.TaskTag;
 import com.jackson.server.reminder.mapper.TaskMapper;
 import com.jackson.server.reminder.service.TaskService;
+import com.jackson.server.reminder.service.TaskTagService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,8 +23,10 @@ import lombok.extern.slf4j.Slf4j;
 public class TaskServiceImpl implements TaskService {
 
     private final TaskMapper taskMapper;
+    private final TaskTagService taskTagService;
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Task create(Long userId, CreateTaskRequest dto) {
         log.info("Creating task for user: {}", userId);
         // 先设置userId到dto中，再创建Task对象
@@ -41,6 +47,21 @@ public class TaskServiceImpl implements TaskService {
         int result = taskMapper.insert(task);
         if (result > 0) {
             log.info("Task created successfully with id: {}", task.getTaskId());
+            
+            // 处理标签关联
+            if (dto.getTagIds() != null && !dto.getTagIds().isEmpty()) {
+                List<TaskTag> taskTags = dto.getTagIds().stream()
+                    .map(tagId -> {
+                        TaskTag taskTag = new TaskTag();
+                        taskTag.setTaskId(task.getTaskId());
+                        taskTag.setTagId(tagId);
+                        return taskTag;
+                    })
+                    .collect(Collectors.toList());
+                taskTagService.createBatch(taskTags);
+                log.info("Created task-tag associations for task id: {}", task.getTaskId());
+            }
+            
             return task;
         }
         log.error("Failed to create task");

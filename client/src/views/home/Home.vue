@@ -24,6 +24,9 @@
           <el-menu-item index="/home/reminder/projects">
             <el-icon class="menu-icon"><DataLine /></el-icon>
           </el-menu-item>
+          <el-menu-item index="/home/debug">
+              <el-icon class="menu-icon"><Tools /></el-icon>
+            </el-menu-item>
         </el-menu>
       </el-aside>
       
@@ -62,7 +65,7 @@
 </template>
 
 <script>
-import { UserFilled, List, DataLine, Box } from '@element-plus/icons-vue'
+import { UserFilled, List, DataLine, Box, Tools } from '@element-plus/icons-vue'
 import { authAPI } from '../../api/auth'
 
 export default {
@@ -71,7 +74,8 @@ export default {
     UserFilled,
     List,
     DataLine,
-    Box
+    Box,
+    Tools
   },
   data() {
     return {

@@ -1,6 +1,7 @@
 package com.jackson.server.reminder.dto;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import lombok.Data;
 
 @Data
@@ -14,4 +15,5 @@ public class CreateTaskRequest {
     private LocalDateTime startDate;
     private LocalDateTime reminderSentAt;
     private String priority;
+    private List<Long> tagIds; // 新增标签ID列表字段
 }

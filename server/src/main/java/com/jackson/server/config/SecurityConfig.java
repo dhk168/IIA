@@ -50,6 +50,8 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 // 允许所有用户访问认证端点
                 .requestMatchers("/api/auth/**").permitAll()
+                // 允许所有用户访问debug端点
+                .requestMatchers("/api/debug/**").permitAll()
                 // 允许预检请求
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 // 其他所有请求都需要认证

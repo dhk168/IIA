@@ -45,11 +45,7 @@ const routes = [
         name: 'Tasks', 
         component: () => import('../views/tasks/Tasks.vue') 
       },
-      {
-        path: 'analytics',
-        name: 'Analytics',
-        component: () => import('../views/analytics/Analytics.vue')
-      }
+      {        path: 'analytics',        name: 'Analytics',        component: () => import('../views/analytics/Analytics.vue')      },      {        path: 'debug',        name: 'Debug',        component: () => import('../views/debug/Debug.vue')      }
     ]
   }
 ]
