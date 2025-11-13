@@ -139,3 +139,53 @@ body {
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
   transform: translateY(-2px);
 }
+
+/* 强制覆盖Element UI对话框样式 - 玻璃态效果 */
+.el-dialog {
+  background: rgba(255, 255, 255, 0.15) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 8px 32px 0 var(--project-color, rgba(0, 128, 255, 0.3)) !important;
+}
+
+.el-dialog__title {
+  color: var(--project-color, #0080ff) !important;
+  font-weight: 600 !important;
+}
+
+/* Element UI表单输入组件玻璃态样式 */
+.el-input__wrapper,
+.el-select__wrapper {
+  background: rgba(255, 255, 255, 0.2) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+}
+
+.el-input__inner,
+.el-select__inner {
+  color: var(--project-color, #0080ff) !important;
+}
+
+.el-form-item__label {
+  color: var(--project-color, #0080ff) !important;
+  font-weight: 500 !important;
+}
+
+/* Element UI按钮玻璃态样式 */
+.el-button--primary {
+  background: var(--project-color, #0080ff) !important;
+  border-color: var(--project-color, #0080ff) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+}
+
+.el-button--default {
+  background: rgba(255, 255, 255, 0.2) !important;
+  border-color: rgba(255, 255, 255, 0.3) !important;
+  color: var(--project-color, #0080ff) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+}

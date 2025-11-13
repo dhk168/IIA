@@ -1,0 +1,57 @@
+.el-dialog__wrapper.project-dialog-glass {
+  background-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+.el-dialog__wrapper.project-dialog-glass .el-dialog {
+  background: rgba(255, 255, 255, 0.7) !important;
+  backdrop-filter: blur(20px) saturate(1.2) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(1.2) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.15) !important;
+  background-clip: padding-box !important;
+  -webkit-background-clip: padding-box !important;
+}
+
+.el-dialog__wrapper.project-dialog-glass .el-dialog__header,
+.el-dialog__wrapper.project-dialog-glass .el-dialog__body,
+.el-dialog__wrapper.project-dialog-glass .el-dialog__footer {
+  background: transparent !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+.el-dialog__wrapper.project-dialog-glass .el-dialog__title {
+  color: rgba(0, 0, 0, 0.85) !important;
+}
+
+.el-dialog__wrapper.project-dialog-glass .el-input__wrapper,
+.el-dialog__wrapper.project-dialog-glass .el-textarea__inner {
+  background: rgba(255, 255, 255, 0.9) !important;
+  border: 1px solid rgba(255, 255, 255, 0.5) !important;
+  border-radius: 8px !important;
+  color: rgba(0, 0, 0, 0.85) !important;
+}
+
+/* Ensure the glassmorphism effect works on all browsers */
+@supports (-webkit-backdrop-filter: blur(10px)) {
+  .el-dialog__wrapper.project-dialog-glass .el-dialog {
+    background: rgba(255, 255, 255, 0.7) !important;
+    backdrop-filter: blur(20px) saturate(1.2) !important;
+    -webkit-backdrop-filter: blur(20px) saturate(1.2) !important;
+  }
+}
+
+@supports not (-webkit-backdrop-filter: blur(10px)) {
+  .el-dialog__wrapper.project-dialog-glass .el-dialog {
+    background: rgba(255, 255, 255, 0.95) !important;
+  }
+}
+
+/* Apply project color to text elements */
+.el-dialog__wrapper.project-dialog-glass .el-dialog__title,
+.el-dialog__wrapper.project-dialog-glass .el-form-item__label,
+.el-dialog__wrapper.project-dialog-glass .el-input__inner,
+.el-dialog__wrapper.project-dialog-glass .el-textarea__inner,
+.el-dialog__wrapper.project-dialog-glass .el-button {
+  color: var(--project-color, rgba(0, 0, 0, 0.85)) !important;
+}
