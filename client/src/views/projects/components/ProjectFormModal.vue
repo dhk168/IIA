@@ -200,7 +200,7 @@ export default {
 
 <style scoped>
 @import '../../../assets/styles/element-ui-reset.css';
-@import '../../../assets/styles/components/background.css';
+/* Removed background.css import */
 
 /* Project-specific styles for the glass dialog */
 .project-dialog-glass {

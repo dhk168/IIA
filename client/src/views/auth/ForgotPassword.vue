@@ -1,18 +1,18 @@
 <template>
-  <div class="auth-container">
+  <back-div>
     <h1 class="auth-title">Intelligent Information Assistant</h1>
     <el-form :model="forgotForm" :rules="rules" ref="forgotFormRef" class="auth-form">
       <div class="form-group">
         <label class="form-label">Email</label>
         <el-form-item prop="email" style="margin: 0;">
-          <el-input v-model="forgotForm.email" placeholder="" class="form-input"></el-input>
+          <light-input v-model="forgotForm.email" placeholder="Email"></light-input>
         </el-form-item>
       </div>
       <div class="form-group">
         <label class="form-label">Verification Code</label>
         <el-form-item prop="verificationCode" style="margin: 0;">
           <div class="verification-code-container">
-            <el-input v-model="forgotForm.verificationCode" placeholder="" class="verification-code-input"></el-input>
+            <light-input v-model="forgotForm.verificationCode" placeholder="Verification Code"></light-input>
             <LightButton @click="sendVerificationCode" :disabled="sending">
               {{ sending ? 'Sending...' : 'Send Code' }}
             </LightButton>
@@ -22,27 +22,27 @@
       <div class="form-group">
         <label class="form-label">New Password</label>
         <el-form-item prop="newPassword" style="margin: 0;">
-          <el-input v-model="forgotForm.newPassword" type="password" placeholder="" show-password class="form-input"></el-input>
+          <light-input v-model="forgotForm.newPassword" type="password" placeholder="New Password"></light-input>
         </el-form-item>
       </div>
       <div class="form-group">
         <label class="form-label">Confirm Password</label>
         <el-form-item prop="confirmPassword" style="margin: 0;">
-          <el-input v-model="forgotForm.confirmPassword" type="password" placeholder="" show-password class="form-input"></el-input>
+          <light-input v-model="forgotForm.confirmPassword" type="password" placeholder="Confirm Password"></light-input>
         </el-form-item>
       </div>
       <auth-button @click="handleResetPassword" submit>Reset Password</auth-button>
       <div class="bottom-text">
-        <router-link to="/login">Back to Login</router-link>
+        Remember your password? <router-link to="/login">Back to Login</router-link>
       </div>
     </el-form>
-  </div>
-  <light-toast
-    :visible="toastVisible"
-    :message="toastMessage"
-    :type="toastType"
-    @close="closeToast"
-  ></light-toast>
+    <light-toast
+      :visible="toastVisible"
+      :message="toastMessage"
+      :type="toastType"
+      @close="closeToast"
+    ></light-toast>
+  </back-div>
 </template>
 
 <script>
@@ -50,12 +50,16 @@ import { authAPI } from '@/api/auth';
 import LightButton from '@/components/LightButton.vue';
 import AuthButton from './components/AuthButton.vue';
 import LightToast from '@/components/LightToast.vue';
+import LightInput from '@/components/LightInput.vue';
+import BackDiv from '@/components/BackDiv.vue';
 export default {
   name: 'ForgotPassword',
   components: {
     LightButton,
     AuthButton,
-    LightToast
+    LightToast,
+    LightInput,
+    BackDiv
   },
   data() {
     return {
@@ -197,4 +201,5 @@ export default {
 </script>
 
 <style scoped>
+@import '@/assets/styles/page/auth.css';
 </style>

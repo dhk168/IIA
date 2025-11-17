@@ -1,67 +1,73 @@
 <template>
   <div class="main-container home-container">
     <!-- 波浪呼吸效果背景层 -->
-    <div class="home-background"></div>
+    <BackDiv />
     
     <div class="layout-wrapper">
       <!-- 侧边栏 -->
-      <el-aside width="80px" class="sidebar">
-        <el-menu
-          :default-active="activeMenu"
-          class="el-menu-vertical"
-          router
-          @select="handleMenuSelect"
-          background-color="transparent"
-          text-color="#fff"
-          active-text-color="#fff"
-        >
-          <el-menu-item index="/home/projects">
-            <el-icon class="menu-icon"><Box /></el-icon>
-          </el-menu-item>
-          <el-menu-item index="/home/tasks">
-            <el-icon class="menu-icon"><List /></el-icon>
-          </el-menu-item>
-          <el-menu-item index="/home/reminder/projects">
-            <el-icon class="menu-icon"><DataLine /></el-icon>
-          </el-menu-item>
-          <el-menu-item index="/home/debug">
-              <el-icon class="menu-icon"><Tools /></el-icon>
-          </el-menu-item>
-          <el-menu-item index="/home/demo">
-              <el-icon class="menu-icon"><Tools /></el-icon>
-          </el-menu-item>
-        </el-menu>
-      </el-aside>
+      <LightDiv class="sidebar">
+        <el-aside width="80px">
+          <el-menu
+            :default-active="activeMenu"
+            class="el-menu-vertical"
+            router
+            @select="handleMenuSelect"
+            background-color="transparent"
+            text-color="#fff"
+            active-text-color="#fff"
+          >
+            <el-menu-item index="/home/projects">
+              <el-icon class="menu-icon"><Box /></el-icon>
+            </el-menu-item>
+            <el-menu-item index="/home/tasks">
+              <el-icon class="menu-icon"><List /></el-icon>
+            </el-menu-item>
+            <el-menu-item index="/home/reminder/projects">
+              <el-icon class="menu-icon"><DataLine /></el-icon>
+            </el-menu-item>
+            <el-menu-item index="/home/debug">
+                <el-icon class="menu-icon"><Tools /></el-icon>
+            </el-menu-item>
+            <el-menu-item index="/home/demo">
+                <el-icon class="menu-icon"><Tools /></el-icon>
+            </el-menu-item>
+          </el-menu>
+        </el-aside>
+      </LightDiv>
       
       <!-- 右侧内容区域 -->
       <div class="right-content">
         <!-- 顶部导航 -->
-        <el-header class="header">
-          <div class="header-left">
-            <h1 class="page-title">{{ currentPageTitle }}</h1>
-          </div>
-          <div class="header-right">
-            <div class="welcome-text">
-              Welcome, {{ username }}
+        <LightDiv class="header">
+          <el-header>
+            <div class="header-left">
+              <h1 class="page-title">{{ currentPageTitle }}</h1>
             </div>
-            <!-- 自定义下拉菜单 -->
-              <div class="custom-dropdown" @click="toggleDropdown">
-                <el-avatar :size="50" :icon="UserFilled" class="user-avatar" />
-                <!-- 自定义下拉菜单内容 -->
-                <transition name="dropdown">
-                  <div v-if="dropdownVisible" class="custom-dropdown-menu">
-                    <div class="custom-dropdown-item" @click="dropdownVisible = false">Profile</div>
-                    <div class="custom-dropdown-item" @click="handleLogout">Logout</div>
-                  </div>
-                </transition>
+            <div class="header-right">
+              <div class="welcome-text">
+                Welcome, {{ username }}
               </div>
-          </div>
-        </el-header>
+              <!-- 自定义下拉菜单 -->
+                <div class="custom-dropdown" @click="toggleDropdown">
+                  <el-avatar :size="50" :icon="UserFilled" class="user-avatar" />
+                  <!-- 自定义下拉菜单内容 -->
+                  <transition name="dropdown">
+                    <div v-if="dropdownVisible" class="custom-dropdown-menu">
+                      <div class="custom-dropdown-item" @click="dropdownVisible = false">Profile</div>
+                      <div class="custom-dropdown-item" @click="handleLogout">Logout</div>
+                    </div>
+                  </transition>
+                </div>
+            </div>
+          </el-header>
+        </LightDiv>
         
         <!-- 页面内容 -->
-        <el-main class="main-content">
-          <router-view />
-        </el-main>
+        <LightDiv class="main-content">
+          <el-main>
+            <router-view />
+          </el-main>
+        </LightDiv>
       </div>
     </div>
   </div>
@@ -70,6 +76,8 @@
 <script>
 import { UserFilled, List, DataLine, Box, Tools } from '@element-plus/icons-vue'
 import { authAPI } from '@/api/auth'
+import LightDiv from '@/components/LightDiv.vue'
+import BackDiv from '@/components/BackDiv.vue'
 
 export default {
   name: 'Home',
@@ -78,7 +86,9 @@ export default {
     List,
     DataLine,
     Box,
-    Tools
+    Tools,
+    LightDiv,
+    BackDiv
   },
   data() {
     return {
@@ -181,5 +191,4 @@ export default {
 
 <style scoped>
 @import '../../assets/styles/page/home.css';
-/* 导入页面级样式文件 */
 </style>

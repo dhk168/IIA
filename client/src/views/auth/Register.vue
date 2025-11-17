@@ -1,24 +1,24 @@
 <template>
-  <div class="auth-container">
+  <back-div>
     <h1 class="auth-title">Intelligent Information Assistant</h1>
     <el-form :model="registerForm" :rules="rules" ref="registerFormRef" class="auth-form">
       <div class="form-group">
         <label class="form-label">Username</label>
         <el-form-item prop="username" style="margin: 0;">
-          <el-input v-model="registerForm.username" placeholder="" class="form-input"></el-input>
+          <light-input v-model="registerForm.username" placeholder="Username"></light-input>
         </el-form-item>
       </div>
       <div class="form-group">
         <label class="form-label">Email</label>
         <el-form-item prop="email" style="margin: 0;">
-          <el-input v-model="registerForm.email" placeholder="" class="form-input"></el-input>
+          <light-input v-model="registerForm.email" placeholder="Email"></light-input>
         </el-form-item>
       </div>
       <div class="form-group">
         <label class="form-label">Verification Code</label>
         <el-form-item prop="verificationCode" style="margin: 0;">
           <div class="verification-code-container">
-            <el-input v-model="registerForm.verificationCode" placeholder="" class="verification-code-input"></el-input>
+            <light-input v-model="registerForm.verificationCode" placeholder="Verification Code"></light-input>
             <LightButton @click="sendVerificationCode" :disabled="countDownSeconds > 0 || sending">
               {{ countDownSeconds > 0 ? `${countDownSeconds}s to resend` : 'Send Code' }}
             </LightButton>
@@ -28,13 +28,13 @@
       <div class="form-group">
         <label class="form-label">Password</label>
         <el-form-item prop="password" style="margin: 0;">
-          <el-input v-model="registerForm.password" type="password" placeholder="" class="form-input"></el-input>
+          <light-input v-model="registerForm.password" type="password" placeholder="Password"></light-input>
         </el-form-item>
       </div>
       <div class="form-group">
         <label class="form-label">Confirm Password</label>
         <el-form-item prop="confirmPassword" style="margin: 0;">
-          <el-input v-model="registerForm.confirmPassword" type="password" placeholder="" class="form-input"></el-input>
+          <light-input v-model="registerForm.confirmPassword" type="password" placeholder="Confirm Password"></light-input>
         </el-form-item>
       </div>
       <auth-button @click="handleRegister" submit>Sign up</auth-button>
@@ -42,26 +42,30 @@
         Already have an account? <router-link to="/login">Sign in</router-link>
       </div>
     </el-form>
-  </div>
-  <light-toast
-    :visible="toastVisible"
-    :message="toastMessage"
-    :type="toastType"
-    @close="closeToast"
-  ></light-toast>
-</template>
+    <light-toast
+      :visible="toastVisible"
+      :message="toastMessage"
+      :type="toastType"
+      @close="closeToast"
+    ></light-toast>
+    </back-div>
+    </template>
 
 <script>
 import { authAPI } from '@/api/auth';
 import LightButton from '@/components/LightButton.vue';
 import AuthButton from './components/AuthButton.vue';
 import LightToast from '@/components/LightToast.vue';
+import LightInput from '@/components/LightInput.vue';
+import BackDiv from '@/components/BackDiv.vue';
 export default {
   name: 'Register',
   components: {
     LightButton,
     AuthButton,
-    LightToast
+    LightToast,
+    LightInput,
+    BackDiv
   },
   data() {
     return {
@@ -263,4 +267,5 @@ export default {
 </script>
 
 <style scoped>
+@import '@/assets/styles/page/auth.css';
 </style>

@@ -1,10 +1,4 @@
 /* 导入认证页面样式，包含毛玻璃效果和渐变背景 */
-@import './assets/styles/page/auth.css';
-
-
-/* 导入通用轻量级毛玻璃按钮样式 */
-
-/* 已通过新路径导入 */
 
 /* 全局重置样式 */
 * {
@@ -29,6 +23,7 @@ body {
   position: relative;
 }
 
+/* 
 /* 为自定义下拉菜单添加全局样式支持 */
 .custom-dropdown {
   position: relative;
@@ -66,3 +61,12 @@ body {
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
   transform: translateY(-2px);
 }
+
+/* Ocean wave animation - global */
+@keyframes oceanGradient {
+  0% { background-position: 0% 50%; }
+  25% { background-position: 50% 60%; }
+  50% { background-position: 100% 50%; }
+  75% { background-position: 50% 40%; }
+  100% { background-position: 0% 50%; }
+} */

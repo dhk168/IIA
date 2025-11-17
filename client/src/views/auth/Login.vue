@@ -1,11 +1,11 @@
 <template>
-  <div class="auth-container">
+  <back-div>
     <h1 class="auth-title">Intelligent Information Assistant</h1>
     <el-form :model="loginForm" :rules="rules" ref="loginFormRef" class="auth-form">
       <div class="form-group">
         <label class="form-label">Email</label>
         <el-form-item prop="email" style="margin: 0;">
-          <el-input v-model="loginForm.email" placeholder="" class="form-input"></el-input>
+          <light-input v-model="loginForm.email" placeholder="Email"></light-input>
         </el-form-item>
       </div>
       <div class="form-group">
@@ -14,7 +14,7 @@
           <router-link to="/forgot-password" class="forgot-password-link">Forgot password?</router-link>
         </div>
         <el-form-item prop="password" style="margin: 0;">
-          <el-input v-model="loginForm.password" type="password" placeholder="" class="form-input"></el-input>
+          <light-input v-model="loginForm.password" type="password" placeholder="Password"></light-input>
         </el-form-item>
       </div>
       <auth-button @click="handleLogin" submit>Sign in</auth-button>
@@ -28,18 +28,22 @@
       :type="toastType"
       @close="closeToast"
     ></light-toast>
-  </div>
+  </back-div>
 </template>
 
 <script>
 import { authAPI } from '@/api/auth';
 import AuthButton from './components/AuthButton.vue';
 import LightToast from '@/components/LightToast.vue';
+import LightInput from '@/components/LightInput.vue';
+import BackDiv from '@/components/BackDiv.vue';
 export default {
   name: 'Login',
   components: {
     AuthButton,
-    LightToast
+    LightToast,
+    LightInput,
+    BackDiv
   },
   data() {
     return {
@@ -134,4 +138,5 @@ export default {
 </script>
 
 <style scoped>
+@import '@/assets/styles/page/auth.css';
 </style>

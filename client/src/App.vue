@@ -37,8 +37,7 @@ export default {
 </script>
 
 <style>
-/* 导入可复用的背景样式 */
-@import './assets/styles/components/background.css';
+/* Removed background.css import */
 
 .app-container {
   width: 100%;

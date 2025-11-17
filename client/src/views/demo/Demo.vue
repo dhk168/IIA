@@ -42,11 +42,25 @@
       @close="toastVisible = false"
     />
 
+    <!-- Light Div Demo -->
+    <div class="demo-section">
+      <h2 class="demo-section-title">Light Div</h2>
+      <div class="demo-lightdiv-container">
+        <LightDiv class="demo-lightdiv-item">
+          <p>Default Light Div</p>
+        </LightDiv>
+        <LightDiv dark class="demo-lightdiv-item">
+          <p>Dark Light Div</p>
+        </LightDiv>
+      </div>
+    </div>
+
 </template>
 
 <script>
 import LightButton from '@/components/LightButton.vue'
 import LightToast from '@/components/LightToast.vue'
+import LightDiv from '@/components/LightDiv.vue'
 import { ElButton, ElInput, ElDialog } from 'element-plus'
 import 'element-plus/dist/index.css'
 
@@ -63,6 +77,7 @@ export default {
   components: {
     LightButton,
     LightToast,
+    LightDiv,
     ElButton,
     ElInput,
     ElDialog
@@ -146,5 +161,22 @@ export default {
 .demo-input {
   margin-top: 1rem;
   width: 300px;
+}
+
+.demo-lightdiv-container {
+  display: flex;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.demo-lightdiv-item {
+  width: 200px;
+  height: 200px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #fff;
+  font-size: 18px;
+  font-weight: bold;
 }
 </style>

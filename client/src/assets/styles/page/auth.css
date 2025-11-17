@@ -1,33 +1,4 @@
 /* 认证页面共享样式 */
-/* 导入可复用的背景样式 */
-@import '../components/background.css';
-/* 导入轻量级毛玻璃按钮样式 */
-
-.auth-container {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  padding: 20px;
-  color: #ffffff;
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  overflow: hidden;
-  background: linear-gradient(
-    135deg, 
-    #1e1b4b 0%, 
-    #312e81 25%, 
-    #4338ca 50%, 
-    #3b82f6 75%, 
-    #60a5fa 100%
-  );
-  background-size: 400% 400%;
-  animation: oceanGradient 15s ease-in-out infinite;
-}
 
 .auth-form {
   width: 100%;
@@ -65,96 +36,11 @@
   margin-bottom: 8px;
 }
 
-.form-input {
-  width: 100%;
-  height: 48px;
-  background-color: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 8px;
-  color: #ffffff;
-  padding: 0 16px;
-  font-size: 16px;
-  transition: all 0.3s ease;
-}
-
-.form-input:focus {
-  outline: none;
-  border-color: rgba(255, 255, 255, 0.5);
-  background-color: rgba(255, 255, 255, 0.15);
-}
-
-.form-input::placeholder {
-  color: rgba(255, 255, 255, 0.5);
-}
-
 .verification-code-container {
   display: flex;
   gap: 12px;
   align-items: stretch;
   width: 100%;
-}
-
-.verification-code-input {
-  flex: 1;
-  height: 48px;
-  background-color: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 8px;
-  color: #ffffff;
-  padding: 0 16px;
-  font-size: 16px;
-  transition: all 0.3s ease;
-}
-
-.verification-code-input:focus {
-  outline: none;
-  border-color: rgba(255, 255, 255, 0.5);
-  background-color: rgba(255, 255, 255, 0.15);
-}
-
-.send-code-button {
-  height: 48px;
-  min-width: 120px;
-  background-color: rgba(255, 255, 255, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  border-radius: 8px;
-  color: rgba(255, 255, 255, 0.9);
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  white-space: nowrap;
-  backdrop-filter: blur(10px);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.send-code-button:hover:not(:disabled) {
-  background-color: rgba(255, 255, 255, 0.25);
-  border-color: rgba(255, 255, 255, 0.4);
-  color: #ffffff;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  transform: translateY(-1px);
-}
-
-.auth-form .submit-button {
-  width: 100%;
-  height: 48px;
-  background-color: #3b82f6;
-  border: none;
-  border-radius: 8px;
-  color: #ffffff;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  margin-top: 8px;
-  margin-bottom: 24px;
-}
-
-.auth-form .submit-button:hover {
-  background-color: #2563eb;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
 }
 
 .password-container {
@@ -193,48 +79,4 @@
 
 .bottom-text a:hover {
   color: rgba(255, 255, 255, 0.8);
-}
-
-/* Element Plus 组件样式覆盖 - 仅应用于认证页面 */
-.auth-form .el-input__wrapper {
-  width: 100% !important;
-  background-color: transparent !important;
-  border-color: rgba(255, 255, 255, 0.2) !important;
-  box-shadow: none !important;
-}
-
-.auth-form .el-input__wrapper:hover,
-.auth-form .el-input__wrapper.is-hover {
-  border-color: rgba(255, 255, 255, 0.3) !important;
-  box-shadow: none !important;
-}
-
-.auth-form .el-input__wrapper:focus-within,
-.auth-form .el-input__wrapper.is-focus {
-  border-color: rgba(255, 255, 255, 0.5) !important;
-  box-shadow: none !important;
-}
-
-.auth-form .el-input__inner {
-  width: 100% !important;
-  height: 48px !important;
-  padding: 0 16px !important;
-  font-size: 16px !important;
-  color: #ffffff !important;
-  background-color: transparent !important;
-  box-sizing: border-box !important;
-}
-
-.auth-form .el-input__inner::placeholder {
-  color: rgba(255, 255, 255, 0.6) !important;
-}
-
-.auth-form .el-button--primary {
-  background-color: #3b82f6 !important;
-  border-color: #3b82f6 !important;
-}
-
-.auth-form .el-button--primary:hover:not(:disabled) {
-  background-color: #2563eb !important;
-  border-color: #2563eb !important;
 }

@@ -15,7 +15,7 @@
 
 <script>
 import { ElMessage } from 'element-plus';
-import '../assets/styles/glass-toast.css';
+import '../../assets/styles/components/glass-toast.css';
 
 export default {
   name: 'Blank',
