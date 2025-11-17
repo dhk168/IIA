@@ -6,27 +6,6 @@
   width: 100%;
 }
 
-/* 呼吸效果背景容器 */
-.home-background {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: -1;
-  overflow: hidden;
-  background: linear-gradient(
-    135deg, 
-    #1e1b4b 0%, 
-    #312e81 25%, 
-    #4338ca 50%, 
-    #3b82f6 75%, 
-    #60a5fa 100%
-  );
-  background-size: 400% 400%;
-  animation: oceanGradient 15s ease-in-out infinite;
-}
-
 .layout-wrapper {
   display: flex;
   height: 100vh;
@@ -113,10 +92,9 @@
   background: rgba(255, 255, 255, 0.15);
   backdrop-filter: blur(12px);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  padding: 0 32px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  padding: 0 16px;
   height: 88px;
   border-radius: 16px;
   margin: 16px 16px 8px 16px;
@@ -125,17 +103,24 @@
   z-index: 100;
 }
 
+.header-left {
+  flex: 0 0 auto;
+}
+
 .header-left .page-title {
   margin: 0;
   color: #ffffff;
   font-size: 28px;
   font-weight: 700;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  white-space: nowrap;
 }
 
 .header-right {
+  flex: 1;
   display: flex;
   align-items: center;
+  justify-content: flex-end;
   gap: 24px;
   position: relative;
   z-index: 200;
@@ -200,7 +185,10 @@
 /* 自定义下拉菜单样式 */
 .custom-dropdown {
   position: relative;
-  display: inline-block;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex: 1;
   cursor: pointer;
   /* 确保父容器不会限制下拉菜单的层级 */
   z-index: 300;

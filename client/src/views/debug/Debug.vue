@@ -1,8 +1,8 @@
 <template>
   <div class="debug-container">
     <div class="debug-buttons">
-      <el-button class="light-button" @click="clearAllData">清除全部数据</el-button>
-      <el-button class="light-button" @click="clearReminderData">清除备忘录数据</el-button>
+      <light-button @click="clearAllData">清除全部数据</light-button>
+      <light-button @click="clearReminderData">清除备忘录数据</light-button>
     </div>
   </div>
 </template>
@@ -10,9 +10,13 @@
 <script>
 import '../../assets/styles/components/glass-toast.css';
 import debugAPI from '../../api/debug';
+import LightButton from '../../components/LightButton.vue';
 
 export default {
   name: 'Debug',
+  components: {
+    LightButton
+  },
   data() {
     return {
       // 可以添加debug相关的数据
