@@ -1,67 +1,12 @@
 <template>
-  <div class="main-container home-container">
-    <!-- 波浪呼吸效果背景层 -->
-    <BackDiv />
-    
+  <BackDiv class="main-container home-container">
     <div class="layout-wrapper">
       <!-- 侧边栏 -->
-      <LightDiv class="sidebar">
-        <el-aside width="80px">
-          <el-menu
-            :default-active="activeMenu"
-            class="el-menu-vertical"
-            router
-            @select="handleMenuSelect"
-            background-color="transparent"
-            text-color="#fff"
-            active-text-color="#fff"
-          >
-            <el-menu-item index="/home/projects">
-              <el-icon class="menu-icon"><Box /></el-icon>
-            </el-menu-item>
-            <el-menu-item index="/home/tasks">
-              <el-icon class="menu-icon"><List /></el-icon>
-            </el-menu-item>
-            <el-menu-item index="/home/reminder/projects">
-              <el-icon class="menu-icon"><DataLine /></el-icon>
-            </el-menu-item>
-            <el-menu-item index="/home/debug">
-                <el-icon class="menu-icon"><Tools /></el-icon>
-            </el-menu-item>
-            <el-menu-item index="/home/demo">
-                <el-icon class="menu-icon"><Tools /></el-icon>
-            </el-menu-item>
-          </el-menu>
-        </el-aside>
-      </LightDiv>
-      
+      <SideBar :active-menu="activeMenu" @menu-select="handleMenuSelect" />
       <!-- 右侧内容区域 -->
       <div class="right-content">
         <!-- 顶部导航 -->
-        <LightDiv class="header">
-          <el-header>
-            <div class="header-left">
-              <h1 class="page-title">{{ currentPageTitle }}</h1>
-            </div>
-            <div class="header-right">
-              <div class="welcome-text">
-                Welcome, {{ username }}
-              </div>
-              <!-- 自定义下拉菜单 -->
-                <div class="custom-dropdown" @click="toggleDropdown">
-                  <el-avatar :size="50" :icon="UserFilled" class="user-avatar" />
-                  <!-- 自定义下拉菜单内容 -->
-                  <transition name="dropdown">
-                    <div v-if="dropdownVisible" class="custom-dropdown-menu">
-                      <div class="custom-dropdown-item" @click="dropdownVisible = false">Profile</div>
-                      <div class="custom-dropdown-item" @click="handleLogout">Logout</div>
-                    </div>
-                  </transition>
-                </div>
-            </div>
-          </el-header>
-        </LightDiv>
-        
+        <Header :username="username" :current-page-title="currentPageTitle" />
         <!-- 页面内容 -->
         <LightDiv class="main-content">
           <el-main>
@@ -70,42 +15,38 @@
         </LightDiv>
       </div>
     </div>
-  </div>
+  </BackDiv>
 </template>
 
 <script>
-import { UserFilled, List, DataLine, Box, Tools } from '@element-plus/icons-vue'
 import { authAPI } from '@/api/auth'
 import LightDiv from '@/components/LightDiv.vue'
 import BackDiv from '@/components/BackDiv.vue'
+import SideBar from './components/SideBar.vue'
+import Header from './components/Header.vue'
 
 export default {
   name: 'Home',
   components: {
-    UserFilled,
-    List,
-    DataLine,
-    Box,
-    Tools,
     LightDiv,
-    BackDiv
+    BackDiv,
+    SideBar,
+    Header
   },
   data() {
     return {
       activeMenu: '/home/projects',
-      username: 'User',
-      dropdownVisible: false
+      username: 'User'
     }
   },
   computed: {
     currentPageTitle() {
       const path = this.$route.path
-      if (path.includes('/blank')) return 'Blank Page'
-      if (path.includes('/reminder/projects')) return 'Reminder Projects'
-      if (path.includes('/reminder/tasks')) return 'Reminder Tasks'
       if (path.includes('/projects')) return 'Projects'
       if (path.includes('/tasks')) return 'Tasks'
-      // if (path.includes('/analytics')) return 'Analytics'
+      if (path.includes('/analytics')) return 'Analytics'
+      if (path.includes('/debug')) return 'Debug'
+      if (path.includes('/demo')) return 'Demo'
       return 'Blank Page'
     }
   },
@@ -155,40 +96,17 @@ export default {
         this.activeMenu = currentPath
       }
     },
-    handleLogout() {
-      // 清除localStorage中的用户信息
-      localStorage.removeItem('username')
-      localStorage.removeItem('isLoggedIn')
-      // 重定向到登录页面
-      this.$router.push('/login')
-    },
-    toggleDropdown() {
-      this.dropdownVisible = !this.dropdownVisible
-    },
-    // 点击外部关闭下拉菜单
-    closeDropdownOnClickOutside(event) {
-      const dropdown = this.$el.querySelector('.custom-dropdown')
-      if (dropdown && !dropdown.contains(event.target)) {
-        this.dropdownVisible = false
-      }
-    }
+
   },
   watch: {
     $route() {
       this.setActiveMenu()
     }
   },
-  mounted() {
-    // 添加点击外部关闭下拉菜单的事件监听
-    document.addEventListener('click', this.closeDropdownOnClickOutside)
-  },
-  beforeUnmount() {
-    // 移除事件监听
-    document.removeEventListener('click', this.closeDropdownOnClickOutside)
-  }
+
 }
 </script>
 
 <style scoped>
-@import '../../assets/styles/page/home.css';
+@import '@/assets/styles/page/home.css';
 </style>

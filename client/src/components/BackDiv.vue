@@ -1,8 +1,20 @@
 <template>
-  <div class="back-div gradient-background">
+  <div class="back-div gradient-background" :class="className">
     <slot></slot>
   </div>
 </template>
+
+<script>
+export default {
+  name: 'BackDiv',
+  props: {
+    className: {
+      type: String,
+      default: ''
+    }
+  }
+}
+</script>
 
 <style scoped>
 /* Ocean wave animation */
@@ -31,12 +43,12 @@
   );
   background-size: 400% 400%;
   animation: oceanGradient 15s ease-in-out infinite;
-  /* Add flexbox styles for content containment */
+  /* Default flexbox styles for content centering */
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
   padding: 20px;
   color: #ffffff;
 }
