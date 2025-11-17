@@ -1,26 +1,24 @@
 <template>
   <LightDiv class="header">
-    <el-header>
-      <div class="header-left">
-        <h1 class="page-title">{{ currentPageTitle }}</h1>
+    <div class="header-left">
+      <h1 class="page-title">{{ currentPageTitle }}</h1>
+    </div>
+    <div class="header-right">
+      <div class="welcome-text">
+        Welcome, {{ username }}
       </div>
-      <div class="header-right">
-        <div class="welcome-text">
-          Welcome, {{ username }}
-        </div>
-        <!-- 自定义下拉菜单 -->
-        <div class="custom-dropdown" @click="toggleDropdown">
-          <el-avatar :size="50" :icon="UserFilled" class="user-avatar" />
-          <!-- 自定义下拉菜单内容 -->
-          <transition name="dropdown">
-            <div v-if="dropdownVisible" class="custom-dropdown-menu">
-              <div class="custom-dropdown-item" @click="dropdownVisible = false">Profile</div>
-              <div class="custom-dropdown-item" @click="handleLogout">Logout</div>
-            </div>
-          </transition>
-        </div>
+      <!-- 自定义下拉菜单 -->
+      <div class="custom-dropdown" @click="toggleDropdown">
+        <el-avatar :size="50" :icon="UserFilled" class="user-avatar" />
+        <!-- 自定义下拉菜单内容 -->
+        <transition name="dropdown">
+          <div v-if="dropdownVisible" class="custom-dropdown-menu">
+            <div class="custom-dropdown-item" @click="dropdownVisible = false">Profile</div>
+            <div class="custom-dropdown-item" @click="handleLogout">Logout</div>
+          </div>
+        </transition>
       </div>
-    </el-header>
+    </div>
   </LightDiv>
 </template>
 
@@ -149,7 +147,6 @@ export default {
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  flex: 1;
   cursor: pointer;
   /* 确保父容器不会限制下拉菜单的层级 */
   z-index: 300;
