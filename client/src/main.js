@@ -10,6 +10,8 @@ import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 import './assets/styles/components/dropdown-glass.css'
 // 导入项目对话框毛玻璃效果样式
 import './assets/styles/components/el-dialog-glass.css'
+// 导入背景动画样式
+import './assets/styles/components/background.css'
 // 引入路由
 import router from './router'
 

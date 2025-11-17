@@ -9,7 +9,6 @@
 
 <script>
 import '../../assets/styles/components/glass-toast.css';
-import '../../assets/styles/components/light-button.css';
 import debugAPI from '../../api/debug';
 
 export default {

@@ -27,16 +27,21 @@
     
     <h3 class="empty-title">No Projects Yet</h3>
     <p class="empty-description">Get started by creating your first project</p>
-    <el-button type="primary" class="light-button" @click="$emit('create-project')">
+    <LightButton type="primary" @click="$emit('create-project')">
         <i class="el-icon-plus"></i>
         Create New Project
-      </el-button>
+      </LightButton>
   </div>
 </template>
 
 <script>
+import LightButton from '@/components/LightButton.vue';
+
 export default {
   name: 'EmptyProjects',
+  components: {
+    LightButton
+  },
   emits: ['create-project']
 }
 </script>

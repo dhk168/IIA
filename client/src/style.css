@@ -1,8 +1,9 @@
 /* 导入认证页面样式，包含毛玻璃效果和渐变背景 */
 @import './assets/styles/page/auth.css';
 
+
 /* 导入通用轻量级毛玻璃按钮样式 */
-@import './assets/styles/components/light-button.css';
+
 /* 已通过新路径导入 */
 
 /* 全局重置样式 */
@@ -27,80 +28,6 @@ body {
   padding: 0;
   position: relative;
 }
-
-/* 注释掉Element Plus下拉菜单样式，避免与自定义下拉菜单冲突 */
-/* 最直接的下拉菜单毛玻璃样式 - 强制覆盖所有样式 */
-/* .el-dropdown-menu {
-  background: none !important;
-  position: relative !important;
-  border: 1px solid rgba(255, 255, 255, 0.2) !important;
-  border-radius: 12px !important;
-  overflow: hidden !important;
-  padding: 0 !important;
-  min-width: 180px !important;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15) !important;
-}
-
-.el-dropdown-menu::before {
-  content: '' !important;
-  position: absolute !important;
-  top: 0 !important;
-  left: 0 !important;
-  right: 0 !important;
-  bottom: 0 !important;
-  background: rgba(255, 255, 255, 0.15) !important;
-  backdrop-filter: blur(20px) !important;
-  -webkit-backdrop-filter: blur(20px) !important;
-  z-index: -1 !important;
-}
-
-.el-dropdown-menu__item {
-  color: #ffffff !important;
-  background: transparent !important;
-  padding: 12px 20px !important;
-  position: relative !important;
-  z-index: 1 !important;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
-}
-
-.el-dropdown-menu__item:last-child {
-  border-bottom: none !important;
-}
-
-.el-dropdown-menu__item:hover {
-  background: rgba(255, 255, 255, 0.2) !important;
-  color: #ffffff !important;
-  transform: translateX(4px) !important;
-}
-
-.el-dropdown-menu__item--divided {
-  background: linear-gradient(to right, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0) 100%) !important;
-  height: 1px !important;
-  margin: 4px 0 !important;
-  padding: 0 !important;
-}
-
-.home-container .el-dropdown .el-dropdown-menu {
-  background: none !important;
-}
-
-.home-container .el-dropdown .el-dropdown-menu::before {
-  background: rgba(255, 255, 255, 0.15) !important;
-  backdrop-filter: blur(20px) !important;
-  -webkit-backdrop-filter: blur(20px) !important;
-}
-
-.el-dropdown-menu-enter-active,
-.el-dropdown-menu-leave-active {
-  transition: all 0.3s ease !important;
-}
-
-.el-dropdown-menu-enter-from,
-.el-dropdown-menu-leave-to {
-  opacity: 0 !important;
-  transform: translateY(-10px) scale(0.95) !important;
-} */
 
 /* 为自定义下拉菜单添加全局样式支持 */
 .custom-dropdown {
@@ -138,54 +65,4 @@ body {
 .frosted-card:hover {
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
   transform: translateY(-2px);
-}
-
-/* 强制覆盖Element UI对话框样式 - 玻璃态效果 */
-.el-dialog {
-  background: rgba(255, 255, 255, 0.15) !important;
-  backdrop-filter: blur(20px) !important;
-  -webkit-backdrop-filter: blur(20px) !important;
-  border: 1px solid rgba(255, 255, 255, 0.3) !important;
-  border-radius: 16px !important;
-  box-shadow: 0 8px 32px 0 var(--project-color, rgba(0, 128, 255, 0.3)) !important;
-}
-
-.el-dialog__title {
-  color: var(--project-color, #0080ff) !important;
-  font-weight: 600 !important;
-}
-
-/* Element UI表单输入组件玻璃态样式 */
-.el-input__wrapper,
-.el-select__wrapper {
-  background: rgba(255, 255, 255, 0.2) !important;
-  border: 1px solid rgba(255, 255, 255, 0.3) !important;
-  backdrop-filter: blur(10px) !important;
-  -webkit-backdrop-filter: blur(10px) !important;
-}
-
-.el-input__inner,
-.el-select__inner {
-  color: var(--project-color, #0080ff) !important;
-}
-
-.el-form-item__label {
-  color: var(--project-color, #0080ff) !important;
-  font-weight: 500 !important;
-}
-
-/* Element UI按钮玻璃态样式 */
-.el-button--primary {
-  background: var(--project-color, #0080ff) !important;
-  border-color: var(--project-color, #0080ff) !important;
-  backdrop-filter: blur(10px) !important;
-  -webkit-backdrop-filter: blur(10px) !important;
-}
-
-.el-button--default {
-  background: rgba(255, 255, 255, 0.2) !important;
-  border-color: rgba(255, 255, 255, 0.3) !important;
-  color: var(--project-color, #0080ff) !important;
-  backdrop-filter: blur(10px) !important;
-  -webkit-backdrop-filter: blur(10px) !important;
 }

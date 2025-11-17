@@ -19,9 +19,9 @@
         <el-form-item prop="verificationCode" style="margin: 0;">
           <div class="verification-code-container">
             <el-input v-model="registerForm.verificationCode" placeholder="" class="verification-code-input"></el-input>
-            <el-button @click="sendVerificationCode" :disabled="countDownSeconds > 0 || sending" class="light-button">
+            <LightButton @click="sendVerificationCode" :disabled="countDownSeconds > 0 || sending">
               {{ countDownSeconds > 0 ? `${countDownSeconds}s to resend` : 'Send Code' }}
-            </el-button>
+            </LightButton>
           </div>
         </el-form-item>
       </div>
@@ -37,20 +37,32 @@
           <el-input v-model="registerForm.confirmPassword" type="password" placeholder="" class="form-input"></el-input>
         </el-form-item>
       </div>
-      <!-- 调试按钮 -->
-
-      <el-button type="primary" @click="handleRegister" class="submit-button">Sign up</el-button>
+      <auth-button @click="handleRegister" submit>Sign up</auth-button>
       <div class="bottom-text">
         Already have an account? <router-link to="/login">Sign in</router-link>
       </div>
     </el-form>
   </div>
+  <light-toast
+    :visible="toastVisible"
+    :message="toastMessage"
+    :type="toastType"
+    @close="closeToast"
+  ></light-toast>
 </template>
 
 <script>
-import { authAPI } from '../../api/auth';
+import { authAPI } from '@/api/auth';
+import LightButton from '@/components/LightButton.vue';
+import AuthButton from './components/AuthButton.vue';
+import LightToast from '@/components/LightToast.vue';
 export default {
   name: 'Register',
+  components: {
+    LightButton,
+    AuthButton,
+    LightToast
+  },
   data() {
     return {
       registerForm: {
@@ -63,6 +75,9 @@ export default {
       sending: false,
       countDownSeconds: 0,
       countDownTimer: null,
+      toastVisible: false,
+      toastMessage: '',
+      toastType: 'success', // success, error, warning, info
       rules: {
         username: [
           { required: true, message: 'Please enter username', trigger: 'blur' },
@@ -82,8 +97,7 @@ export default {
         ],
         confirmPassword: [
           { required: true, message: 'Please confirm password', trigger: 'blur' },
-          {
-            validator: (rule, value, callback) => {
+          { validator: (rule, value, callback) => {
               if (value !== this.registerForm.password) {
                 callback(new Error('Passwords do not match'))
               } else {
@@ -97,8 +111,6 @@ export default {
     }
   },
   methods: {
-
-        
         sendVerificationCode() {
           console.log('Send Code button clicked')
           // Prevent clicking during countdown
@@ -107,42 +119,39 @@ export default {
             return
           }
           
-          // 邮箱格式验证
+          // Validate email format
           if (!this.registerForm.email) {
-            this.createGlassToast('error', 'Please enter email')
+            this.showToast('error', 'Please enter email')
             return
           }
           
-          // 使用正则表达式验证邮箱格式
+          // Validate email format using regex
           const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
           if (!emailRegex.test(this.registerForm.email)) {
-            this.createGlassToast('error', 'Please enter a valid email address')
+            this.showToast('error', 'Please enter a valid email address')
             return
           }
           
           console.log('Email validated successfully:', this.registerForm.email)
           this.sending = true
           
-          // 使用authAPI发送验证码
+          // Use authAPI to send verification code
           console.log('Calling API to send verification code...')
           authAPI.sendVerificationCode({
             email: this.registerForm.email
           })
           .then((response) => {
-            // 检查响应数据结构
             console.log('Verification code response:', response)
             
-            // 使用提取出来的方法显示毛玻璃提示
-            this.createGlassToast('success', 'Verification code sent to your email')
+            this.showToast('success', 'Verification code sent to your email')
             
-            // 添加倒计时功能
             this.countDown()
           })
           .catch(error => {
             console.error('Failed to send verification code:', error)
             console.error('Error details:', JSON.stringify(error, null, 2))
             let errorMsg = error?.message || 'Failed to send verification code, please try again later'
-            this.createGlassToast('error', errorMsg)
+            this.showToast('error', errorMsg)
           })
           .finally(() => {
             console.log('API call completed')
@@ -155,7 +164,7 @@ export default {
           this.countDownSeconds = 60
           this.sending = true
           
-          // 清除可能存在的旧计时器
+          // Clear existing timer if any
           if (this.countDownTimer) {
             clearInterval(this.countDownTimer)
           }
@@ -170,52 +179,46 @@ export default {
           }, 1000)
         },
         
-        // Clear timer when component is destroyed
-        beforeDestroy() {
-          if (this.countDownTimer) {
-            clearInterval(this.countDownTimer)
-          }
-        },
-        
+
         handleRegister() {
           this.$refs.registerFormRef.validate((valid) => {
             if (valid) {
-              // 准备注册数据，注意后端字段名要求
+              // Prepare registration data (note backend field name requirements)
               const registerData = {
                 username: this.registerForm.username,
                 email: this.registerForm.email,
                 password: this.registerForm.password,
-                code: this.registerForm.verificationCode // 后端使用code字段
+                code: this.registerForm.verificationCode // backend uses code field
               }
               
-              // 使用authAPI进行注册
+              // Use authAPI to register
               authAPI.register(registerData)
               .then(response => {
                 console.log('Registration successful:', response)
                 
-                // 根据后端响应结构获取数据
+                // Get data from backend response structure
                 const responseData = response.data || response;
                 const result = responseData.result || responseData.data || responseData;
                 
-                // 检查token是否存在
+                // Check if token exists
                 const token = result.token;
                 
                 if (token) {
-                  // 设置登录状态和token
+                  // Set login status and token
                   localStorage.setItem('isLoggedIn', 'true')
                   localStorage.setItem('usernameOrEmail', this.registerForm.username)
                   localStorage.setItem('token', token)
                   
-                  // 使用毛玻璃效果显示成功提示
-                  this.createGlassToast('success', 'Registration successful, logging in...');
+                  // Show success toast with frosted glass effect
+                  this.showToast('success', 'Registration successful, logging in...');
                   
-                  // 延迟跳转，让用户看到成功提示
+                  // Delay navigation to let user see success toast
                   setTimeout(() => {
                     this.$router.push('/home')
                   }, 1500);
                 } else {
-                  // 即使没有token，注册成功后也跳转到登录页
-                  this.createGlassToast('success', 'Registration successful, please log in');
+                  // Even without token, redirect to login after registration
+                  this.showToast('success', 'Registration successful, please log in');
                   setTimeout(() => {
                     this.$router.push('/login')
                   }, 1500);
@@ -223,7 +226,7 @@ export default {
               })
               .catch(error => {
                 console.error('Registration failed:', error)
-                // 错误处理，尝试从不同结构中获取错误信息
+                // Error handling: try to get error message from different structures
                 let errorMsg = 'Registration failed, please try again later';
                 if (error.response) {
                   errorMsg = error.response.data?.message || 
@@ -233,41 +236,31 @@ export default {
                 } else if (error.message) {
                   errorMsg = error.message;
                 }
-                this.createGlassToast('error', errorMsg);
+                this.showToast('error', errorMsg);
               })
             }
           })
         },
         
-        // 提取毛玻璃提示为独立方法
-        createGlassToast(type, message) {
-          const toast = document.createElement('div');
-          toast.className = `glass-toast glass-toast-${type}`;
-          toast.textContent = message;
-          document.body.appendChild(toast);
-          
-          // 自动移除
-          setTimeout(() => {
-            toast.style.opacity = '0';
-            toast.style.transform = 'translateX(100%)';
-          }, 4000);
-          
-          setTimeout(() => {
-            if (document.body.contains(toast)) {
-              document.body.removeChild(toast);
-            }
-          }, 4500);
-          
-          toast.addEventListener('click', () => {
-            if (document.body.contains(toast)) {
-              document.body.removeChild(toast);
-            }
-          });
+        // LightToast control methods
+        showToast(type, message) {
+          this.toastType = type;
+          this.toastMessage = message;
+          this.toastVisible = true;
+        },
+        closeToast() {
+          this.toastVisible = false;
+        }
+      },
+      // Clear timer when component is destroyed
+      beforeDestroy() {
+        if (this.countDownTimer) {
+          clearInterval(this.countDownTimer)
         }
       }
 }
+
 </script>
 
-<style>
-@import '../../assets/styles/page/auth.css';
+<style scoped>
 </style>

@@ -50,7 +50,7 @@
 
 <script>
 import { Plus } from '@element-plus/icons-vue'
-import { tagAPI, taskTagAPI } from '../../../api/reminder'
+import { tagAPI, taskTagAPI } from '@/api/reminder'
 
 export default {
   name: 'TagManagement',

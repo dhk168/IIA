@@ -2,12 +2,12 @@
   <div class="tasks-container">
     <div class="page-header">
       <div class="header-actions">
-        <el-button type="primary" light @click="showAddTaskDialog = true"  class="light-button">
+        <LightButton type="primary" @click="showAddTaskDialog = true">
           New Task
-        </el-button>
-        <el-button light @click="showTagsDialog = true" class="light-button">
+        </LightButton>
+        <LightButton @click="showTagsDialog = true">
           Tags Management
-        </el-button>
+        </LightButton>
       </div>
     </div>
     
@@ -228,11 +228,13 @@
 
 <script>
 import TagManagement from './components/TagManagement.vue'
-import { reminderTaskAPI, tagAPI, taskTagAPI, reminderProjectAPI } from '../../api/reminder';
+import LightButton from '@/components/LightButton.vue'
+import { reminderTaskAPI, tagAPI, taskTagAPI, reminderProjectAPI } from '@/api/reminder';
 export default {
   name: 'Tasks',
   components: {
-    TagManagement
+    TagManagement,
+    LightButton
   },
   created() {
     this.init()

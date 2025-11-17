@@ -5,9 +5,9 @@
 
     <!-- Page Header (Non-Empty State) -->
     <div class="page-header" v-if="projects.length > 0">
-      <el-button type="primary" @click="showAddProjectModal" class="light-button">
+      <LightButton type="primary" @click="showAddProjectModal">
         New Project
-      </el-button>
+      </LightButton>
     </div>
     
     <!-- Project List (Non-Empty State) -->
@@ -35,12 +35,13 @@
 </template>
 
 <script>
-import { reminderProjectAPI } from '../../api/reminder';
+import { reminderProjectAPI } from '@/api/reminder';
 import { OfficeBuilding, Document } from '@element-plus/icons-vue';
 import EmptyProjects from './components/EmptyProjects.vue';
 import { Vue3IconPicker } from 'vue3-icon-picker';
 import ProjectCard from './components/ProjectCard.vue';
 import ProjectFormModal from './components/ProjectFormModal.vue';
+import LightButton from '@/components/LightButton.vue';
 
 
 
@@ -52,7 +53,8 @@ export default {
     ProjectCard,
     Document,
     EmptyProjects,
-    ProjectFormModal
+    ProjectFormModal,
+    LightButton
   },
   data() {
     return {

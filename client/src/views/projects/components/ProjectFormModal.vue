@@ -2,21 +2,25 @@
   <el-dialog
     v-model="dialogVisible"
     :title="isEditMode ? 'Edit Project' : 'New Project'"
-    width="500px"
-    @close="handleDialogClose"
-    custom-class="project-dialog-glass"
-    :mask="false"
-    :style="dialogStyle"
+    :width="'500px'"
+    :before-close="handleCancel"
+    class="project-dialog-glass"
   >
-    <el-form :model="formData" :rules="rules" ref="projectForm" label-width="100px">
+    <el-form
+      ref="formRef"
+      :model="formData"
+      :rules="rules"
+      label-position="top"
+      class="project-form"
+    >
       <el-form-item label="Project Name" prop="name">
         <el-input v-model="formData.name" placeholder="Enter project name" />
       </el-form-item>
       
-      <el-form-item label="Description">
-        <el-input 
-          v-model="formData.description" 
-          type="textarea" 
+      <el-form-item label="Description" prop="description">
+        <el-input
+          v-model="formData.description"
+          type="textarea"
           placeholder="Enter project description"
           :rows="3"
         />
@@ -49,7 +53,7 @@
 
 <script>
 import { Vue3IconPicker } from 'vue3-icon-picker';
-import { reminderProjectAPI } from '../../../api/reminder';
+import { reminderProjectAPI } from '@/api/reminder';
 
 export default {
   name: 'ProjectFormModal',
@@ -150,7 +154,7 @@ export default {
     
     async handleSubmit() {
       try {
-        await this.$refs.projectForm.validate();
+        await this.$refs.formRef.validate();
         
         console.log('Submitting form data:', this.formData);
         
@@ -195,6 +199,9 @@ export default {
 </script>
 
 <style scoped>
+@import '../../../assets/styles/element-ui-reset.css';
+@import '../../../assets/styles/components/background.css';
+
 /* Project-specific styles for the glass dialog */
 .project-dialog-glass {
   /* Ensure the wrapper element has the project color variable */
@@ -205,6 +212,15 @@ export default {
 .project-dialog-glass .el-dialog {
   /* Apply project color border */
   box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37), 0 0 0 1px var(--project-color, rgba(24, 144, 255, 0.2)) !important;
+  /* Add gradient background with animation */
+  background: linear-gradient(135deg, rgba(30, 27, 75, 0.3) 0%, rgba(49, 46, 129, 0.3) 25%, rgba(67, 56, 202, 0.3) 50%, rgba(59, 130, 246, 0.3) 75%, rgba(96, 165, 250, 0.3) 100%) !important;
+  background-size: 400% 400% !important;
+  animation: oceanGradient 15s ease-in-out infinite !important;
+  /* 玻璃效果 */
+  backdrop-filter: blur(20px) saturate(1.2) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(1.2) !important;
+  /* 确保弹窗容器是相对定位 */
+  position: relative;
 }
 
 /* Style form elements with project color */

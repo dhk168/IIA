@@ -26,7 +26,10 @@
           </el-menu-item>
           <el-menu-item index="/home/debug">
               <el-icon class="menu-icon"><Tools /></el-icon>
-            </el-menu-item>
+          </el-menu-item>
+          <el-menu-item index="/home/demo">
+              <el-icon class="menu-icon"><Tools /></el-icon>
+          </el-menu-item>
         </el-menu>
       </el-aside>
       
@@ -66,7 +69,7 @@
 
 <script>
 import { UserFilled, List, DataLine, Box, Tools } from '@element-plus/icons-vue'
-import { authAPI } from '../../api/auth'
+import { authAPI } from '@/api/auth'
 
 export default {
   name: 'Home',

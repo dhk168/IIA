@@ -13,9 +13,9 @@
         <el-form-item prop="verificationCode" style="margin: 0;">
           <div class="verification-code-container">
             <el-input v-model="forgotForm.verificationCode" placeholder="" class="verification-code-input"></el-input>
-            <el-button @click="sendVerificationCode" :disabled="sending" class="light-button">
+            <LightButton @click="sendVerificationCode" :disabled="sending">
               {{ sending ? 'Sending...' : 'Send Code' }}
-            </el-button>
+            </LightButton>
           </div>
         </el-form-item>
       </div>
@@ -31,19 +31,32 @@
           <el-input v-model="forgotForm.confirmPassword" type="password" placeholder="" show-password class="form-input"></el-input>
         </el-form-item>
       </div>
-      <el-button type="primary" @click="handleResetPassword" class="submit-button">Reset Password</el-button>
+      <auth-button @click="handleResetPassword" submit>Reset Password</auth-button>
       <div class="bottom-text">
         <router-link to="/login">Back to Login</router-link>
       </div>
     </el-form>
   </div>
+  <light-toast
+    :visible="toastVisible"
+    :message="toastMessage"
+    :type="toastType"
+    @close="closeToast"
+  ></light-toast>
 </template>
 
 <script>
-import { authAPI } from '../../api/auth';
-import '../../assets/styles/glass-toast.css';
+import { authAPI } from '@/api/auth';
+import LightButton from '@/components/LightButton.vue';
+import AuthButton from './components/AuthButton.vue';
+import LightToast from '@/components/LightToast.vue';
 export default {
   name: 'ForgotPassword',
+  components: {
+    LightButton,
+    AuthButton,
+    LightToast
+  },
   data() {
     return {
       forgotForm: {
@@ -53,6 +66,10 @@ export default {
         confirmPassword: ''
       },
       sending: false,
+      // LightToast control properties
+      toastVisible: false,
+      toastMessage: '',
+      toastType: 'success', // success, error, warning, info
       rules: {
         email: [
           { required: true, message: 'Please enter email', trigger: 'blur' },
@@ -83,32 +100,32 @@ export default {
   methods: {
     sendVerificationCode() {
       if (!this.forgotForm.email) {
-        this.createGlassToast('warning', 'Please enter email first');
+        this.showToast('warning', 'Please enter email first');
         return
       }
       
       // Validate email format
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(this.forgotForm.email)) {
-        this.createGlassToast('warning', 'Please enter a valid email address');
+        this.showToast('warning', 'Please enter a valid email address');
         return
       }
       
       this.sending = true
       console.log('Sending verification code to:', this.forgotForm.email)
       
-      // 使用authAPI发送验证码
+      // Use authAPI to send verification code
       authAPI.sendVerificationCode({
         email: this.forgotForm.email,
         type: 'reset'
       })
       .then(() => {
         this.sending = false
-        this.createGlassToast('success', 'Verification code sent successfully');
+        this.showToast('success', 'Verification code sent successfully');
       })
       .catch(error => {
         console.error('Failed to send verification code:', error)
-        this.createGlassToast('error', error.response?.data?.message || 'Failed to send verification code');
+        this.showToast('error', error.response?.data?.message || 'Failed to send verification code');
         this.sending = false
       })
     },
@@ -116,36 +133,36 @@ export default {
     handleResetPassword() {
       this.$refs.forgotFormRef.validate((valid) => {
         if (valid) {
-          // 准备密码重置数据
+          // Prepare password reset data
           const resetData = {
             email: this.forgotForm.email,
             verificationCode: this.forgotForm.verificationCode,
             newPassword: this.forgotForm.newPassword
           };
           
-          // 使用authAPI进行密码重置
+          // Use authAPI to reset password
           authAPI.resetPassword(resetData)
           .then(response => {
-            this.createGlassToast('success', 'Password reset successful');
+            this.showToast('success', 'Password reset successful');
             console.log('Password reset info:', this.forgotForm.email);
             
-            // 自动登录逻辑 - 从不同的响应结构中尝试获取token
+            // Auto-login logic - try to get token from different response structures
             const token = response.data?.token || response.token;
             
             if (token) {
-              // 存储token
+              // Store token
               localStorage.setItem('token', token);
-              // 设置登录状态
+              // Set login status
               localStorage.setItem('isLoggedIn', 'true');
-              // 设置用户名/邮箱（使用邮箱）
+              // Set username/email (using email)
               localStorage.setItem('usernameOrEmail', this.forgotForm.email);
               
-              // 重置成功后延迟跳转到首页，确保用户能看到成功提示
+              // Delay redirect to home after successful reset to ensure user sees success prompt
               setTimeout(() => {
                 this.$router.push('/');
               }, 1500);
             } else {
-              // 如果没有返回token，延迟跳转到登录页
+              // If no token returned, delay redirect to login page
               setTimeout(() => {
                 this.$router.push('/login');
               }, 1500);
@@ -153,55 +170,31 @@ export default {
           })
           .catch(error => {
             console.error('Password reset failed:', error);
-            // 尝试从不同结构中获取错误信息
+            // Error handling: try to get message from different structures
             let errorMsg = 'Password reset failed';
             if (error.response) {
               errorMsg = error.response.data?.message || error.response.data || errorMsg;
             } else if (error.message) {
               errorMsg = error.message;
             }
-            this.createGlassToast('error', errorMsg);
+            this.showToast('error', errorMsg);
           })
         }
       })
     },
     
-    // 毛玻璃效果提示函数
-    createGlassToast(type, message) {
-      // 创建提示元素
-      const toast = document.createElement('div');
-      toast.className = `glass-toast glass-toast-${type}`;
-      toast.textContent = message;
-      
-      // 添加到body
-      document.body.appendChild(toast);
-      
-      // 自动移除
-      setTimeout(() => {
-        // 添加淡出动画
-        toast.style.opacity = '0';
-        setTimeout(() => {
-          if (document.body.contains(toast)) {
-            document.body.removeChild(toast);
-          }
-        }, 300);
-      }, 3000);
-      
-      // 点击移除
-      toast.addEventListener('click', () => {
-        toast.style.opacity = '0';
-        setTimeout(() => {
-          if (document.body.contains(toast)) {
-            document.body.removeChild(toast);
-          }
-        }, 300);
-      });
+    // LightToast control methods
+    showToast(type, message) {
+      this.toastType = type;
+      this.toastMessage = message;
+      this.toastVisible = true;
+    },
+    closeToast() {
+      this.toastVisible = false;
     }
   }
 }
 </script>
 
-<style>
-/* 导入共享的认证页面样式 */
-@import '../../assets/styles/page/auth.css';
+<style scoped>
 </style>

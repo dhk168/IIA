@@ -1,9 +1,9 @@
 .el-dialog__wrapper.project-dialog-glass {
-  background-color: rgba(0, 0, 0, 0.1) !important;
+  background-color: rgba(0, 0, 0, 1) !important;
 }
 
 .el-dialog__wrapper.project-dialog-glass .el-dialog {
-  background: rgba(255, 255, 255, 0.7) !important;
+  background: rgba(255, 255, 255, 1.0) !important;
   backdrop-filter: blur(20px) saturate(1.2) !important;
   -webkit-backdrop-filter: blur(20px) saturate(1.2) !important;
   border: 1px solid rgba(255, 255, 255, 0.3) !important;
