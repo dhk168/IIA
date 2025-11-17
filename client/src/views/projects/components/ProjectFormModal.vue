@@ -232,4 +232,22 @@ export default {
 .project-dialog-glass .el-textarea__inner {
   border: 1px solid var(--project-color, rgba(255, 255, 255, 0.5)) !important;
 }
+
+/* Fix submit button color to default primary */
+.project-dialog-glass .el-dialog__footer .el-button--primary {
+  background-color: #1890ff !important;
+  border-color: #1890ff !important;
+  color: #fff !important;
+}
+
+/* Fix submit button hover and active colors */
+.project-dialog-glass .el-dialog__footer .el-button--primary:hover {
+  background-color: #40a9ff !important;
+  border-color: #40a9ff !important;
+}
+
+.project-dialog-glass .el-dialog__footer .el-button--primary:active {
+  background-color: #096dd9 !important;
+  border-color: #096dd9 !important;
+}
 </style>

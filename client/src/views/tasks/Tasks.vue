@@ -15,34 +15,17 @@
     <div class="filter-section">
       <el-row :gutter="20">
         <el-col :md="6" :sm="12">
-          <el-select v-model="filterOptions.status" placeholder="Task Status" clearable class="glass-filter">
-            <el-option label="All" value="" />
-            <el-option label="To Do" value="todo" />
-            <el-option label="Completed" value="done" />
-            <el-option label="Abandoned" value="abandoned" />
-          </el-select>
+          <LightSelect v-model="filterOptions.status" placeholder="Task Status" clearable :options="statusOptions" />
         </el-col>
 
         <el-col :md="6" :sm="12">
-          <el-select v-model="filterOptions.priority" placeholder="Priority" clearable class="glass-filter">
-            <el-option label="All" value="" />
-            <el-option label="None" value="none" />
-            <el-option label="Low" value="low" />
-            <el-option label="Medium" value="medium" />
-            <el-option label="High" value="high" />
-          </el-select>
+          <LightSelect v-model="filterOptions.priority" placeholder="Priority" clearable :options="priorityOptions" />
         </el-col>
         <el-col :md="6" :sm="12">
-          <el-select v-model="filterOptions.tag" placeholder="Tags Filter" clearable class="glass-filter">
-            <el-option label="All" value="" />
-            <el-option v-for="tag in tags" :key="tag.tag_id" :label="tag.name" :value="tag.tag_id" />
-          </el-select>
+          <LightSelect v-model="filterOptions.tag" placeholder="Tags Filter" clearable :options="tagOptions" />
         </el-col>
         <el-col :md="6" :sm="12">
-          <el-select v-model="filterOptions.project" placeholder="Project Filter" clearable class="glass-filter">
-            <el-option label="All" value="" />
-            <el-option v-for="project in sortedProjects" :key="project.projectId" :label="project.name" :value="project.projectId" />
-          </el-select>
+          <LightSelect v-model="filterOptions.project" placeholder="Project Filter" clearable :options="projectOptions" />
         </el-col>
         <el-col :md="6" :sm="12">
           <el-date-picker v-model="filterOptions.dateRange" type="daterange" range-separator="to" start-placeholder="Start Date" end-placeholder="End Date" class="glass-filter" />
@@ -229,12 +212,14 @@
 <script>
 import TagManagement from './components/TagManagement.vue'
 import LightButton from '@/components/LightButton.vue'
+import LightSelect from '@/components/LightSelect.vue'
 import { reminderTaskAPI, tagAPI, taskTagAPI, reminderProjectAPI } from '@/api/reminder';
 export default {
   name: 'Tasks',
   components: {
     TagManagement,
-    LightButton
+    LightButton,
+    LightSelect
   },
   created() {
     this.init()
@@ -268,6 +253,19 @@ export default {
 
       tags: [],
       projects: [],
+      statusOptions: [
+        { label: 'All', value: '' },
+        { label: 'To Do', value: 'todo' },
+        { label: 'Completed', value: 'done' },
+        { label: 'Abandoned', value: 'abandoned' }
+      ],
+      priorityOptions: [
+        { label: 'All', value: '' },
+        { label: 'None', value: 'none' },
+        { label: 'Low', value: 'low' },
+        { label: 'Medium', value: 'medium' },
+        { label: 'High', value: 'high' }
+      ],
       filterOptions: {
         status: '',
         priority: '',
@@ -312,6 +310,22 @@ export default {
         const nameB = (b?.name || '').toLowerCase();
         return nameA.localeCompare(nameB);
       });
+    },
+    tagOptions() {
+      // 生成标签筛选选项，包含"All"选项
+      const options = [{ label: 'All', value: '' }];
+      if (Array.isArray(this.tags)) {
+        options.push(...this.tags.map(tag => ({ label: tag.name, value: tag.tag_id })));
+      }
+      return options;
+    },
+    projectOptions() {
+      // 生成项目筛选选项，包含"All"选项
+      const options = [{ label: 'All', value: '' }];
+      if (Array.isArray(this.sortedProjects)) {
+        options.push(...this.sortedProjects.map(project => ({ label: project.name, value: project.projectId })));
+      }
+      return options;
     },
     filteredTasks() {
       let filtered = [...this.tasks]

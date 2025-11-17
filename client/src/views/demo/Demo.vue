@@ -66,7 +66,7 @@ import 'element-plus/dist/index.css'
 
 // Import custom component styles
 import '@/assets/styles/components/el-dialog-glass.css'
-import '@/assets/styles/components/light-toast.css'
+
 import '@/assets/styles/components/glass-toast.css'
 
 // Import page styles
