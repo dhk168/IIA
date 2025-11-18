@@ -25,45 +25,44 @@ body {
 
 /* 
 /* 为自定义下拉菜单添加全局样式支持 */
-.custom-dropdown {
+/* .custom-dropdown {
   position: relative;
   display: inline-block;
   cursor: pointer;
-  /* 确保父元素不会限制子元素的层级 */
   z-index: 10;
-}
+} */
 
 /* 确保Element Plus样式正常显示 */
-.el-form-item__label {
+/* .el-form-item__label {
   text-align: left;
-}
+} */
 
 /* 全局毛玻璃效果容器 */
-.frosted-glass-container {
+/* .frosted-glass-container {
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 16px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-}
+} */
 
 /* 卡片毛玻璃效果 */
-.frosted-card {
+/* .frosted-card {
   background: rgba(255, 255, 255, 0.15);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 12px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
-}
+} */
 
-.frosted-card:hover {
+/* .frosted-card:hover {
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
   transform: translateY(-2px);
-}
+} */
 
 /* Ocean wave animation - global */
-@keyframes oceanGradient {
+/* @keyframes oceanGradient {
   0% { background-position: 0% 50%; }
   25% { background-position: 50% 60%; }
   50% { background-position: 100% 50%; }
