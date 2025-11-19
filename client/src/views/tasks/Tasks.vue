@@ -137,13 +137,13 @@ export default {
       // 标签筛选
       if (this.filterOptions.tag) {
         filtered = filtered.filter(task => 
-          task.tags && task.tags.some(tag => tag.tagId === this.filterOptions.tag)
+          task.tags && task.tags.some(tag => String(tag.tagId) === String(this.filterOptions.tag))
         )
       }
       
       // 项目筛选
       if (this.filterOptions.project) {
-        filtered = filtered.filter(task => task && task.project_id === this.filterOptions.project)
+        filtered = filtered.filter(task => task && String(task.project_id) === String(this.filterOptions.project))
       }
       
       return filtered
@@ -172,21 +172,19 @@ export default {
     },
     getProjectName(projectId) {
       if (!projectId) return 'No Project';
-      const project = this.projects.find(p => p.projectId === projectId);
+      const project = this.projects.find(p => String(p.projectId) === String(projectId));
       return project ? project.name : 'Unknown Project';
     },
     // 初始化数据加载
     async init() {
-      // 加载标签、任务和项目数据
+      // 先加载标签数据，确保查询任务标签时可用
+      await this.loadTags();
+      // 同时加载任务和项目数据
       await Promise.all([
-        this.loadTags(),
         this.loadTasks(),
         this.loadProjects()
       ]);
     },
-    
-
-    
     
     async loadTags() {
       try {
@@ -210,7 +208,7 @@ export default {
       try {
         const response = await reminderTaskAPI.getTasks();
         if (response && response.code === 200) {
-          this.tasks = (response.data || []).map(task => ({
+          let tasks = (response.data || []).map(task => ({
             task_id: task.taskId,
             user_id: task.userId,
             project_id: task.projectId,
@@ -227,12 +225,33 @@ export default {
             completed_at: task.completedAt,
             created_at: task.createdAt,
             priority: task.priority || 'none',
-            tags: task.tags || [],
+            tags: [], // 初始化空标签数组，后续单独查询
             recurrence_info: task.recurrenceInfo,
             // 保留原始字段
             ...task
           }));
-          console.log('Tasks loaded successfully:', this.tasks);
+
+          // 查询每个任务的标签
+          tasks = await Promise.all(tasks.map(async (task) => {
+            try {
+              // 获取任务关联的标签ID
+              const taskTagsResponse = await taskTagAPI.getTaskTagsByTaskId(task.task_id);
+              const taskTagIds = (taskTagsResponse.data || []).map(taskTag => taskTag.tagId);
+
+              // 从已加载的tags数组中匹配实际标签
+              const taskTags = taskTagIds
+                .map(tagId => this.tags.find(tag => String(tag.tagId) === String(tagId)))
+                .filter(Boolean);
+
+              return { ...task, tags: taskTags };
+            } catch (error) {
+              console.error(`Failed to load tags for task ${task.task_id}:`, error);
+              return task; // 出错时返回原始任务，标签为空数组
+            }
+          }));
+
+          this.tasks = tasks;
+          console.log('Tasks loaded successfully with tags:', this.tasks);
           // this.showToast('success', `Successfully loaded ${this.tasks.length} tasks`);
         } else {
           console.warn('API returned non-success response:', response);
@@ -373,7 +392,7 @@ export default {
               await taskTagAPI.createTaskTagBatch({ taskId: savedTask.taskId, tagIds: taskData.tags });
             }
             // 添加到本地列表
-            this.tasks.push({ ...savedTask, task_id: savedTask.taskId, status: 'todo', created_at: new Date().toISOString(), tags: taskData.tags.map(tagId => this.tags.find(tag => tag.tagId === tagId)).filter(Boolean) });
+            this.tasks.push({ ...savedTask, task_id: savedTask.taskId, status: 'todo', created_at: new Date().toISOString(), tags: taskData.tags.map(tagId => this.tags.find(tag => String(tag.tagId) === String(tagId))).filter(Boolean) });
             this.showToast('success', 'Task created successfully');
           } else {
             throw new Error('Failed to create task');
@@ -459,7 +478,7 @@ export default {
                   ...this.tasks[index],
                   ...savedTask,
                   tags: this.taskForm.selectedTags.map(tagId => 
-                    this.tags.find(tag => tag.tagId === tagId)
+                    this.tags.find(tag => String(tag.tagId) === String(tagId))
                   ).filter(Boolean)
                 }
               }
@@ -504,7 +523,7 @@ export default {
               created_at: new Date().toISOString(),
               priority: savedTask.priority,
               tags: this.taskForm.selectedTags.map(tagId => 
-                this.tags.find(tag => tag.tagId === tagId)
+                this.tags.find(tag => String(tag.tagId) === String(tagId))
               ).filter(Boolean)
             })
               

@@ -1,84 +1,78 @@
 <template>
-  <el-card class="tasks-card">
-    <template #header>
-      <div class="card-header">
-        <span>Task List</span>
-      </div>
-    </template>
-    <light-table :data="filteredTasks" stripe style="width: 100%" default-expand-all>
-      <el-table-column type="expand" width="40">
-        <template #default="scope">
-          <div class="task-detail">
-            <div class="detail-item" v-if="scope.row.description">
-              <strong>Description:</strong>
-              <p>{{ scope.row.description }}</p>
-            </div>
-            <div class="detail-item">
-              <strong>Created At:</strong>
-              <span>{{ formatDate(scope.row.created_at) }}</span>
-            </div>
-            <div class="detail-item" v-if="scope.row.start_date">
-              <strong>Start Date:</strong>
-              <span>{{ formatDate(scope.row.start_date) }}</span>
-            </div>
-            <div class="detail-item" v-if="scope.row.completed_at">
-              <strong>Completed At:</strong>
-              <span>{{ formatDate(scope.row.completed_at) }}</span>
-            </div>
-            <div class="detail-item" v-if="scope.row.recurrence_info">
-              <strong>Recurrence Rule:</strong>
-              <span>{{ getRecurrenceText(scope.row.recurrence_info) }}</span>
-            </div>
-            <div class="detail-item" v-if="scope.row.tags && scope.row.tags.length > 0">
-              <strong>Tags:</strong>
-              <div class="task-tags">
-                <el-tag 
-                  v-for="tag in scope.row.tags" 
-                  :key="tag.tagId" 
-                  :type="getTagType(tag.color)" 
-                  size="small" 
-                  effect="plain"
-                >
-                  {{ tag.name }}
-                </el-tag>
-              </div>
+  <light-table :data="filteredTasks" stripe style="width: 100%">
+    <el-table-column type="expand" width="40">
+      <template #default="scope">
+        <div class="task-detail">
+          <div class="detail-item" v-if="scope.row.description">
+            <strong>Description:</strong>
+            <p>{{ scope.row.description }}</p>
+          </div>
+
+          <div class="detail-item" v-if="scope.row.start_date">
+            <strong>Start Date:</strong>
+            <span>{{ formatDate(scope.row.start_date) }}</span>
+          </div>
+          <div class="detail-item" v-if="scope.row.tags && scope.row.tags.length > 0">
+            <strong>Tags:</strong>
+            <div class="task-tags" style="display: inline-block; margin-left: 8px;">
+              <el-tag 
+                v-for="tag in scope.row.tags" 
+                :key="tag.tagId" 
+                :type="getTagType(tag.color)" 
+                size="small" 
+                effect="plain"
+              >
+                {{ tag.name }}
+              </el-tag>
             </div>
           </div>
-        </template>
-      </el-table-column>
-      <el-table-column prop="title" label="Task Name" min-width="300">
-        <template #default="scope">
-          <div class="task-title-container">
-            <el-checkbox v-model="scope.row.status" :checked="scope.row.status === 'done'" @change="updateTaskStatus(scope.row)">
-              <span :class="{ 'task-completed': scope.row.status === 'done' }" :style="{ paddingLeft: scope.row.level * 20 + 'px' }">{{ scope.row.title }}</span>
-            </el-checkbox>
-            <el-tag v-if="scope.row.category === 'note'" size="small" type="info" style="margin-left: 10px;">Note</el-tag>
+          <div class="detail-item" v-if="scope.row.completed_at">
+            <strong>Completed At:</strong>
+            <span>{{ formatDate(scope.row.completed_at) }}</span>
           </div>
-        </template>
-      </el-table-column>
-      <el-table-column prop="project_name" label="Project" width="120" />
-      <el-table-column prop="due_date" label="Due Date" width="120">
-        <template #default="scope">
-          <el-tag :type="getTaskDueType(scope.row)">
-            {{ formatDate(scope.row.due_date) }}
-          </el-tag>
-        </template>
-      </el-table-column>
-      <el-table-column prop="priority" label="Priority" width="100">
-        <template #default="scope">
-          <el-tag :type="getPriorityType(scope.row.priority)">
-            {{ getPriorityText(scope.row.priority) }}
-          </el-tag>
-        </template>
-      </el-table-column>
-      <el-table-column label="操作" width="150" fixed="right">
-        <template #default="scope">
-          <el-button size="small" @click="editTask(scope.row)">Edit</el-button>
-          <el-button size="small" type="danger" @click="deleteTask(scope.row.task_id)">Delete</el-button>
-        </template>
-      </el-table-column>
-    </light-table>
-  </el-card>
+          <div class="detail-item" v-if="scope.row.recurrence_info">
+            <strong>Recurrence Rule:</strong>
+            <span>{{ getRecurrenceText(scope.row.recurrence_info) }}</span>
+          </div>
+        </div>
+      </template>
+    </el-table-column>
+    <el-table-column prop="title" label="Task Name" min-width="100" max-width="140">
+      <template #default="scope">
+        <div class="task-title-container">
+          <el-checkbox v-model="scope.row.status" :checked="scope.row.status === 'done'" @change="updateTaskStatus(scope.row)">
+            <span :class="{ 'task-completed': scope.row.status === 'done' }" :style="{ paddingLeft: scope.row.level * 20 + 'px' }">{{ scope.row.title }}</span>
+          </el-checkbox>
+          <el-tag v-if="scope.row.category === 'note'" size="small" type="info" style="margin-left: 10px;">Note</el-tag>
+        </div>
+      </template>
+    </el-table-column>
+    <el-table-column label="Project" width="120">
+      <template #default="scope">
+        {{ getProjectName(scope.row.project_id) }}
+      </template>
+    </el-table-column>
+    <el-table-column prop="due_date" label="Due Date" width="180">
+      <template #default="scope">
+        <el-tag :type="getTaskDueType(scope.row)">
+          {{ formatDate(scope.row.due_date) }}
+        </el-tag>
+      </template>
+    </el-table-column>
+    <el-table-column prop="priority" label="Priority" width="100">
+      <template #default="scope">
+        <el-tag :type="getPriorityType(scope.row.priority)">
+          {{ getPriorityText(scope.row.priority) }}
+        </el-tag>
+      </template>
+    </el-table-column>
+    <el-table-column label="Operation" width="150" fixed="right">
+      <template #default="scope">
+        <el-button size="small" @click="editTask(scope.row)">Edit</el-button>
+        <el-button size="small" type="danger" @click="deleteTask(scope.row.task_id)">Delete</el-button>
+      </template>
+    </el-table-column>
+  </light-table>
 </template>
 
 <script>
@@ -104,6 +98,11 @@ export default {
     }
   },
   methods: {
+    getProjectName(projectId) {
+      if (!projectId) return 'No Project';
+      const project = this.projects.find(p => String(p.projectId) === String(projectId));
+      return project ? project.name : 'No Project';
+    },
     getTagType(color) {
       const colorMap = {
         '#409eff': 'primary',
