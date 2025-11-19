@@ -55,12 +55,47 @@
       </div>
     </div>
 
+    <!-- Light Select Demo -->
+    <div class="demo-section">
+      <h2 class="demo-section-title">Light Select</h2>
+      <div class="demo-select-group">
+        <LightSelect
+          v-model="selectedOption"
+          :options="selectOptions"
+          placeholder="Select an option"
+        />
+      </div>
+    </div>
+
+    <!-- Light Dialog Demo -->
+    <div class="demo-section">
+      <h2 class="demo-section-title">Light Dialog</h2>
+      <div class="demo-button-group">
+        <LightButton @click="showLightDialog = true">Open Light Dialog</LightButton>
+      </div>
+      <LightDialog
+        v-model="showLightDialog"
+        title="Light Dialog Demo"
+        width="600px"
+      >
+        <p>This is a glass-style dialog with Element Plus overrides.</p>
+        <template #footer>
+          <span class="dialog-footer">
+            <el-button @click="showDialog = false">Cancel</el-button>
+            <el-button type="primary" @click="showDialog = false">Confirm</el-button>
+          </span>
+        </template>
+      </LightDialog>
+    </div>
+
 </template>
 
 <script>
 import LightButton from '@/components/LightButton.vue'
 import LightToast from '@/components/LightToast.vue'
 import LightDiv from '@/components/LightDiv.vue'
+import LightSelect from '@/components/LightSelect.vue'
+import LightDialog from '@/components/LightDialog.vue'
 import { ElButton, ElInput, ElDialog } from 'element-plus'
 import 'element-plus/dist/index.css'
 
@@ -78,6 +113,8 @@ export default {
     LightButton,
     LightToast,
     LightDiv,
+    LightSelect,
+    LightDialog,
     ElButton,
     ElInput,
     ElDialog
@@ -85,9 +122,18 @@ export default {
   data() {
     return {
       showDialog: false,
+      showLightDialog: false,
       toastVisible: false,
       toastMessage: '',
-      toastType: ''
+      toastType: '',
+      selectedOption: '',
+      selectOptions: [
+        { value: 'option1', label: 'Option 1' },
+        { value: 'option2', label: 'Option 2' },
+        { value: 'option3', label: 'Option 3' },
+        { value: 'option4', label: 'Option 4' },
+        { value: 'option5', label: 'Option 5' }
+      ]
     }
   },
   methods: {

@@ -139,8 +139,10 @@ export default {
 }
 
 .el-select-dropdown__item.is-selected.custom-option {
-  color: rgb(100, 100, 245) !important;
-  background-color: rgba(255, 255, 255, 0.6) !important;
+  background-color: rgba(255, 255, 255, 0.4) !important;
+  color: rgb(255, 255, 255) !important;
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.3) !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
 </style>

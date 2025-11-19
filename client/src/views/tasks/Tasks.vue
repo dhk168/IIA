@@ -116,84 +116,15 @@
     </el-card>
     
     <!-- 添加/编辑任务对话框 -->
-    <el-dialog
+    <TaskDialog
       v-model="showAddTaskDialog"
-      :title="isEditMode ? 'Edit Task' : 'New Task'"
-      width="600px"
-    >
-      <el-form :model="taskForm" :rules="taskRules" ref="taskFormRef">
-        <el-form-item label="Task Title" prop="title">
-          <el-input v-model="taskForm.title" placeholder="Enter task title" />
-        </el-form-item>
-        <el-form-item label="Task Type" prop="category">
-          <el-radio-group v-model="taskForm.category">
-            <el-radio value="task">Task</el-radio>
-            <el-radio value="note">Note</el-radio>
-          </el-radio-group>
-        </el-form-item>
-        <el-form-item label="Description" prop="description">
-          <el-input v-model="taskForm.description" type="textarea" placeholder="Enter task description" :rows="3" />
-        </el-form-item>
+      :is-edit-mode="isEditMode"
+      :task="taskToEdit"
+      :projects="sortedProjects"
+      :tags="tags"
+      @save="handleTaskSave"
+    />
 
-        <el-form-item label="Start Date" prop="start_date">
-          <el-date-picker
-            v-model="taskForm.start_date"
-            type="datetime"
-            placeholder="Select start date and time"
-            style="width: 100%"
-          />
-        </el-form-item>
-        <el-form-item label="Due Date" prop="due_date">
-          <el-date-picker
-            v-model="taskForm.due_date"
-            type="datetime"
-            placeholder="Select due date and time"
-            style="width: 100%"
-          />
-        </el-form-item>
-        <el-form-item label="Priority" prop="priority">
-          <el-select v-model="taskForm.priority" placeholder="Select priority">
-            <el-option label="None" value="none" />
-            <el-option label="Low" value="low" />
-            <el-option label="Medium" value="medium" />
-            <el-option label="High" value="high" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="Project" prop="project_id">
-          <el-select v-model="taskForm.project_id" placeholder="Select project">
-            <el-option label="No Project" value="" />
-            <el-option v-for="project in sortedProjects" :key="project.projectId" :label="project.name" :value="project.projectId" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="Recurrence Settings" prop="has_recurrence">
-          <el-switch v-model="taskForm.has_recurrence" />
-        </el-form-item>
-        <template v-if="taskForm.has_recurrence">
-          <el-form-item label="Recurrence Type" prop="recurrence_category">
-            <el-select v-model="taskForm.recurrence_category" placeholder="Select recurrence type">
-              <el-option label="Weekly" value="weekly" />
-              <el-option label="Monthly" value="monthly" />
-              <el-option label="Yearly" value="yearly" />
-              <el-option label="Every N days" value="days" />
-              <el-option label="Every N weeks" value="weeks" />
-              <el-option label="Ebbinghaus" value="ebinghaus" />
-            </el-select>
-          </el-form-item>
-          <el-form-item label="Recurrence Count" prop="recurrence_count">
-          <el-input v-model.number="taskForm.recurrence_count" type="number" min="1" placeholder="Set recurrence count" />
-        </el-form-item>
-      </template>
-      <el-form-item label="Tags">
-          <el-select v-model="taskForm.selectedTags" multiple placeholder="Select tags">
-          <el-option v-for="tag in tags" :key="tag.tagId" :label="tag.name" :value="tag.tagId" />
-        </el-select>
-      </el-form-item>
-      </el-form>
-      <template #footer>
-          <el-button @click="showAddTaskDialog = false">Cancel</el-button>
-          <el-button type="primary" @click="submitTaskForm">Confirm</el-button>
-        </template>
-    </el-dialog>
     <!-- Tags Management Dialog -->
     <el-dialog
       v-model="showTagsDialog"
@@ -213,13 +144,15 @@
 import TagManagement from './components/TagManagement.vue'
 import LightButton from '@/components/LightButton.vue'
 import LightSelect from '@/components/LightSelect.vue'
+import TaskDialog from '@/components/TaskDialog.vue'
 import { reminderTaskAPI, tagAPI, taskTagAPI, reminderProjectAPI } from '@/api/reminder';
 export default {
   name: 'Tasks',
   components: {
     TagManagement,
     LightButton,
-    LightSelect
+    LightSelect,
+    TaskDialog
   },
   created() {
     this.init()
@@ -276,6 +209,7 @@ export default {
       showAddTaskDialog: false,
       isEditMode: false,
       showTagsDialog: false,
+      taskToEdit: {},
       taskForm: {
         title: '',
         description: '',
@@ -577,22 +511,56 @@ export default {
       }
     },
     editTask(task) {
-      this.isEditMode = true
-      this.taskForm = {
-        task_id: task.task_id,
-        title: task.title,
-        description: task.description || '',
-        category: task.category,
-        project_id: task.project_id,
-        start_date: task.start_date ? new Date(task.start_date) : null,
-        due_date: task.due_date ? new Date(task.due_date) : null,
-        priority: task.priority,
-        has_recurrence: !!task.recurrence_info,
-        recurrence_category: task.recurrence_info?.category || 'weekly',
-        recurrence_count: task.recurrence_info?.count || 1,
-        selectedTags: task.tags ? task.tags.map(tag => tag.tagId) : []
+      this.isEditMode = true;
+      this.taskToEdit = task;
+      this.showAddTaskDialog = true;
+    },
+    async handleTaskSave(taskData) {
+      try {
+        let savedTask;
+        // 创建/编辑任务请求
+        if (this.isEditMode) {
+          // 编辑任务
+          taskData.taskId = this.taskToEdit.task_id;
+          const response = await reminderTaskAPI.createTask(taskData);
+          if (response?.code === 200) {
+            savedTask = response.data || {};
+            await taskTagAPI.deleteTaskTagsByTaskId(this.taskToEdit.task_id);
+            if (taskData.tags?.length > 0) {
+              await taskTagAPI.createTaskTagBatch({ taskId: savedTask.taskId, tagIds: taskData.tags });
+            }
+            // 更新本地列表
+            const index = this.tasks.findIndex(t => t.task_id === savedTask.task_id);
+            if (index !== -1) {
+              this.tasks[index] = { ...this.tasks[index], ...savedTask, tags: taskData.tags.map(tagId => this.tags.find(tag => tag.tagId === tagId)).filter(Boolean) };
+            }
+            this.createGlassToast('success', 'Task updated successfully');
+          } else {
+            throw new Error('Failed to update task');
+          }
+        } else {
+          // 创建任务
+          const response = await reminderTaskAPI.createTask(taskData);
+          if (response?.code === 200) {
+            savedTask = response.data || {};
+            if (taskData.tags?.length > 0) {
+              await taskTagAPI.createTaskTagBatch({ taskId: savedTask.taskId, tagIds: taskData.tags });
+            }
+            // 添加到本地列表
+            this.tasks.push({ ...savedTask, task_id: savedTask.taskId, status: 'todo', created_at: new Date().toISOString(), tags: taskData.tags.map(tagId => this.tags.find(tag => tag.tagId === tagId)).filter(Boolean) });
+            this.createGlassToast('success', 'Task created successfully');
+          } else {
+            throw new Error('Failed to create task');
+          }
+        }
+        // 关闭弹窗并重置状态
+        this.showAddTaskDialog = false;
+        this.isEditMode = false;
+        this.taskToEdit = {};
+      } catch (error) {
+        console.error('Task save error:', error);
+        this.createGlassToast('error', error.message || 'Failed to save task');
       }
-      this.showAddTaskDialog = true
     },
     deleteTask(taskId) {
       this.$confirm('Are you sure you want to delete this task?', 'Confirmation', {

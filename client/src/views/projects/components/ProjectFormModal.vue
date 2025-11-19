@@ -1,9 +1,9 @@
 <template>
-  <el-dialog
+  <LightDialog
     v-model="dialogVisible"
     :title="isEditMode ? 'Edit Project' : 'New Project'"
-    :width="'500px'"
-    :before-close="handleCancel"
+    width="500px"
+    @close="handleCancel"
     class="project-dialog-glass"
   >
     <el-form
@@ -48,17 +48,19 @@
       <el-button @click="handleCancel">Cancel</el-button>
       <el-button type="primary" @click="handleSubmit">Submit</el-button>
     </template>
-  </el-dialog>
+  </LightDialog>
 </template>
 
 <script>
 import { Vue3IconPicker } from 'vue3-icon-picker';
 import { reminderProjectAPI } from '@/api/reminder';
+import LightDialog from '@/components/LightDialog.vue';
 
 export default {
   name: 'ProjectFormModal',
   components: {
-    Vue3IconPicker
+    Vue3IconPicker,
+    LightDialog
   },
   emits: ['close', 'success', 'error'],
   props: {
@@ -206,10 +208,6 @@ export default {
 .project-dialog-glass {
   /* Ensure the wrapper element has the project color variable */
   --project-color: var(--project-color, #1890ff);
-}
-
-/* Override specific Element Plus styles for project color integration */
-.project-dialog-glass .el-dialog {
   /* Apply project color border */
   box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37), 0 0 0 1px var(--project-color, rgba(24, 144, 255, 0.2)) !important;
   /* Add gradient background with animation */
