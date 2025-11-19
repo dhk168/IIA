@@ -1,9 +1,5 @@
 <template>
   <div class="analytics-container">
-    <div class="page-header">
-      <h1>Analytics</h1>
-      <p>View your to-do list statistics</p>
-    </div>
     
     <!-- Stats Cards -->
     <div class="stats-cards">
@@ -177,22 +173,6 @@ export default {
 <style scoped>
 .analytics-container {
   padding: 20px;
-}
-
-.page-header {
-  margin-bottom: 30px;
-}
-
-.page-header h1 {
-  margin: 0 0 10px 0;
-  color: #303133;
-  font-size: 24px;
-}
-
-.page-header p {
-  margin: 0;
-  color: #606266;
-  font-size: 14px;
 }
 
 .stats-cards {

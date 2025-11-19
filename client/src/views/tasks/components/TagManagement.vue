@@ -1,33 +1,41 @@
 <template>
-  <div class="tag-management">
-    <!-- Tags List -->
-    <el-card class="tags-card">
-      <div class="tags-card-header">
-        <span>Tags List</span>
-        <el-button type="primary" size="small" @click="showAddTagDialog = true">
-          <el-icon><Plus /></el-icon> New Tag
-        </el-button>
+  <LightDialog
+      v-model="dialogVisible"
+      title="Tags Management"
+      width="500px"
+      @close="handleClose"
+    >
+      <div class="tag-management">
+        <!-- Tags List -->
+        <el-card class="tags-card">
+          <div class="tags-card-header">
+            <span>Tags List</span>
+            <el-button type="primary" size="small" @click="showAddTagDialog = true">
+              <el-icon><Plus /></el-icon> New Tag
+            </el-button>
+          </div>
+          <el-table :data="tagList" stripe style="width: 100%">
+            <el-table-column prop="name" label="Tag Name" />
+            <el-table-column label="Color">
+              <template #default="scope">
+                <el-tag :type="getTagType(scope.row.color)">
+                  {{ scope.row.color }}
+                </el-tag>
+              </template>
+            </el-table-column>
+            <el-table-column label="Actions" width="150">
+              <template #default="scope">
+                <el-button size="small" @click="editTag(scope.row)">Edit</el-button>
+                <el-button size="small" type="danger" @click="deleteTag(scope.row.tagId)">Delete</el-button>
+              </template>
+            </el-table-column>
+          </el-table>
+        </el-card>
       </div>
-      <el-table :data="tagList" stripe style="width: 100%">
-        <el-table-column prop="name" label="Tag Name" />
-        <el-table-column label="Color">
-          <template #default="scope">
-            <el-tag :type="getTagType(scope.row.color)">
-              {{ scope.row.color }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column label="Actions" width="150">
-          <template #default="scope">
-            <el-button size="small" @click="editTag(scope.row)">Edit</el-button>
-            <el-button size="small" type="danger" @click="deleteTag(scope.row.tagId)">Delete</el-button>
-          </template>
-        </el-table-column>
-      </el-table>
-    </el-card>
+    </LightDialog>
 
     <!-- Add/Edit Tag Dialog -->
-    <el-dialog
+    <LightDialog
       v-model="showAddTagDialog"
       :title="isEditingTag ? 'Edit Tag' : 'New Tag'"
       width="400px"
@@ -44,21 +52,39 @@
         <el-button @click="showAddTagDialog = false">Cancel</el-button>
         <el-button type="primary" @click="submitTagForm">Confirm</el-button>
       </template>
-    </el-dialog>
-  </div>
+    </LightDialog>
+
+    <!-- Delete Confirm Dialog -->
+    <LightDialog
+      v-model="showDeleteConfirm"
+      title="Delete Tag"
+      width="400px"
+    >
+      <div>Are you sure you want to delete this tag?</div>
+      <template #footer>
+        <el-button @click="handleDeleteCancel">No</el-button>
+        <el-button type="danger" @click="handleDeleteConfirm">Yes</el-button>
+      </template>
+    </LightDialog>
 </template>
 
 <script>
 import { Plus } from '@element-plus/icons-vue'
 import { tagAPI, taskTagAPI } from '@/api/reminder'
+import LightDialog from '@/components/LightDialog.vue'
 
 export default {
   inject: ['showToast'],
   name: 'TagManagement',
   components: {
-    Plus
+    Plus,
+    LightDialog
   },
   props: {
+    modelValue: {
+      type: Boolean,
+      default: false
+    },
     tags: {
       type: Array,
       default: () => []
@@ -70,9 +96,12 @@ export default {
   },
   data() {
     return {
+      dialogVisible: this.modelValue,
       showAddTagDialog: false,
+      showDeleteConfirm: false,
       isEditingTag: false,
       tagList: [],
+      tagToDelete: null,
       tagForm: {
         tagId: '',
         name: '',
@@ -95,13 +124,27 @@ export default {
         this.tagList = newTags
       },
       immediate: true
+    },
+    modelValue: {
+      handler(newVal) {
+        this.dialogVisible = newVal
+      },
+      immediate: true
+    },
+    dialogVisible: {
+      handler(newVal) {
+        this.$emit('update:model-value', newVal)
+      },
+      immediate: true
     }
   },
   mounted() {
     this.loadTags()
   },
   methods: {
-    
+    handleClose() {
+      this.$emit('close');
+    },
     
     getTagType(color) {
       // 根据颜色值判断对应的el-tag类型
@@ -157,27 +200,26 @@ export default {
     },
     
     async deleteTag(tagId) {
+      this.tagToDelete = tagId
+      this.showDeleteConfirm = true
+    },
+    
+    async handleDeleteConfirm() {
       try {
-        await this.$confirm('Are you sure you want to delete this tag?', 'Confirmation', {
-          confirmButtonText: 'Yes',
-          cancelButtonText: 'No',
-          type: 'warning'
-        })
-        
         // 删除标签相关的所有任务标签关联
-        const response = await taskTagAPI.deleteTaskTagsByTagId(tagId)
+        const response = await taskTagAPI.deleteTaskTagsByTagId(this.tagToDelete)
         
         // 根据Projects.vue的判断逻辑，检查response.code === 200
         if (response && response.code === 200) {
           // 更新本地数据
-          const updatedTags = this.tagList.filter(tag => tag.tagId !== tagId)
+          const updatedTags = this.tagList.filter(tag => tag.tagId !== this.tagToDelete)
           this.tagList = updatedTags
           this.$emit('tags-updated', this.tagList)
           
           // 更新任务中的标签
           this.tasks.forEach(task => {
             if (task.tags && task.tags.length > 0) {
-              task.tags = task.tags.filter(tag => tag.tagId !== tagId)
+              task.tags = task.tags.filter(tag => tag.tagId !== this.tagToDelete)
             }
           })
           
@@ -186,11 +228,15 @@ export default {
           this.showToast('error', 'Failed to delete tag')
         }
       } catch (error) {
-        if (error !== 'cancel') {
-          console.error('Failed to delete tag:', error)
-          this.showToast('error', 'Failed to delete tag')
-        }
+        console.error('Failed to delete tag:', error)
+        this.showToast('error', 'Failed to delete tag')
+      } finally {
+        this.showDeleteConfirm = false
       }
+    },
+    
+    handleDeleteCancel() {
+      this.showDeleteConfirm = false
     },
     
     async submitTagForm() {
@@ -275,3 +321,13 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+  .tags-card-header {
+    span{
+      font-size: 16px;
+      font-weight: 600;
+      color: rgb(200, 200, 200);
+    }
+  }
+</style>

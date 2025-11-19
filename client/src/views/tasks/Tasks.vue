@@ -15,86 +15,14 @@
     <TaskFilter v-model:filter="filterOptions" :tags="tags" :projects="projects" />
     
     <!-- 任务列表 -->
-    <el-card class="tasks-card">
-      <template #header>
-        <div class="card-header">
-          <span>Task List</span>
-        </div>
-      </template>
-      <el-table :data="filteredTasks" stripe style="width: 100%" default-expand-all>
-        <el-table-column type="expand" width="40">
-          <template #default="scope">
-            <div class="task-detail">
-              <div class="detail-item" v-if="scope.row.description">
-                <strong>Description:</strong>
-                <p>{{ scope.row.description }}</p>
-              </div>
-              <div class="detail-item">
-                <strong>Created At:</strong>
-                <span>{{ formatDate(scope.row.created_at) }}</span>
-              </div>
-              <div class="detail-item" v-if="scope.row.start_date">
-                <strong>Start Date:</strong>
-                <span>{{ formatDate(scope.row.start_date) }}</span>
-              </div>
-              <div class="detail-item" v-if="scope.row.completed_at">
-                <strong>Completed At:</strong>
-                <span>{{ formatDate(scope.row.completed_at) }}</span>
-              </div>
-              <div class="detail-item" v-if="scope.row.recurrence_info">
-                <strong>Recurrence Rule:</strong>
-                <span>{{ getRecurrenceText(scope.row.recurrence_info) }}</span>
-              </div>
-              <div class="detail-item" v-if="scope.row.tags && scope.row.tags.length > 0">
-                <strong>Tags:</strong>
-                <div class="task-tags">
-                  <el-tag 
-                    v-for="tag in scope.row.tags" 
-                    :key="tag.tagId" 
-                    :type="getTagType(tag.color)" 
-                    size="small" 
-                    effect="plain"
-                  >
-                    {{ tag.name }}
-                  </el-tag>
-                </div>
-              </div>
-            </div>
-          </template>
-        </el-table-column>
-        <el-table-column prop="title" label="Task Name" min-width="300">
-          <template #default="scope">
-            <div class="task-title-container">
-              <el-checkbox v-model="scope.row.status" :checked="scope.row.status === 'done'" @change="updateTaskStatus(scope.row)">
-                <span :class="{ 'task-completed': scope.row.status === 'done' }" :style="{ paddingLeft: scope.row.level * 20 + 'px' }">{{ scope.row.title }}</span>
-              </el-checkbox>
-              <el-tag v-if="scope.row.category === 'note'" size="small" type="info" style="margin-left: 10px;">Note</el-tag>
-            </div>
-          </template>
-        </el-table-column>
-        <el-table-column prop="project_name" label="Project" width="120" />
-        <el-table-column prop="due_date" label="Due Date" width="120">
-          <template #default="scope">
-            <el-tag :type="getTaskDueType(scope.row)">
-              {{ formatDate(scope.row.due_date) }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column prop="priority" label="Priority" width="100">
-          <template #default="scope">
-            <el-tag :type="getPriorityType(scope.row.priority)">
-              {{ getPriorityText(scope.row.priority) }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column label="操作" width="150" fixed="right">
-          <template #default="scope">
-            <el-button size="small" @click="editTask(scope.row)">Edit</el-button>
-            <el-button size="small" type="danger" @click="deleteTask(scope.row.task_id)">Delete</el-button>
-          </template>
-        </el-table-column>
-      </el-table>
-    </el-card>
+    <TaskList
+      :filtered-tasks="filteredTasks"
+      :tags="tags"
+      :projects="projects"
+      @edit-task="editTask"
+      @delete-task="deleteTask"
+      @update-task-status="updateTaskStatus"
+    />
     
     <!-- 添加/编辑任务对话框 -->
     <TaskDialog
@@ -107,17 +35,13 @@
     />
 
     <!-- Tags Management Dialog -->
-    <el-dialog
+    <tag-management 
       v-model="showTagsDialog"
-      title="Tags Management"
-      width="500px"
-    >
-      <tag-management 
-        :tags="tags" 
-        :tasks="tasks" 
-        @tags-updated="handleTagsUpdated"
-      />
-    </el-dialog>
+      :tags="tags" 
+      :tasks="tasks" 
+      @tags-updated="handleTagsUpdated"
+      @close="showTagsDialog = false"
+    />
   </div>
 </template>
 
@@ -127,6 +51,7 @@ import LightButton from '@/components/LightButton.vue'
 import LightSelect from '@/components/LightSelect.vue'
 import TaskDialog from './components/TaskDialog.vue'
 import TaskFilter from './components/TaskFilter.vue'
+import TaskList from './components/TaskList.vue'
 import { reminderTaskAPI, tagAPI, taskTagAPI, reminderProjectAPI } from '@/api/reminder';
 export default {
   name: 'Tasks',
@@ -136,7 +61,8 @@ export default {
     LightButton,
     LightSelect,
     TaskDialog,
-    TaskFilter
+    TaskFilter,
+    TaskList
   },
   created() {
     this.init()
@@ -221,6 +147,13 @@ export default {
       }
       
       return filtered
+    },
+    sortedProjects() {
+      return [...this.projects].sort((a, b) => {
+        const nameA = (a?.name || '').toLowerCase();
+        const nameB = (b?.name || '').toLowerCase();
+        return nameA.localeCompare(nameB);
+      });
     }
   },
   methods: {
@@ -441,7 +374,7 @@ export default {
             }
             // 添加到本地列表
             this.tasks.push({ ...savedTask, task_id: savedTask.taskId, status: 'todo', created_at: new Date().toISOString(), tags: taskData.tags.map(tagId => this.tags.find(tag => tag.tagId === tagId)).filter(Boolean) });
-            this.createGlassToast('success', 'Task created successfully');
+            this.showToast('success', 'Task created successfully');
           } else {
             throw new Error('Failed to create task');
           }
@@ -452,7 +385,7 @@ export default {
         this.taskToEdit = {};
       } catch (error) {
         console.error('Task save error:', error);
-        this.createGlassToast('error', error.message || 'Failed to save task');
+        this.showToast('error', error.message || 'Failed to save task');
       }
     },
     deleteTask(taskId) {
@@ -531,7 +464,7 @@ export default {
                 }
               }
               
-              this.createGlassToast('success', 'Task updated successfully')
+              this.showToast('success', 'Task updated successfully')
             } else {
               // 创建新任务
               const response = await reminderTaskAPI.createTask(taskData)
