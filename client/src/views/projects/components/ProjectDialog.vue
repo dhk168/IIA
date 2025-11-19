@@ -57,7 +57,7 @@ import { reminderProjectAPI } from '@/api/reminder';
 import LightDialog from '@/components/LightDialog.vue';
 
 export default {
-  name: 'ProjectFormModal',
+  name: 'ProjectDialog',
   components: {
     Vue3IconPicker,
     LightDialog

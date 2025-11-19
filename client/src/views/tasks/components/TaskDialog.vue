@@ -81,7 +81,7 @@
 </template>
 
 <script>
-import LightDialog from './LightDialog.vue'
+import LightDialog from '@/components/LightDialog.vue'
 export default {
   name: 'TaskDialog',
   components: {
@@ -243,5 +243,4 @@ export default {
 </script>
 
 <style scoped>
-/* 可以在这里添加组件特定的样式 */
 </style>

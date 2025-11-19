@@ -22,7 +22,7 @@
     </div>
     
     <!-- Project Form Modal -->
-    <ProjectFormModal
+    <ProjectDialog
       :visible="showProjectForm"
       :project-data="projectFormData"
       :is-edit-mode="isEditMode"
@@ -40,7 +40,7 @@ import { OfficeBuilding, Document } from '@element-plus/icons-vue';
 import EmptyProjects from './components/EmptyProjects.vue';
 import { Vue3IconPicker } from 'vue3-icon-picker';
 import ProjectCard from './components/ProjectCard.vue';
-import ProjectFormModal from './components/ProjectFormModal.vue';
+import ProjectDialog from './components/ProjectDialog.vue';
 import LightButton from '@/components/LightButton.vue';
 
 
@@ -52,7 +52,7 @@ export default {
     ProjectCard,
     Document,
     EmptyProjects,
-    ProjectFormModal,
+    ProjectDialog,
     LightButton
   },
   inject: ['showToast'],

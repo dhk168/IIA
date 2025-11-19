@@ -105,19 +105,23 @@ export default {
 /* Remove white borders from Element UI internal components */
 .glass-filter .el-input__wrapper,
 .glass-filter .el-select__wrapper,
+.glass-filter .el-date-picker__input-wrapper,
 .glass-filter .el-input__wrapper:hover,
-.glass-filter .el-select__wrapper:hover {
+.glass-filter .el-select__wrapper:hover,
+.glass-filter .el-date-picker__input-wrapper:hover {
   border: none !important;
   --el-border-color: transparent !important;
   --el-border-color-light: transparent !important;
   box-shadow: none !important;
   --el-box-shadow: none !important;
   background-color: transparent !important;
+  width: 100% !important;
 }
 
 /* 为选择器下拉面板添加毛玻璃效果 */
 .glass-popper {
-  background: rgba(255, 255, 255, 0.2) !important;
+  /* background: rgba(255, 255, 255, 0.2) !important; */
+  background: rgba(80,80, 145, 0.45) !important;
   backdrop-filter: blur(25px) !important;
   -webkit-backdrop-filter: blur(25px) !important;
   border: 1px solid rgba(255, 255, 255, 0.3) !important;

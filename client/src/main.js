@@ -6,10 +6,9 @@ import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
 // 导入所有Element Plus图标
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
-// 导入下拉菜单毛玻璃效果样式，确保在Element Plus样式之后加载
-import './assets/styles/components/dropdown-glass.css'
+
 // 导入项目对话框毛玻璃效果样式
-import './assets/styles/components/el-dialog-glass.css'
+
 // 导入背景动画样式
 /* Removed background.css import */
 // 引入路由

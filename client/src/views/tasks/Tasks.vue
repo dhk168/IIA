@@ -12,26 +12,7 @@
     </div>
     
     <!-- 任务筛选 -->
-    <div class="filter-section">
-      <el-row :gutter="20">
-        <el-col :md="6" :sm="12">
-          <LightSelect v-model="filterOptions.status" placeholder="Task Status" clearable :options="statusOptions" />
-        </el-col>
-
-        <el-col :md="6" :sm="12">
-          <LightSelect v-model="filterOptions.priority" placeholder="Priority" clearable :options="priorityOptions" />
-        </el-col>
-        <el-col :md="6" :sm="12">
-          <LightSelect v-model="filterOptions.tag" placeholder="Tags Filter" clearable :options="tagOptions" />
-        </el-col>
-        <el-col :md="6" :sm="12">
-          <LightSelect v-model="filterOptions.project" placeholder="Project Filter" clearable :options="projectOptions" />
-        </el-col>
-        <el-col :md="6" :sm="12">
-          <el-date-picker v-model="filterOptions.dateRange" type="daterange" range-separator="to" start-placeholder="Start Date" end-placeholder="End Date" class="glass-filter" />
-        </el-col>
-      </el-row>
-    </div>
+    <TaskFilter v-model:filter="filterOptions" :tags="tags" :projects="projects" />
     
     <!-- 任务列表 -->
     <el-card class="tasks-card">
@@ -144,7 +125,8 @@
 import TagManagement from './components/TagManagement.vue'
 import LightButton from '@/components/LightButton.vue'
 import LightSelect from '@/components/LightSelect.vue'
-import TaskDialog from '@/components/TaskDialog.vue'
+import TaskDialog from './components/TaskDialog.vue'
+import TaskFilter from './components/TaskFilter.vue'
 import { reminderTaskAPI, tagAPI, taskTagAPI, reminderProjectAPI } from '@/api/reminder';
 export default {
   name: 'Tasks',
@@ -153,53 +135,17 @@ export default {
     TagManagement,
     LightButton,
     LightSelect,
-    TaskDialog
+    TaskDialog,
+    TaskFilter
   },
   created() {
     this.init()
   },
   data() {
     return {
-      tasks: [{
-        task_id: 3,
-        user_id: 1,
-        project_id: null,
-        project_name: 'No Project',
-        title: 'Weekly Fitness Record',
-        description: 'Record weekly fitness activities',
-        category: 'note',
-        status: 'todo',
-        is_archived: false,
-        parent_task_id: null,
-        level: 0,
-        due_date: null,
-        start_date: null,
-        completed_at: null,
-        created_at: '2023-11-01T10:00:00',
-        priority: 'low',
-        tags: [],
-        recurrence_info: {
-          category: 'weekly',
-          schedule: [1, 3, 5],
-          count: 52
-        }
-      }],
-
+      tasks: [],
       tags: [],
       projects: [],
-      statusOptions: [
-        { label: 'All', value: '' },
-        { label: 'To Do', value: 'todo' },
-        { label: 'Completed', value: 'done' },
-        { label: 'Abandoned', value: 'abandoned' }
-      ],
-      priorityOptions: [
-        { label: 'All', value: '' },
-        { label: 'None', value: 'none' },
-        { label: 'Low', value: 'low' },
-        { label: 'Medium', value: 'medium' },
-        { label: 'High', value: 'high' }
-      ],
       filterOptions: {
         status: '',
         priority: '',
@@ -237,31 +183,7 @@ export default {
     });
   },
   computed: {
-    sortedProjects() {
-      // 确保projects是数组，然后按名称排序
-      if (!Array.isArray(this.projects)) return [];
-      return [...this.projects].sort((a, b) => {
-        const nameA = (a?.name || '').toLowerCase();
-        const nameB = (b?.name || '').toLowerCase();
-        return nameA.localeCompare(nameB);
-      });
-    },
-    tagOptions() {
-      // 生成标签筛选选项，包含"All"选项
-      const options = [{ label: 'All', value: '' }];
-      if (Array.isArray(this.tags)) {
-        options.push(...this.tags.map(tag => ({ label: tag.name, value: tag.tag_id })));
-      }
-      return options;
-    },
-    projectOptions() {
-      // 生成项目筛选选项，包含"All"选项
-      const options = [{ label: 'All', value: '' }];
-      if (Array.isArray(this.sortedProjects)) {
-        options.push(...this.sortedProjects.map(project => ({ label: project.name, value: project.projectId })));
-      }
-      return options;
-    },
+
     filteredTasks() {
       let filtered = [...this.tasks]
       
@@ -305,17 +227,14 @@ export default {
     async loadProjects() {
       try {
         const response = await reminderProjectAPI.getAllProjects();
-        // 响应拦截器已经返回了response.data，直接检查code
         if (response && response.code === 200 && Array.isArray(response.data)) {
           this.projects = response.data.filter(project => !project.isArchived);
+        } else {
+          this.projects = [];
         }
       } catch (error) {
         console.error('Failed to load projects:', error);
-        // 提供一些默认的模拟项目数据
-        this.projects = [
-          { projectId: 1, name: 'Personal Project' },
-          { projectId: 2, name: 'Work Project' }
-        ];
+        this.projects = [];
       }
     },
     getProjectName(projectId) {
@@ -340,15 +259,16 @@ export default {
       try {
         const response = await tagAPI.getAllTags();
         // 响应拦截器已经返回了response.data，直接检查code
-        if (response && response.code === 200) {
-          this.tags = response.data || [];
+        if (response && response.code === 200 && Array.isArray(response.data)) {
+          this.tags = response.data;
         } else {
-          console.warn('API returned non-success response:', response);
+          console.warn('API returned non-success response or invalid data:', response);
           this.tags = [];
           this.showToast('error', 'Failed to load tags');
         }
       } catch (error) {
         console.error('Failed to load tags:', error);
+        this.tags = [];
         this.showToast('error', 'Failed to load tags');
       }
     },
@@ -356,11 +276,8 @@ export default {
     async loadTasks() {
       try {
         const response = await reminderTaskAPI.getTasks();
-        // 响应拦截器已经返回了response.data，直接检查code
         if (response && response.code === 200) {
-          // 处理任务数据，确保字段格式与前端组件匹配
           this.tasks = (response.data || []).map(task => ({
-            // 前端使用的字段名
             task_id: task.taskId,
             user_id: task.userId,
             project_id: task.projectId,
@@ -383,7 +300,7 @@ export default {
             ...task
           }));
           console.log('Tasks loaded successfully:', this.tasks);
-          this.showToast('success', `Successfully loaded ${this.tasks.length} tasks`);
+          // this.showToast('success', `Successfully loaded ${this.tasks.length} tasks`);
         } else {
           console.warn('API returned non-success response:', response);
           this.tasks = [];
@@ -696,5 +613,5 @@ export default {
 </script>
 
 <style>
-@import '../../assets/styles/page/tasks.css';
+@import '@/assets/styles/page/tasks.css';
 </style>

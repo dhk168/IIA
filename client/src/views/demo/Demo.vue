@@ -100,9 +100,8 @@ import { ElButton, ElInput, ElDialog } from 'element-plus'
 import 'element-plus/dist/index.css'
 
 // Import custom component styles
-import '@/assets/styles/components/el-dialog-glass.css'
+// import '@/assets/styles/components/el-dialog-glass.css'
 
-import '@/assets/styles/components/glass-toast.css'
 
 // Import page styles
 import '@/assets/styles/page/auth.css'
