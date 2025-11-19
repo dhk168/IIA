@@ -1,13 +1,13 @@
 <template>
   <BackDiv class="main-container home-container">
     <div class="layout-wrapper">
-      <!-- 侧边栏 -->
+      <!-- Sidebar -->
       <SideBar :active-menu="activeMenu" @menu-select="handleMenuSelect" />
-      <!-- 右侧内容区域 -->
+      <!-- Right content area -->
       <div class="right-content">
-        <!-- 顶部导航 -->
+        <!-- Top navigation -->
         <Header :username="username" :current-page-title="currentPageTitle" />
-        <!-- 页面内容 -->
+        <!-- Page content -->
         <LightDiv class="main-content">
           <el-main>
             <router-view />
@@ -51,20 +51,20 @@ export default {
     }
   },
   created() {
-    // 尝试从localStorage获取用户名（如果有）
+    // Try to get username from localStorage if exists
     const savedUsername = localStorage.getItem('username')
     if (savedUsername) {
       this.username = savedUsername
     }
     
-    // 调用API获取真实用户信息
+    // Call API to get real user information
     this.fetchUserProfile()
     
-    // 设置当前激活的菜单项
+    // Set current active menu item
     this.setActiveMenu()
   },
   methods: {
-    // 获取用户个人信息
+    // Get user profile
     async fetchUserProfile() {
       try {
         const response = await authAPI.getCurrentUser()

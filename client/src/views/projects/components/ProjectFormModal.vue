@@ -162,16 +162,16 @@ export default {
         
         let response;
         if (this.isEditMode) {
-          // 更新项目
+          // Update project
           response = await reminderProjectAPI.updateProject(this.formData);
         } else {
-          // 创建新项目
+          // Create new project
           response = await reminderProjectAPI.createProject(this.formData);
         }
         
         console.log('API response:', response);
         
-        // 成功响应的检测逻辑，与后端响应格式匹配
+        // Check if response is successful (matching backend response format)
         const isSuccess = response?.code === 200;
         
         if (isSuccess) {
@@ -214,10 +214,10 @@ export default {
   background: linear-gradient(135deg, rgba(30, 27, 75, 0.3) 0%, rgba(49, 46, 129, 0.3) 25%, rgba(67, 56, 202, 0.3) 50%, rgba(59, 130, 246, 0.3) 75%, rgba(96, 165, 250, 0.3) 100%) !important;
   background-size: 400% 400% !important;
   animation: oceanGradient 15s ease-in-out infinite !important;
-  /* 玻璃效果 */
+  /* Glass effect */
   backdrop-filter: blur(20px) saturate(1.2) !important;
   -webkit-backdrop-filter: blur(20px) saturate(1.2) !important;
-  /* 确保弹窗容器是相对定位 */
+  /* Ensure dialog container is relatively positioned */
   position: relative;
 }
 

@@ -1,22 +1,22 @@
 <template>
   <div class="empty-state">
-    <!-- 更精美的项目图标 -->
+    <!-- More beautiful project icon -->
     <svg width="100" height="100" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <!-- 文件夹底座 -->
+      <!-- Folder base -->
       <path d="M21 15V8.6H13.6L12 7V4.5C12 3.837 11.463 3.3 10.8 3.3H3.6C2.937 3.3 2.4 3.837 2.4 4.5V19.5C2.4 20.163 2.937 20.7 3.6 20.7H20.4C21.063 20.7 21.6 20.163 21.6 19.5V15H21Z" fill="url(#folderGradient)" stroke="#6a5acd" stroke-width="0.5"/>
-      <!-- 文件夹标签 -->
+      <!-- Folder label -->
       <path d="M3.6 10.5H21.6" stroke="#836fff" stroke-width="0.8" stroke-linecap="round"/>
-      <!-- 装饰点 -->
+      <!-- Decorative dots -->
       <circle cx="6" cy="6" r="0.4" fill="#9370db"/>
       <circle cx="9" cy="6" r="0.4" fill="#9370db"/>
       <circle cx="6" cy="13.5" r="0.4" fill="#9370db"/>
       <circle cx="9" cy="13.5" r="0.4" fill="#9370db"/>
       <circle cx="12" cy="13.5" r="0.4" fill="#9370db"/>
-      <!-- 加号 -->
+      <!-- Plus sign -->
       <circle cx="19" cy="18" r="1.5" fill="white" stroke="#6a5acd" stroke-width="0.5"/>
       <path d="M19 17V19" stroke="#6a5acd" stroke-width="0.8" stroke-linecap="round"/>
       <path d="M18 18H20" stroke="#6a5acd" stroke-width="0.8" stroke-linecap="round"/>
-      <!-- 渐变定义 -->
+      <!-- Gradient definition -->
       <defs>
         <linearGradient id="folderGradient" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stop-color="#e6e6fa"/>

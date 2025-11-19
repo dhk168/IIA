@@ -1,5 +1,5 @@
-/* 下拉菜单毛玻璃效果全局样式 */
-/* 确保最高优先级 */
+/* Global frosted glass effect for dropdown menus */
+/* Ensure highest priority */
 .el-dropdown-menu,
 .el-dropdown-menu--default {
   background: rgba(255, 255, 255, 0.15) !important;

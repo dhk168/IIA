@@ -1,9 +1,6 @@
 
-/* 导入毛玻璃提示样式 */
-@import '../components/glass-toast.css';
 /* 导入下拉菜单毛玻璃样式 */
 @import '../components/dropdown-glass.css';
-/* 导入下拉列表毛玻璃样式 */
 
 /* 导入图标选择器样式 */
 @import 'vue3-icon-picker/dist/style.css';

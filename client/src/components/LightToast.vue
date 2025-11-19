@@ -66,9 +66,9 @@ export default {
 </script>
 
 <style scoped>
-/* 毛玻璃特效提示框样式 */
+/* Frosted glass effect toast style */
 
-/* 基础毛玻璃样式 */
+/* Basic frosted glass style */
 .glass-toast {
   position: fixed;
   top: 20px;
@@ -90,7 +90,7 @@ export default {
   cursor: pointer;
 }
 
-/* 成功提示样式 */
+/* Success toast style */
 .glass-toast.success {
   background: rgba(72, 187, 120, 0.6);
   color: #1e5c3e;
@@ -102,7 +102,7 @@ export default {
   transform: translateY(-2px);
 }
 
-/* 错误提示样式 */
+/* Error toast style */
 .glass-toast.error {
   background: rgba(245, 108, 108, 0.4);
   color: #a51e1e;
@@ -114,7 +114,7 @@ export default {
   transform: translateY(-2px);
 }
 
-/* 警告提示样式 */
+/* Warning toast style */
 .glass-toast.warning {
   background: rgba(247, 183, 49, 0.4);
   color: #8a4c13;
@@ -126,7 +126,7 @@ export default {
   transform: translateY(-2px);
 }
 
-/* 信息提示样式 */
+/* Info toast style */
 .glass-toast.info {
   background: rgba(64, 158, 255, 0.4);
   color: #104c83;
@@ -138,7 +138,7 @@ export default {
   transform: translateY(-2px);
 }
 
-/* 响应式设计 */
+/* Responsive design */
 @media (max-width: 768px) {
   .glass-toast {
     top: 10px;

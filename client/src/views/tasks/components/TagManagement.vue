@@ -53,6 +53,7 @@ import { Plus } from '@element-plus/icons-vue'
 import { tagAPI, taskTagAPI } from '@/api/reminder'
 
 export default {
+  inject: ['showToast'],
   name: 'TagManagement',
   components: {
     Plus
@@ -100,31 +101,7 @@ export default {
     this.loadTags()
   },
   methods: {
-    // 添加毛玻璃提示方法
-    createGlassToast(type, message) {
-      const toast = document.createElement('div');
-      toast.className = `glass-toast glass-toast-${type}`;
-      toast.textContent = message;
-      document.body.appendChild(toast);
-      
-      // 自动移除
-      setTimeout(() => {
-        toast.style.opacity = '0';
-        toast.style.transform = 'translateX(100%)';
-      }, 4000);
-      
-      setTimeout(() => {
-        if (document.body.contains(toast)) {
-          document.body.removeChild(toast);
-        }
-      }, 4500);
-      
-      toast.addEventListener('click', () => {
-        if (document.body.contains(toast)) {
-          document.body.removeChild(toast);
-        }
-      });
-    },
+    
     
     getTagType(color) {
       // 根据颜色值判断对应的el-tag类型
@@ -149,11 +126,11 @@ export default {
         } else {
           console.warn('API returned non-success response:', response)
           this.tagList = []
-          this.createGlassToast('error', 'Failed to load tags')
+          this.showToast('error', 'Failed to load tags')
         }
       } catch (error) {
         console.error('Failed to load tags:', error)
-        this.createGlassToast('error', 'Failed to load tags')
+        this.showToast('error', 'Failed to load tags')
       }
     },
     
@@ -204,14 +181,14 @@ export default {
             }
           })
           
-          this.createGlassToast('success', 'Tag deleted successfully')
+          this.showToast('success', 'Tag deleted successfully')
         } else {
-          this.createGlassToast('error', 'Failed to delete tag')
+          this.showToast('error', 'Failed to delete tag')
         }
       } catch (error) {
         if (error !== 'cancel') {
           console.error('Failed to delete tag:', error)
-          this.createGlassToast('error', 'Failed to delete tag')
+          this.showToast('error', 'Failed to delete tag')
         }
       }
     },
@@ -246,13 +223,13 @@ export default {
                     }
                   })
                 }
-                this.createGlassToast('success', 'Tag updated successfully')
+                this.showToast('success', 'Tag updated successfully')
               }
             } else {
               // 检查标签名是否已存在
               const exists = await tagAPI.existsByName(this.tagForm.name)
               if (exists) {
-                this.createGlassToast('warning', 'Tag name already exists')
+                this.showToast('warning', 'Tag name already exists')
                 return
               }
               
@@ -264,7 +241,7 @@ export default {
               
               if (result.success) {
                 this.tagList.push(result.data)
-                this.createGlassToast('success', 'Tag created successfully')
+                this.showToast('success', 'Tag created successfully')
               }
             }
             
@@ -284,13 +261,13 @@ export default {
               this.showAddTagDialog = false
               this.resetTagForm()
               
-              this.createGlassToast('success', this.isEditingTag ? 'Tag updated successfully' : 'Tag created successfully')
+              this.showToast('success', this.isEditingTag ? 'Tag updated successfully' : 'Tag created successfully')
             } else {
-              this.createGlassToast('error', 'Operation failed')
+              this.showToast('error', 'Operation failed')
             }
           } catch (error) {
             console.error('Failed to submit tag form:', error)
-            this.createGlassToast('error', 'Failed to submit tag form')
+            this.showToast('error', 'Failed to submit tag form')
           }
         }
       })

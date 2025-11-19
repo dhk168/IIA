@@ -35,12 +35,12 @@ export default {
   },
   emits: ['select', 'toggle-archive'],
   methods: {
-    // 十六进制颜色转RGB的工具方法
+    // Hex to RGB conversion utility method
     hexToRgb(hex) {
-      // 移除#号
+      // Remove the # sign
       hex = hex.replace('#', '');
       
-      // 解析RGB值
+      // Parse RGB values
       const r = parseInt(hex.substring(0, 2), 16);
       const g = parseInt(hex.substring(2, 4), 16);
       const b = parseInt(hex.substring(4, 6), 16);

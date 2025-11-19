@@ -15,46 +15,22 @@
 
 <script>
 import { ElMessage } from 'element-plus';
-import '../../assets/styles/components/glass-toast.css';
 
 export default {
   name: 'Blank',
+  inject: ['showToast'],
   methods: {
     showDebugMessage(type) {
-      // 创建自定义毛玻璃提示
-      const createGlassToast = (type, message) => {
-        const toast = document.createElement('div');
-        toast.className = `glass-toast glass-toast-${type}`;
-        toast.textContent = message;
-        document.body.appendChild(toast);
-        
-        // 自动移除
-        setTimeout(() => {
-          toast.style.opacity = '0';
-          toast.style.transform = 'translateX(100%)';
-        }, 4000); // 增加显示时间
-        
-        // 等待动画完成后移除元素
-        setTimeout(() => {
-          document.body.removeChild(toast);
-        }, 4500); // 4000ms显示 + 500ms动画
-        
-        // 点击移除
-        toast.addEventListener('click', () => {
-          document.body.removeChild(toast);
-        });
-      };
-      
       if (type === 'success') {
-        createGlassToast('success', '这是一个成功提示示例');
+        this.showToast('success', '这是一个成功提示示例');
       } else if (type === 'error') {
-        createGlassToast('error', '这是一个错误提示示例');
+        this.showToast('error', '这是一个错误提示示例');
       } else if (type === 'warning') {
-        createGlassToast('warning', '这是一个警告提示示例');
+        this.showToast('warning', '这是一个警告提示示例');
       } else if (type === 'info') {
-        createGlassToast('info', '这是一个信息提示示例');
+        this.showToast('info', '这是一个信息提示示例');
       } else if (type === 'email') {
-        createGlassToast('success', '已发送邮件到您的邮箱，请查收验证码');
+        this.showToast('success', '已发送邮件到您的邮箱，请查收验证码');
       }
     }
   }

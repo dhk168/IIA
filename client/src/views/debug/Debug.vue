@@ -1,83 +1,59 @@
 <template>
   <div class="debug-container">
     <div class="debug-buttons">
-      <light-button @click="clearAllData">清除全部数据</light-button>
-      <light-button @click="clearReminderData">清除备忘录数据</light-button>
+      <light-button @click="clearAllData">Clear All Data</light-button>
+      <light-button @click="clearReminderData">Clear Reminder Data</light-button>
     </div>
   </div>
 </template>
 
 <script>
-import '../../assets/styles/components/glass-toast.css';
 import debugAPI from '../../api/debug';
 import LightButton from '../../components/LightButton.vue';
 
 export default {
   name: 'Debug',
+  inject: ['showToast'],
   components: {
     LightButton
   },
   data() {
     return {
-      // 可以添加debug相关的数据
+      // ...
     }
   },
   methods: {
-    // 清除所有数据库表内容
+    // Clear all database table contents
     async clearAllData() {
       try {
         const response = await debugAPI.clearAllData();
         if (response.code === 200) {
-          this.createGlassToast('success', '所有数据库表内容已成功清除');
+          this.showToast('success', 'All database table contents have been successfully cleared');
         } else {
-          this.createGlassToast('error', response.msg || '清除全部数据失败');
+          this.showToast('error', response.msg || 'Failed to clear all data');
         }
       } catch (error) {
-        console.error('清除全部数据失败:', error);
-        this.createGlassToast('error', '清除全部数据失败');
+        console.error('Failed to clear all data:', error);
+        this.showToast('error', 'Failed to clear all data');
       }
     },
 
-    // 清除所有提醒模块数据表内容
+    // Clear all reminder module data table contents
     async clearReminderData() {
       try {
         const response = await debugAPI.clearReminderData();
         if (response.code === 200) {
-          this.createGlassToast('success', '所有提醒模块数据表内容已成功清除');
+          this.showToast('success', 'All reminder module data table contents have been successfully cleared');
         } else {
-          this.createGlassToast('error', response.msg || '清除备忘录数据失败');
+          this.showToast('error', response.msg || 'Failed to clear reminder data');
         }
       } catch (error) {
-        console.error('清除备忘录数据失败:', error);
-        this.createGlassToast('error', '清除备忘录数据失败');
+        console.error('Failed to clear reminder data:', error);
+        this.showToast('error', 'Failed to clear reminder data');
       }
     },
 
-    // 毛玻璃提示方法
-    createGlassToast(type, message) {
-      const toast = document.createElement('div');
-      toast.className = `glass-toast glass-toast-${type}`;
-      toast.textContent = message;
-      document.body.appendChild(toast);
 
-      // 自动移除
-      setTimeout(() => {
-        toast.style.opacity = '0';
-        toast.style.transform = 'translateX(100%)';
-      }, 4000);
-
-      setTimeout(() => {
-        if (document.body.contains(toast)) {
-          document.body.removeChild(toast);
-        }
-      }, 4500);
-
-      toast.addEventListener('click', () => {
-        if (document.body.contains(toast)) {
-          document.body.removeChild(toast);
-        }
-      });
-    }
   }
 }
 </script>

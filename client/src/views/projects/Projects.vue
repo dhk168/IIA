@@ -44,7 +44,6 @@ import ProjectFormModal from './components/ProjectFormModal.vue';
 import LightButton from '@/components/LightButton.vue';
 
 
-
 export default {
   name: 'ReminderProjects',
   components: {
@@ -56,9 +55,10 @@ export default {
     ProjectFormModal,
     LightButton
   },
+  inject: ['showToast'],
   data() {
     return {
-      projects: [], // 空数组，不使用mock数据
+      projects: [], // Empty array, not using mock data
       selectedProject: null,
       showProjectForm: false,
       isEditMode: false,
@@ -81,56 +81,30 @@ export default {
     this.fetchProjects()
   },
   methods: {
-    // 添加毛玻璃提示方法
-    createGlassToast(type, message) {
-      const toast = document.createElement('div');
-      toast.className = `glass-toast glass-toast-${type}`;
-      toast.textContent = message;
-      document.body.appendChild(toast);
-      
-      // 自动移除
-      setTimeout(() => {
-        toast.style.opacity = '0';
-        toast.style.transform = 'translateX(100%)';
-      }, 4000);
-      
-      setTimeout(() => {
-        if (document.body.contains(toast)) {
-          document.body.removeChild(toast);
-        }
-      }, 4500);
-      
-      toast.addEventListener('click', () => {
-        if (document.body.contains(toast)) {
-          document.body.removeChild(toast);
-        }
-      });
-    },
-    
     async fetchProjects() {
       try {
         const response = await reminderProjectAPI.getAllProjects();
-        // 修改成功响应的检测逻辑，与后端响应格式匹配
+        // Modify success response detection logic to match backend response format
         if (response && response.code === 200) {
           this.projects = response.data || [];
-          // 移除查询成功的弹窗提示
+          // Remove success toast notification for query
         } else {
-          this.projects = []; // 清空projects数组
-          // 显示失败弹窗
-          this.createGlassToast('error', response?.msg || 'Failed to load projects');
+          this.projects = []; // Clear projects array
+          // Show failure toast
+          this.showToast('error', response?.msg || 'Failed to load projects');
         }
       } catch (error) {
-        this.projects = []; // 清空projects数组
-        // 显示失败弹窗
-        this.createGlassToast('error', 'Failed to load projects');
+        this.projects = []; // Clear projects array
+        // Show failure toast
+        this.showToast('error', 'Failed to load projects');
       }
     },
     
     selectProject(project) {
-      // 显示项目详情弹窗
+      // Display project detail modal
       this.selectedProject = project;
-      // 这里暂时使用项目表单弹窗来展示项目详情
-      // 后续可以创建专门的详情弹窗
+      // Temporarily use project form modal to show project details
+      // A dedicated detail modal can be created later
       this.isEditMode = true;
       this.projectFormData = { ...project };
       this.showProjectForm = true;
@@ -149,15 +123,15 @@ export default {
     },
     
     handleFormSuccess(result) {
-      // 处理表单提交成功
-      this.createGlassToast('success', result.message);
+      // Handle form submission success
+      this.showToast('success', result.message);
       this.showProjectForm = false;
-      this.fetchProjects(); // 重新获取项目列表
+      this.fetchProjects(); // Refresh project list
     },
     
     handleFormError(error) {
-      // 处理表单提交错误
-      this.createGlassToast('error', error.message);
+      // Handle form submission error
+      this.showToast('error', error.message);
     },
     
     async toggleArchive(project) {
@@ -166,25 +140,23 @@ export default {
         updatedProject.isArchived = !updatedProject.isArchived;
         
         const response = await reminderProjectAPI.updateProject(updatedProject);
-        // 修改成功响应的检测逻辑，与后端响应格式匹配
+        // Modify success response detection logic to match backend response format
         if (response?.code === 200) {
-          // 保留归档/取消归档成功的弹窗
-          this.createGlassToast('success', response?.msg || (updatedProject.isArchived ? 'Project archived' : 'Project unarchived'));
-          this.fetchProjects(); // 重新获取项目列表
+          // Keep archive/unarchive success toast
+          this.showToast('success', response?.msg || (updatedProject.isArchived ? 'Project archived' : 'Project unarchived'));
+          this.fetchProjects(); // Refresh project list
         } else {
-          this.createGlassToast('error', response?.msg || 'Operation failed');
+          this.showToast('error', response?.msg || 'Operation failed');
         }
       } catch (error) {
         console.error('Error toggling archive status:', error);
-        this.createGlassToast('error', 'An error occurred while updating project');
+        this.showToast('error', 'An error occurred while updating project');
       }
     },
-    
-
   }
 }
 </script>
 
 <style>
-@import '../../assets/styles/page/projects.css';
+@import '@/assets/styles/page/projects.css';
 </style>

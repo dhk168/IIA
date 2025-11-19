@@ -1,7 +1,5 @@
 
-/* 导入毛玻璃提示样式 */
-@import '../components/glass-toast.css';
-/* 导入图标选择器样式 */
+/* Import icon picker styles */
 @import 'vue3-icon-picker/dist/style.css';
 
 .reminder-projects-page {
@@ -48,7 +46,6 @@
   color: rgba(255, 255, 255, 0.8);
 }
 
-/* 确保按钮文字颜色在卡片上清晰可见 */
 .project-card .el-button--text {
   color: rgba(255, 255, 255, 0.9);
 }

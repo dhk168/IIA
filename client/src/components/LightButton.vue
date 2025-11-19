@@ -29,7 +29,7 @@ export default {
 </script>
 
 <style scoped>
-/* 通用轻量级毛玻璃按钮样式 */
+/* General lightweight frosted glass button style */
 .light-button {
   height: 48px;
   padding: 0 16px;
@@ -51,7 +51,7 @@ export default {
   outline: none;
 }
 
-/* 悬停状态 */
+/* Hover state */
 .light-button:hover:not(:disabled) {
   background-color: rgba(255, 255, 255, 0.25);
   border-color: rgba(255, 255, 255, 0.4);
@@ -60,14 +60,14 @@ export default {
   transform: translateY(-1px);
 }
 
-/* 点击状态 */
+/* Active state */
 .light-button:active:not(:disabled) {
   transform: translateY(0);
   background-color: rgba(255, 255, 255, 0.1);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-/* 禁用状态 */
+/* Disabled state */
 .light-button:disabled {
   opacity: 0.6;
   cursor: not-allowed;

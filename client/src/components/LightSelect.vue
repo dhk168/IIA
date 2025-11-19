@@ -102,7 +102,7 @@ export default {
   color: rgb(255, 255, 255) !important;
 }
 
-/* 移除Element UI内部组件的白色边框 */
+/* Remove white borders from Element UI internal components */
 .glass-filter .el-input__wrapper,
 .glass-filter .el-select__wrapper,
 .glass-filter .el-input__wrapper:hover,

@@ -62,6 +62,6 @@ export default {
 
 <style scoped>
 .light-div {
-  /* 基础样式，可通过props覆盖 */
+  /* Basic style, can be overridden by props */
 }
 </style>

@@ -148,6 +148,7 @@ import TaskDialog from '@/components/TaskDialog.vue'
 import { reminderTaskAPI, tagAPI, taskTagAPI, reminderProjectAPI } from '@/api/reminder';
 export default {
   name: 'Tasks',
+  inject: ['showToast'],
   components: {
     TagManagement,
     LightButton,
@@ -332,32 +333,7 @@ export default {
       ]);
     },
     
-    // 添加毛玻璃提示方法
-    createGlassToast(type, message) {
-      const toast = document.createElement('div');
-      toast.className = `glass-toast glass-toast-${type}`;
-      toast.textContent = message;
-      
-      document.body.appendChild(toast);
-      
-      // 自动移除
-      setTimeout(() => {
-        toast.style.opacity = '0';
-        toast.style.transform = 'translateX(100%)';
-      }, 4000);
-      
-      setTimeout(() => {
-        if (document.body.contains(toast)) {
-          document.body.removeChild(toast);
-        }
-      }, 4500);
-      
-      toast.addEventListener('click', () => {
-        if (document.body.contains(toast)) {
-          document.body.removeChild(toast);
-        }
-      });
-    },
+
     
     
     async loadTags() {
@@ -369,11 +345,11 @@ export default {
         } else {
           console.warn('API returned non-success response:', response);
           this.tags = [];
-          this.createGlassToast('error', 'Failed to load tags');
+          this.showToast('error', 'Failed to load tags');
         }
       } catch (error) {
         console.error('Failed to load tags:', error);
-        this.createGlassToast('error', 'Failed to load tags');
+        this.showToast('error', 'Failed to load tags');
       }
     },
     
@@ -407,15 +383,15 @@ export default {
             ...task
           }));
           console.log('Tasks loaded successfully:', this.tasks);
-          this.createGlassToast('success', `成功加载 ${this.tasks.length} 个任务`);
+          this.showToast('success', `Successfully loaded ${this.tasks.length} tasks`);
         } else {
           console.warn('API returned non-success response:', response);
           this.tasks = [];
-          this.createGlassToast('error', 'Failed to load tasks');
+          this.showToast('error', 'Failed to load tasks');
         }
       } catch (error) {
         console.error('Failed to load tasks data:', error);
-        this.createGlassToast('error', 'Failed to load tasks');
+        this.showToast('error', 'Failed to load tasks');
       }
     },
     
@@ -507,7 +483,7 @@ export default {
           this.tasks[taskIndex].status = 'todo'
           this.tasks[taskIndex].completed_at = null
         }
-        this.createGlassToast('success', 'Task status updated successfully')
+        this.showToast('success', 'Task status updated successfully')
       }
     },
     editTask(task) {
@@ -534,7 +510,7 @@ export default {
             if (index !== -1) {
               this.tasks[index] = { ...this.tasks[index], ...savedTask, tags: taskData.tags.map(tagId => this.tags.find(tag => tag.tagId === tagId)).filter(Boolean) };
             }
-            this.createGlassToast('success', 'Task updated successfully');
+            this.showToast('success', 'Task updated successfully');
           } else {
             throw new Error('Failed to update task');
           }
@@ -571,7 +547,7 @@ export default {
         const index = this.tasks.findIndex(t => t.task_id === taskId);
         if (index !== -1) {
           this.tasks.splice(index, 1);
-          this.createGlassToast('success', 'Task deleted successfully');
+          this.showToast('success', 'Task deleted successfully');
         }
       }).catch(() => {
         // 取消删除
@@ -622,7 +598,7 @@ export default {
                   })
                 }
               } else {
-                this.createGlassToast('error', 'Failed to update task');
+                this.showToast('error', 'Failed to update task');
                 throw new Error('Failed to update task')
               }
               
@@ -655,7 +631,7 @@ export default {
                   });
                 }
               } else {
-                this.createGlassToast('error', 'Failed to create task');
+                this.showToast('error', 'Failed to create task');
                 throw new Error('Failed to create task');
               }
             
@@ -682,7 +658,7 @@ export default {
               ).filter(Boolean)
             })
               
-              this.createGlassToast('success', 'Task created successfully')
+              this.showToast('success', 'Task created successfully')
             }
             
             // 关闭对话框并重置表单
@@ -690,7 +666,7 @@ export default {
             this.resetTaskForm();
           } catch (error) {
             console.error('Failed to save task:', error);
-            this.createGlassToast('error', 'Failed to save task: ' + (error.response?.data?.message || error.message));
+            this.showToast('error', 'Failed to save task: ' + (error.response?.data?.message || error.message));
           }
         }
       });

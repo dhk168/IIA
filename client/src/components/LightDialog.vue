@@ -75,17 +75,17 @@ export default {
 
 <style>
 .el-dialog.light-dialog {
-  box-sizing: border-box; /* 确保padding和border包含在width内 */
-  padding: 20px; /* 调整内边距 */
+  box-sizing: border-box; /* Ensure padding and border are included in width */
+  padding: 20px; /* Adjust padding */
 
   /* Apply project color border */
   box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37), 0 0 0 1px rgba(255, 255, 255, 0.2) !important;
-  /* Set light white background */
+  /* Set dark blue-purple background */
   background: rgba(50, 50, 95, 0.8) !important;
-  /* 玻璃效果 - 增强模糊度 */
+  /* Glass effect - Increase blur */
   backdrop-filter: blur(30px) saturate(1.2) !important;
   -webkit-backdrop-filter: blur(30px) saturate(1.2) !important;
-  /* 确保弹窗容器是相对定位 */
+  /* Ensure dialog container is relatively positioned */
   position: relative;
   border: 1px solid rgba(255, 255, 255, 0.3) !important;
   border-radius: 14px !important;
@@ -168,7 +168,7 @@ export default {
   }
 }
 
-/* 渐变动画定义 */
+/* Gradient animation definition */
 @keyframes oceanGradient {
   0%, 100% {
     background-position: 0% 50%;
