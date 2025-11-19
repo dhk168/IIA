@@ -90,10 +90,6 @@ export default {
   transition: all 0.3s ease !important;
 }
 
-.el-select__input {
-  color: rgb(0, 240, 240) !important;
-}
-
 .el-select__selected-item.el-select__placeholder.is-transparent {
   color: rgb(210, 210, 210) !important;
 }

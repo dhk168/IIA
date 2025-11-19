@@ -5,7 +5,7 @@
         <span>Task List</span>
       </div>
     </template>
-    <el-table :data="filteredTasks" stripe style="width: 100%" default-expand-all>
+    <light-table :data="filteredTasks" stripe style="width: 100%" default-expand-all>
       <el-table-column type="expand" width="40">
         <template #default="scope">
           <div class="task-detail">
@@ -77,13 +77,18 @@
           <el-button size="small" type="danger" @click="deleteTask(scope.row.task_id)">Delete</el-button>
         </template>
       </el-table-column>
-    </el-table>
+    </light-table>
   </el-card>
 </template>
 
 <script>
+import LightTable from '@/components/LightTable.vue'
+
 export default {
   name: 'TaskList',
+  components: {
+    LightTable
+  },
   props: {
     filteredTasks: {
       type: Array,

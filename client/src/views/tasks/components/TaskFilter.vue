@@ -3,7 +3,6 @@
       <el-col :md="6" :sm="12">
         <LightSelect v-model="localFilter.status" placeholder="Task Status" clearable :options="statusOptions" />
       </el-col>
-
       <el-col :md="6" :sm="12">
         <LightSelect v-model="localFilter.priority" placeholder="Priority" clearable :options="priorityOptions" />
       </el-col>
@@ -13,21 +12,21 @@
       <el-col :md="6" :sm="12">
         <LightSelect v-model="localFilter.project" placeholder="Project Filter" clearable :options="projectOptions" />
       </el-col>
-      <el-col :span="24">
-        <el-date-picker v-model="localFilter.dateRange" type="daterange" range-separator="to" start-placeholder="Start Date" end-placeholder="End Date" class="glass-filter" />
+      <el-col :md="12" :sm="24">
+        <LightDate v-model="localFilter.dateRange" type="daterange" range-separator="to" start-placeholder="Start Date" end-placeholder="End Date" />
       </el-col>
     </el-row>
 </template>
 
 <script>
 import LightSelect from '@/components/LightSelect.vue';
-import LightDiv from '@/components/LightDiv.vue';
+import LightDate from '@/components/LightDate.vue';
 
 export default {
   name: 'TaskFilter',
   components: {
     LightSelect,
-    LightDiv
+    LightDate
   },
   props: {
     tags: {
@@ -110,4 +109,3 @@ export default {
   }
 };
 </script>
-

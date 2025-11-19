@@ -14,7 +14,7 @@
               <el-icon><Plus /></el-icon> New Tag
             </el-button>
           </div>
-          <el-table :data="tagList" stripe style="width: 100%">
+          <light-table :data="tagList" stripe style="width: 100%">
             <el-table-column prop="name" label="Tag Name" />
             <el-table-column label="Color">
               <template #default="scope">
@@ -29,7 +29,7 @@
                 <el-button size="small" type="danger" @click="deleteTag(scope.row.tagId)">Delete</el-button>
               </template>
             </el-table-column>
-          </el-table>
+          </light-table>
         </el-card>
       </div>
     </LightDialog>
@@ -72,13 +72,15 @@
 import { Plus } from '@element-plus/icons-vue'
 import { tagAPI, taskTagAPI } from '@/api/reminder'
 import LightDialog from '@/components/LightDialog.vue'
+import LightTable from '@/components/LightTable.vue'
 
 export default {
   inject: ['showToast'],
   name: 'TagManagement',
   components: {
     Plus,
-    LightDialog
+    LightDialog,
+    LightTable
   },
   props: {
     modelValue: {
@@ -147,10 +149,10 @@ export default {
     },
     
     getTagType(color) {
-      // 根据颜色值判断对应的el-tag类型
+      // Determine the corresponding el-tag type based on the color value
       if (!color) return 'info'
       
-      // 简单的颜色判断逻辑
+      // Simple color judgment logic
       const colorLower = color.toLowerCase()
       if (colorLower.includes('red') || colorLower.includes('f44336')) return 'danger'
       if (colorLower.includes('green') || colorLower.includes('4caf50')) return 'success'
@@ -162,7 +164,7 @@ export default {
     async loadTags() {
       try {
         const response = await tagAPI.getAllTags()
-        // 根据Projects.vue的判断逻辑，检查response.code === 200
+        // According to the judgment logic in Projects.vue, check if response.code === 200
         if (response && response.code === 200) {
           this.tagList = response.data || []
           this.$emit('tags-updated', this.tagList)
@@ -206,17 +208,17 @@ export default {
     
     async handleDeleteConfirm() {
       try {
-        // 删除标签相关的所有任务标签关联
+        // Delete all task tag associations related to the tag
         const response = await taskTagAPI.deleteTaskTagsByTagId(this.tagToDelete)
         
-        // 根据Projects.vue的判断逻辑，检查response.code === 200
+        // According to the judgment logic in Projects.vue, check if response.code === 200
         if (response && response.code === 200) {
-          // 更新本地数据
+          // Update local data
           const updatedTags = this.tagList.filter(tag => tag.tagId !== this.tagToDelete)
           this.tagList = updatedTags
           this.$emit('tags-updated', this.tagList)
           
-          // 更新任务中的标签
+          // Update tags in tasks
           this.tasks.forEach(task => {
             if (task.tags && task.tags.length > 0) {
               task.tags = task.tags.filter(tag => tag.tagId !== this.tagToDelete)
@@ -246,7 +248,7 @@ export default {
             let result
             
             if (this.isEditingTag) {
-              // 更新现有标签
+              // Update existing tag
               result = await tagAPI.updateTag(this.tagForm.tagId, {
                 name: this.tagForm.name,
                 color: this.tagForm.color
@@ -257,7 +259,7 @@ export default {
                 if (index > -1) {
                   this.tagList[index] = result.data
                   
-                  // 更新任务中的标签
+                  // Update tags in tasks
                   this.tasks.forEach(task => {
                     if (task.tags && task.tags.length > 0) {
                       task.tags.forEach(tag => {
@@ -272,14 +274,14 @@ export default {
                 this.showToast('success', 'Tag updated successfully')
               }
             } else {
-              // 检查标签名是否已存在
+              // Check if the tag name already exists
               const exists = await tagAPI.existsByName(this.tagForm.name)
               if (exists) {
                 this.showToast('warning', 'Tag name already exists')
                 return
               }
               
-              // 创建新标签
+              // Create new tag
               result = await tagAPI.createTag({
                 name: this.tagForm.name,
                 color: this.tagForm.color
@@ -291,9 +293,9 @@ export default {
               }
             }
             
-            // 根据Projects.vue的判断逻辑，检查response.code === 200
+            // According to the judgment logic in Projects.vue, check if response.code === 200
             if (result && result.code === 200) {
-              // 更新或添加新标签到列表中
+              // Update or add new tag to the list
               if (this.isEditingTag && result.data) {
                 const index = this.tagList.findIndex(t => t.tagId === this.tagForm.tagId)
                 if (index > -1) {

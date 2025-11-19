@@ -11,10 +11,10 @@
       </div>
     </div>
     
-    <!-- 任务筛选 -->
+    <!-- Task Filter -->
     <TaskFilter v-model:filter="filterOptions" :tags="tags" :projects="projects" />
     
-    <!-- 任务列表 -->
+    <!-- Task List -->
     <TaskList
       :filtered-tasks="filteredTasks"
       :tags="tags"
@@ -24,7 +24,7 @@
       @update-task-status="updateTaskStatus"
     />
     
-    <!-- 添加/编辑任务对话框 -->
+    <!-- Add/Edit Task Dialog -->
     <TaskDialog
       v-model="showAddTaskDialog"
       :is-edit-mode="isEditMode"
