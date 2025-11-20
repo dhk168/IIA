@@ -30,9 +30,13 @@ import GlassDropdown from './GlassDropdown.vue'
 export default {
   name: 'Header',
   components: {
-    UserFilled,
     LightDiv,
     GlassDropdown
+  },
+  data() {
+    return {
+      UserFilled
+    };
   },
   props: {
     username: {

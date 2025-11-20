@@ -5,6 +5,7 @@ import java.util.Map;
 import java.time.LocalDateTime;
 
 import com.jackson.server.reminder.dto.CreateTaskRequest;
+import com.jackson.server.reminder.dto.UpdateTaskRequest;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -35,13 +36,52 @@ public class TaskController {
 
     // 创建任务
     @PostMapping("create")
-    public Map<String, Object> create(@RequestBody @Valid CreateTaskRequest dto, HttpServletRequest request) {
+    public Map<String, Object> create(
+            @RequestBody @Valid CreateTaskRequest dto,
+            HttpServletRequest request
+    ) {
         try {
             Long userId = tokenService.getUserIdFromRequest(request);
             Task createdTask = taskService.create(userId, dto);
             return ResponseUtils.buildSuccessResponse(createdTask, "任务创建成功");
         } catch (Exception e) {
             log.error("创建任务失败: {}", e.getMessage(), e);
+            return ResponseUtils.buildErrorResponse(e.getMessage());
+        }
+    }
+
+    // 更新任务
+    @PutMapping("update/{id}")
+    public Map<String, Object> updateById(
+            @PathVariable("id") Long taskId,
+            @RequestBody Task task,
+            HttpServletRequest request
+    ) {
+        try {
+            Long userId = tokenService.getUserIdFromRequest(request);
+            task.setTaskId(taskId);
+            task.setUserId(userId);
+            boolean updated = taskService.updateById(task);
+            if (updated) {
+                return ResponseUtils.buildSuccessResponse(null, "任务更新成功");
+            } else {
+                return ResponseUtils.buildErrorResponse("任务更新失败或无权限");
+            }
+        } catch (Exception e) {
+            log.error("更新任务失败: {}", e.getMessage(), e);
+            return ResponseUtils.buildErrorResponse(e.getMessage());
+        }
+    }
+    
+    // 更新任务
+    @PostMapping("update")
+    public Map<String, Object> update(@RequestBody UpdateTaskRequest dto, HttpServletRequest request) {
+        try {
+            Long userId = tokenService.getUserIdFromRequest(request);
+            Task updatedTask = taskService.updateById(userId, dto);
+            return ResponseUtils.buildSuccessResponse(updatedTask, "任务更新成功");
+        } catch (Exception e) {
+            log.error("更新任务失败: {}", e.getMessage(), e);
             return ResponseUtils.buildErrorResponse(e.getMessage());
         }
     }
@@ -85,26 +125,6 @@ public class TaskController {
             }
         } catch (Exception e) {
             log.error("获取任务失败: {}", e.getMessage(), e);
-            return ResponseUtils.buildErrorResponse(e.getMessage());
-        }
-    }
-
-    // 更新任务
-    @PutMapping("update/{id}")
-    public Map<String, Object> updateById(@PathVariable("id") Long taskId, @RequestBody Task task, 
-                                        HttpServletRequest request) {
-        try {
-            Long userId = tokenService.getUserIdFromRequest(request);
-            task.setTaskId(taskId);
-            task.setUserId(userId);
-            boolean updated = taskService.updateById(task);
-            if (updated) {
-                return ResponseUtils.buildSuccessResponse(null, "任务更新成功");
-            } else {
-                return ResponseUtils.buildErrorResponse("任务更新失败或无权限");
-            }
-        } catch (Exception e) {
-            log.error("更新任务失败: {}", e.getMessage(), e);
             return ResponseUtils.buildErrorResponse(e.getMessage());
         }
     }

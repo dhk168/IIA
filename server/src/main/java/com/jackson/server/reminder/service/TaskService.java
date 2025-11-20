@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import com.jackson.server.reminder.dto.CreateTaskRequest;
+import com.jackson.server.reminder.dto.UpdateTaskRequest;
 import com.jackson.server.reminder.entity.Task;
 
 public interface TaskService {
@@ -18,6 +19,9 @@ public interface TaskService {
     
     // 更新任务
     boolean updateById(Task task);
+    
+    // 更新任务（根据ID）
+    Task updateById(Long userId, UpdateTaskRequest dto);
     
     // 更新任务状态
     boolean updateStatus(Long taskId, String status);

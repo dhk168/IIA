@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.jackson.server.reminder.dto.CreateTaskRequest;
+import com.jackson.server.reminder.dto.UpdateTaskRequest;
 import com.jackson.server.reminder.entity.Task;
 import com.jackson.server.reminder.entity.TaskTag;
 import com.jackson.server.reminder.mapper.TaskMapper;
@@ -94,6 +95,57 @@ public class TaskServiceImpl implements TaskService {
         boolean success = result > 0;
         log.info("Task update {}" + (success ? "successful" : "failed") + " for task id: {}", success ? "successful" : "failed", task.getTaskId());
         return success;
+    }
+    
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Task updateById(Long userId, UpdateTaskRequest dto) {
+        log.info("Updating task for user: {} with dto: {}", userId, dto);
+        // 验证任务存在且属于当前用户
+        Task existingTask = taskMapper.findById(dto.getTaskId());
+        if (existingTask == null || !existingTask.getUserId().equals(userId)) {
+            log.warn("Task not found or permission denied for task id: {}", dto.getTaskId());
+            throw new RuntimeException("Task not found or permission denied");
+        }
+        
+        // 创建Task对象并设置属性
+        Task task = new Task(existingTask);
+        task.setProjectId(dto.getProjectId());
+        task.setTitle(dto.getTitle());
+        task.setDescription(dto.getDescription());
+        task.setCategory(dto.getCategory());
+        task.setParentTaskId(dto.getParentTaskId());
+        task.setDueDate(dto.getDueDate());
+        task.setStartDate(dto.getStartDate());
+        task.setReminderSentAt(dto.getReminderSentAt());
+        task.setPriority(dto.getPriority());
+        task.setStatus(dto.getStatus());
+        task.setIsArchived(dto.getIsArchived());
+        task.setSortOrder(dto.getSortOrder());
+        
+        int result = taskMapper.update(task);
+        if (result > 0) {
+            log.info("Task updated successfully with id: {}", task.getTaskId());
+            
+            // 处理标签关联：先删除旧的，再添加新的
+            taskTagService.deleteByTaskId(task.getTaskId());
+            if (dto.getTagIds() != null && !dto.getTagIds().isEmpty()) {
+                List<TaskTag> taskTags = dto.getTagIds().stream()
+                    .map(tagId -> {
+                        TaskTag taskTag = new TaskTag();
+                        taskTag.setTaskId(task.getTaskId());
+                        taskTag.setTagId(tagId);
+                        return taskTag;
+                    })
+                    .collect(Collectors.toList());
+                taskTagService.createBatch(taskTags);
+                log.info("Updated task-tag associations for task id: {}", task.getTaskId());
+            }
+            
+            return task;
+        }
+        log.error("Failed to update task");
+        throw new RuntimeException("Failed to update task");
     }
 
     @Override

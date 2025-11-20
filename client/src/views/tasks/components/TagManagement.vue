@@ -77,6 +77,7 @@ import LightTable from '@/components/LightTable.vue'
 export default {
   inject: ['showToast'],
   name: 'TagManagement',
+  emits: ['tags-updated', 'close', 'update:model-value'],
   components: {
     Plus,
     LightDialog,

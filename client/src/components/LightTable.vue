@@ -2,7 +2,6 @@
   <el-table
     class="light-table"
     v-bind="$attrs"
-    v-on="$listeners"
   >
     <slot></slot>
   </el-table>

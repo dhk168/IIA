@@ -18,16 +18,14 @@
     :class="className"
   >
     <template v-if="showTime" #append>
-      <el-input-group>
-        <el-input
-          ref="timeRef"
-          v-model="timeValue"
-          type="time"
-          size="small"
-          format="HH:mm"
-          placeholder="HH:mm"
-        ></el-input>
-      </el-input-group>
+      <el-input
+        ref="timeRef"
+        v-model="timeValue"
+        type="time"
+        size="small"
+        format="HH:mm"
+        placeholder="HH:mm"
+      ></el-input>
     </template>
   </el-date-picker>
 </template>

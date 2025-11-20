@@ -45,6 +45,12 @@ export const reminderTaskAPI = {
   getTasks: async (params) => {
     const response = await axiosInstance.get('/reminder/task', { params });
     return response;
+  },
+  
+  // 更新任务
+  updateTask: async (taskData) => {
+    const response = await axiosInstance.post('/reminder/task/update', taskData);
+    return response;
   }
 };
 

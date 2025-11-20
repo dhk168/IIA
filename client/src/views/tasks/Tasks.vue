@@ -47,11 +47,11 @@
 
 <script>
 import TagManagement from './components/TagManagement.vue'
-import LightButton from '@/components/LightButton.vue'
-import LightSelect from '@/components/LightSelect.vue'
 import TaskDialog from './components/TaskDialog.vue'
 import TaskFilter from './components/TaskFilter.vue'
 import TaskList from './components/TaskList.vue'
+import LightButton from '@/components/LightButton.vue'
+import LightSelect from '@/components/LightSelect.vue'
 import { reminderTaskAPI, tagAPI, taskTagAPI, reminderProjectAPI } from '@/api/reminder';
 export default {
   name: 'Tasks',
@@ -113,18 +113,17 @@ export default {
     filteredTasks() {
       let filtered = [...this.tasks]
       
-      // 状态筛选
+      // Status filter
       if (this.filterOptions.status) {
         filtered = filtered.filter(task => task.status === this.filterOptions.status)
       }
       
-      
-      // 优先级筛选
+      // Priority filter
       if (this.filterOptions.priority) {
         filtered = filtered.filter(task => task.priority === this.filterOptions.priority)
       }
       
-      // 日期范围筛选
+      // Date range filter
       if (this.filterOptions.dateRange && this.filterOptions.dateRange.length === 2) {
         const [start, end] = this.filterOptions.dateRange
         filtered = filtered.filter(task => {
@@ -134,14 +133,14 @@ export default {
         })
       }
       
-      // 标签筛选
+      // Tag filter
       if (this.filterOptions.tag) {
         filtered = filtered.filter(task => 
           task.tags && task.tags.some(tag => String(tag.tagId) === String(this.filterOptions.tag))
         )
       }
       
-      // 项目筛选
+      // Project filter
       if (this.filterOptions.project) {
         filtered = filtered.filter(task => task && String(task.project_id) === String(this.filterOptions.project))
       }
@@ -175,11 +174,9 @@ export default {
       const project = this.projects.find(p => String(p.projectId) === String(projectId));
       return project ? project.name : 'Unknown Project';
     },
-    // 初始化数据加载
+
     async init() {
-      // 先加载标签数据，确保查询任务标签时可用
       await this.loadTags();
-      // 同时加载任务和项目数据
       await Promise.all([
         this.loadTasks(),
         this.loadProjects()
@@ -189,7 +186,6 @@ export default {
     async loadTags() {
       try {
         const response = await tagAPI.getAllTags();
-        // 响应拦截器已经返回了response.data，直接检查code
         if (response && response.code === 200 && Array.isArray(response.data)) {
           this.tags = response.data;
         } else {
@@ -251,8 +247,7 @@ export default {
           }));
 
           this.tasks = tasks;
-          console.log(this.tasks[0].name)
-          console.log('Tasks loaded successfully with tags:', this.tasks);
+          // console.log('Tasks loaded successfully with tags:', this.tasks);
           // this.showToast('success', `Successfully loaded ${this.tasks.length} tasks`);
         } else {
           console.warn('API returned non-success response:', response);
@@ -368,7 +363,7 @@ export default {
         if (this.isEditMode) {
           // 编辑任务
           taskData.taskId = this.taskToEdit.task_id;
-          const response = await reminderTaskAPI.createTask(taskData);
+          const response = await reminderTaskAPI.updateTask(taskData);
           if (response?.code === 200) {
             savedTask = response.data || {};
             await taskTagAPI.deleteTaskTagsByTaskId(this.taskToEdit.task_id);
