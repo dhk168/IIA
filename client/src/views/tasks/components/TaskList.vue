@@ -3,9 +3,9 @@
     <el-table-column type="expand" width="40">
       <template #default="scope">
         <div class="task-detail">
-          <div class="detail-item" v-if="scope.row.description">
+          <div class="detail-item">
             <strong>Description:</strong>
-            <p>{{ scope.row.description }}</p>
+            <span>{{ scope.row.description || '' }}</span>
           </div>
 
           <div class="detail-item" v-if="scope.row.start_date">

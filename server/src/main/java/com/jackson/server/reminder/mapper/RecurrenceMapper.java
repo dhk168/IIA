@@ -7,8 +7,8 @@ import org.apache.ibatis.annotations.*;
 public interface RecurrenceMapper {
     
     // 插入新的循环任务配置
-    @Insert("INSERT INTO reminder_recurrence(task_id, category, interval, count, next_time, schedule) " +
-            "VALUES(#{taskId}, #{category}, #{interval}, #{count}, #{nextTime}, #{schedule})")
+    @Insert("INSERT INTO reminder_recurrence(task_id, category, `frequency`, count, next_time, schedule) " +
+            "VALUES(#{taskId}, #{category}, #{frequency}, #{count}, #{nextTime}, #{schedule})")
     int insert(Recurrence recurrence);
     
     // 根据任务ID查询循环配置
@@ -16,7 +16,7 @@ public interface RecurrenceMapper {
     Recurrence findByTaskId(Long taskId);
     
     // 更新循环任务配置
-    @Update("UPDATE reminder_recurrence SET category = #{category}, interval = #{interval}, " +
+    @Update("UPDATE reminder_recurrence SET category = #{category}, `frequency` = #{frequency}, " +
             "count = #{count}, next_time = #{nextTime}, schedule = #{schedule} " +
             "WHERE task_id = #{taskId}")
     int update(Recurrence recurrence);

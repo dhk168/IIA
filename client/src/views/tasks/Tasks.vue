@@ -251,6 +251,7 @@ export default {
           }));
 
           this.tasks = tasks;
+          console.log(this.tasks[0].name)
           console.log('Tasks loaded successfully with tags:', this.tasks);
           // this.showToast('success', `Successfully loaded ${this.tasks.length} tasks`);
         } else {
@@ -374,11 +375,8 @@ export default {
             if (taskData.tags?.length > 0) {
               await taskTagAPI.createTaskTagBatch({ taskId: savedTask.taskId, tagIds: taskData.tags });
             }
-            // 更新本地列表
-            const index = this.tasks.findIndex(t => t.task_id === savedTask.task_id);
-            if (index !== -1) {
-              this.tasks[index] = { ...this.tasks[index], ...savedTask, tags: taskData.tags.map(tagId => this.tags.find(tag => tag.tagId === tagId)).filter(Boolean) };
-            }
+            // 重新加载所有数据确保一致性
+            await this.init();
             this.showToast('success', 'Task updated successfully');
           } else {
             throw new Error('Failed to update task');
@@ -391,8 +389,8 @@ export default {
             if (taskData.tags?.length > 0) {
               await taskTagAPI.createTaskTagBatch({ taskId: savedTask.taskId, tagIds: taskData.tags });
             }
-            // 添加到本地列表
-            this.tasks.push({ ...savedTask, task_id: savedTask.taskId, status: 'todo', created_at: new Date().toISOString(), tags: taskData.tags.map(tagId => this.tags.find(tag => String(tag.tagId) === String(tagId))).filter(Boolean) });
+            // 重新加载所有数据确保一致性
+            await this.init();
             this.showToast('success', 'Task created successfully');
           } else {
             throw new Error('Failed to create task');

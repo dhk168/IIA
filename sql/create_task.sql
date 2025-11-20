@@ -1,13 +1,6 @@
 -- 提醒模块
 use iia;
 
-drop table if exists reminder_project;
-drop table if exists reminder_task;
-drop table if exists reminder_recurrence;
-drop table if exists reminder_history;
-drop table if exists reminder_tag;
-drop table if exists reminder_task_tag;
-
 -- 提醒模块 - 项目表
 CREATE TABLE reminder_project (
     project_id BIGINT PRIMARY KEY AUTO_INCREMENT COMMENT '项目ID',
@@ -31,6 +24,7 @@ CREATE TABLE reminder_task (
     
     -- 核心元数据
     title TEXT NOT NULL COMMENT '任务标题',
+    description TEXT COMMENT '任务描述',
     category ENUM('task', 'note') NOT NULL DEFAULT 'task' COMMENT 'task:任务, note:笔记',
     status ENUM('todo','done','abandoned') NOT NULL DEFAULT 'todo' COMMENT 'todo: 待处理, done: 已完成, abandoned: 已放弃',
     is_archived BOOLEAN DEFAULT FALSE COMMENT '是否归档',
@@ -66,7 +60,7 @@ CREATE TABLE reminder_recurrence (
     task_id BIGINT PRIMARY KEY COMMENT '与reminder_task表一对一关联',
     category ENUM('weekly', 'monthly', 'yearly', 'days', 'weeks', 'ebinghaus') NOT NULL 
         COMMENT 'weekly:每周, monthly:每月, yearly:每年, days:隔N天, weeks:隔N周, ebinghaus:艾宾浩斯',
-    interval INT DEFAULT 1 COMMENT '间隔数值 - days/weeks类型使用',
+    frequency INT DEFAULT 1 COMMENT '间隔数值 - days/weeks类型使用',
     count INT NOT NULL COMMENT '总重复次数',
     next_time DATETIME NOT NULL COMMENT '下一次发生时间',
     schedule JSON COMMENT '根据category存储规则值

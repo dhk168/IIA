@@ -12,6 +12,7 @@ public class Task {
     
     // 核心元数据
     private String title; // NOT NULL
+    private String description;
     private String category; // 'task' 或 'note' NOT NULL DEFAULT 'task'
     private String status; // 'todo', 'done' 或 'abandoned' NOT NULL DEFAULT 'todo'
     private Boolean isArchived; // DEFAULT FALSE
@@ -36,6 +37,7 @@ public class Task {
         this.userId = dto.getUserId();
         this.projectId = dto.getProjectId();
         this.title = dto.getTitle();
+        this.description = dto.getDescription();
         this.category = dto.getCategory();
         this.parentTaskId = dto.getParentTaskId();
         this.dueDate = dto.getDueDate();

@@ -9,6 +9,7 @@ public class CreateTaskRequest {
     private Long userId;
     private Long projectId;
     private String title;
+    private String description;
     private String category;
     private Long parentTaskId;
     private LocalDateTime dueDate;

@@ -8,10 +8,7 @@ import java.util.List;
 public interface TaskMapper {
     
     // 插入新任务
-    @Insert("INSERT INTO reminder_task(user_id, project_id, title, category, status, parent_task_id, "+
-            "sort_order, due_date, start_date, completed_at, reminder_sent_at, priority, is_archived) "+
-            "VALUES(#{userId}, #{projectId}, #{title}, #{category}, #{status}, #{parentTaskId}, "+
-            "#{sortOrder}, #{dueDate}, #{startDate}, #{completedAt}, #{reminderSentAt}, #{priority}, #{isArchived})")
+    @Insert("INSERT INTO reminder_task(user_id, project_id, title, description, category, status, parent_task_id, "+"sort_order, due_date, start_date, completed_at, reminder_sent_at, priority, is_archived) "+"VALUES(#{userId}, #{projectId}, #{title}, #{description}, #{category}, #{status}, #{parentTaskId}, "+"#{sortOrder}, #{dueDate}, #{startDate}, #{completedAt}, #{reminderSentAt}, #{priority}, #{isArchived})")
     @Options(useGeneratedKeys = true, keyProperty = "taskId", keyColumn = "task_id")
     int insert(Task task);
     
@@ -36,11 +33,7 @@ public interface TaskMapper {
     List<Task> findSubTasks(@Param("userId") Long userId, @Param("parentTaskId") Long parentTaskId);
     
     // 更新任务信息
-    @Update("UPDATE reminder_task SET project_id = #{projectId}, title = #{title}, category = #{category}, "+
-            "status = #{status}, parent_task_id = #{parentTaskId}, sort_order = #{sortOrder}, "+
-            "due_date = #{dueDate}, start_date = #{startDate}, completed_at = #{completedAt}, "+
-            "reminder_sent_at = #{reminderSentAt}, priority = #{priority} "+
-            "WHERE task_id = #{taskId}")
+    @Update("UPDATE reminder_task SET project_id = #{projectId}, title = #{title}, description = #{description}, category = #{category}, "+"status = #{status}, parent_task_id = #{parentTaskId}, sort_order = #{sortOrder}, "+"due_date = #{dueDate}, start_date = #{startDate}, completed_at = #{completedAt}, "+"reminder_sent_at = #{reminderSentAt}, priority = #{priority} "+"WHERE task_id = #{taskId}")
     int update(Task task);
     
     // 更新任务状态
