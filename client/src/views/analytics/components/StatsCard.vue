@@ -105,18 +105,18 @@ export default {
         task.status === 'done' || task.completed_at
       ).length
       
-      // 待处理任务数（状态不是done且没有过期）
+      // 待处理任务数（状态不是done/abandoned且没有过期）
       this.pendingTasks = this.tasks.filter(task => {
-        const isCompleted = task.status === 'done' || task.completed_at
-        const isOverdue = task.due_date && new Date(task.due_date) < now
-        return !isCompleted && !isOverdue
+        const isCompletedOrAbandoned = task.status === 'done' || task.status === 'abandoned' || task.completed_at
+        const isOverdue = task.dueDate && new Date(task.dueDate) < now
+        return !isCompletedOrAbandoned && !isOverdue
       }).length
       
-      // 逾期任务数（状态不是done但已过期）
+      // 逾期任务数（状态不是done/abandoned但已过期）
       this.overdueTasks = this.tasks.filter(task => {
-        const isCompleted = task.status === 'done' || task.completed_at
-        const isOverdue = task.due_date && new Date(task.due_date) < now
-        return !isCompleted && isOverdue
+        const isCompletedOrAbandoned = task.status === 'done' || task.status === 'abandoned' || task.completed_at
+        const isOverdue = task.dueDate && new Date(task.dueDate) < now
+        return !isCompletedOrAbandoned && isOverdue
       }).length
     },
     
