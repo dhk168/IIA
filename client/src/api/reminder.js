@@ -40,10 +40,16 @@ export const reminderTaskAPI = {
     const response = await axiosInstance.post('/reminder/task/create', taskData);
     return response;
   },
-  
-  // 获取任务（可以根据后续controller补充）
+
+  // 获取单个任务
+  getTaskById: async (params) => {
+    const response = await axiosInstance.get(`/reminder/task/get`, { params });
+    return response;
+  },
+
+  // 获取任务
   getTasks: async (params) => {
-    const response = await axiosInstance.get('/reminder/task', { params });
+    const response = await axiosInstance.get('/reminder/task/get-all', { params });
     return response;
   },
   

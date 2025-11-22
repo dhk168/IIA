@@ -187,4 +187,33 @@ public class TaskServiceImpl implements TaskService {
         log.info("Getting upcoming tasks for user: {} until: {}", userId, dueDate);
         return taskMapper.findUpcomingTasks(userId, dueDate);
     }
+    
+    @Override
+    public void verifyTaskOwnership(Long taskId, Long userId) {
+        log.info("Verifying task ownership for taskId: {} by userId: {}", taskId, userId);
+        Task task = taskMapper.findById(taskId);
+        if (task == null) {
+            log.warn("Task not found for id: {}", taskId);
+            throw new RuntimeException("任务不存在");
+        }
+        if (!task.getUserId().equals(userId)) {
+            log.warn("Permission denied: user {} trying to access task {}", userId, taskId);
+            throw new RuntimeException("无权限访问此任务");
+        }
+    }
+    
+    @Override
+    public Task getByIdAndVerifyOwnership(Long taskId, Long userId) {
+        log.info("Getting task by id and verifying ownership: taskId={}, userId={}", taskId, userId);
+        Task task = taskMapper.findById(taskId);
+        if (task == null) {
+            log.warn("Task not found for id: {}", taskId);
+            throw new RuntimeException("任务不存在");
+        }
+        if (!task.getUserId().equals(userId)) {
+            log.warn("Permission denied: user {} trying to access task {}", userId, taskId);
+            throw new RuntimeException("无权限访问此任务");
+        }
+        return task;
+    }
 }

@@ -37,4 +37,10 @@ public interface TaskService {
     
     // 获取即将截止的任务
     List<Task> getUpcomingTasks(Long userId, LocalDateTime dueDate);
+    
+    // 验证任务归属
+    void verifyTaskOwnership(Long taskId, Long userId);
+    
+    // 获取并验证任务归属
+    Task getByIdAndVerifyOwnership(Long taskId, Long userId);
 }

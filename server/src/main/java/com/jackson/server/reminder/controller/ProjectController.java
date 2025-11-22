@@ -33,7 +33,10 @@ public class ProjectController {
     
     // 创建项目
     @PostMapping("create")
-    public Map<String, Object> create(@RequestBody @Valid CreateProjectRequest dto, HttpServletRequest request) {
+    public Map<String, Object> create(
+            @RequestBody @Valid CreateProjectRequest dto,
+            HttpServletRequest request
+    ) {
         try {
             Long userId = tokenService.getUserIdFromRequest(request);
             projectService.create(userId, dto);
@@ -46,7 +49,10 @@ public class ProjectController {
 
     // 更新项目
     @PostMapping("update")
-    public Map<String, Object> updateById(@RequestBody @Valid UpdateProjectRequest dto, HttpServletRequest request) {
+    public Map<String, Object> updateById(
+            @RequestBody @Valid UpdateProjectRequest dto,
+            HttpServletRequest request
+    ) {
         try {
             Long userId = tokenService.getUserIdFromRequest(request);
             projectService.update(userId, dto);
@@ -59,10 +65,13 @@ public class ProjectController {
 
     // 批量更新项目位置
     @PostMapping("batch-update-position")
-    public Map<String, Object> batchUpdatePosition(@RequestBody @Valid BatchUpdatePositionRequest request, HttpServletRequest httpRequest) {
+    public Map<String, Object> batchUpdatePosition(
+            @RequestBody @Valid BatchUpdatePositionRequest dto,
+            HttpServletRequest request
+    ) {
         try {
-            Long userId = tokenService.getUserIdFromRequest(httpRequest);
-            projectService.batchUpdatePosition(userId, request);
+            Long userId = tokenService.getUserIdFromRequest(request);
+            projectService.batchUpdatePosition(userId, dto);
             return ResponseUtils.buildSuccessResponse(null, "批量更新成功");
         } catch (Exception e) {
             log.error("批量更新项目位置失败: {}", e.getMessage(), e);
@@ -85,7 +94,10 @@ public class ProjectController {
     
     // 获取单个项目
     @GetMapping("get/{id}")
-    public Map<String, Object> getById(@PathVariable("id") Long projectId, HttpServletRequest request) {
+    public Map<String, Object> getById(
+            @PathVariable("id") Long projectId,
+            HttpServletRequest request
+    ) {
         try {
             Long userId = tokenService.getUserIdFromRequest(request);
             Project project = projectService.getProjectById(userId, projectId);

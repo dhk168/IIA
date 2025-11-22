@@ -16,5 +16,5 @@ public class CreateTaskRequest {
     private LocalDateTime startDate;
     private LocalDateTime reminderSentAt;
     private String priority;
-    private List<Long> tagIds; // 新增标签ID列表字段
+    private List<Long> tagIds;
 }

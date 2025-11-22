@@ -51,50 +51,17 @@ public class TaskController {
     }
 
     // 更新任务
-    @PutMapping("update/{id}")
-    public Map<String, Object> updateById(
-            @PathVariable("id") Long taskId,
-            @RequestBody Task task,
+    @PostMapping("update")
+    public Map<String, Object> update(
+            @RequestBody UpdateTaskRequest dto,
             HttpServletRequest request
     ) {
-        try {
-            Long userId = tokenService.getUserIdFromRequest(request);
-            task.setTaskId(taskId);
-            task.setUserId(userId);
-            boolean updated = taskService.updateById(task);
-            if (updated) {
-                return ResponseUtils.buildSuccessResponse(null, "任务更新成功");
-            } else {
-                return ResponseUtils.buildErrorResponse("任务更新失败或无权限");
-            }
-        } catch (Exception e) {
-            log.error("更新任务失败: {}", e.getMessage(), e);
-            return ResponseUtils.buildErrorResponse(e.getMessage());
-        }
-    }
-    
-    // 更新任务
-    @PostMapping("update")
-    public Map<String, Object> update(@RequestBody UpdateTaskRequest dto, HttpServletRequest request) {
         try {
             Long userId = tokenService.getUserIdFromRequest(request);
             Task updatedTask = taskService.updateById(userId, dto);
             return ResponseUtils.buildSuccessResponse(updatedTask, "任务更新成功");
         } catch (Exception e) {
             log.error("更新任务失败: {}", e.getMessage(), e);
-            return ResponseUtils.buildErrorResponse(e.getMessage());
-        }
-    }
-
-    // 默认GET端点，用于前端getTasks()调用
-    @GetMapping
-    public Map<String, Object> getTasks(HttpServletRequest request) {
-        try {
-            Long userId = tokenService.getUserIdFromRequest(request);
-            List<Task> tasks = taskService.getAll(userId);
-            return ResponseUtils.buildSuccessResponse(tasks, "任务查询成功");
-        } catch (Exception e) {
-            log.error("获取任务列表失败: {}", e.getMessage(), e);
             return ResponseUtils.buildErrorResponse(e.getMessage());
         }
     }
@@ -113,16 +80,15 @@ public class TaskController {
     }
 
     // 根据ID获取任务
-    @GetMapping("get/{id}")
-    public Map<String, Object> getById(@PathVariable("id") Long taskId, HttpServletRequest request) {
+    @GetMapping("get")
+    public Map<String, Object> get(
+            @RequestParam("id") Long taskId,
+            HttpServletRequest request
+    ) {
         try {
             Long userId = tokenService.getUserIdFromRequest(request);
-            Task task = taskService.getById(taskId);
-            if (task != null && task.getUserId().equals(userId)) {
-                return ResponseUtils.buildSuccessResponse(task, "任务查询成功");
-            } else {
-                return ResponseUtils.buildErrorResponse("任务不存在或无权限");
-            }
+            Task task = taskService.getByIdAndVerifyOwnership(taskId, userId);
+            return ResponseUtils.buildSuccessResponse(task, "任务查询成功");
         } catch (Exception e) {
             log.error("获取任务失败: {}", e.getMessage(), e);
             return ResponseUtils.buildErrorResponse(e.getMessage());
@@ -136,11 +102,8 @@ public class TaskController {
                                          HttpServletRequest request) {
         try {
             Long userId = tokenService.getUserIdFromRequest(request);
-            // 验证任务属于当前用户
-            Task existingTask = taskService.getById(taskId);
-            if (existingTask == null || !existingTask.getUserId().equals(userId)) {
-                return ResponseUtils.buildErrorResponse("任务不存在或无权限");
-            }
+            // 验证任务归属
+            taskService.verifyTaskOwnership(taskId, userId);
             
             boolean updated = taskService.updateStatus(taskId, status);
             if (updated) {

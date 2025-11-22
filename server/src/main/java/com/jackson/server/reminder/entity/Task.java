@@ -9,6 +9,15 @@ import lombok.Data;
 public class Task {
     private Long taskId; // AUTO_INCREMENT
     private Long userId; // NOT NULL
+    
+    // 显式添加getter方法以确保可访问性
+    public Long getUserId() {
+        return userId;
+    }
+    
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
     private Long projectId; // NULL
     
     // 核心元数据
