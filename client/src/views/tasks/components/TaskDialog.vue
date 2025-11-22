@@ -196,7 +196,9 @@ export default {
             startDate: this.taskForm.start_date ? this.taskForm.start_date.toISOString() : null,
             dueDate: this.taskForm.due_date ? this.taskForm.due_date.toISOString() : null,
             reminderSentAt: null,
-            priority: this.taskForm.priority
+            priority: this.taskForm.priority,
+            // 添加status字段，编辑模式下从原始任务获取，新建任务默认为todo
+            status: this.isEditMode && this.task ? (this.task.status || 'todo') : 'todo'
           };
           
           // 处理重复设置

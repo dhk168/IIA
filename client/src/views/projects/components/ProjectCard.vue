@@ -13,7 +13,7 @@
         <i v-if="project.icon" class="fa" :class="`fa-${project.icon}`"></i>
         {{ project.name }}
       </div>
-      <el-button size="mini" type="text" @click.stop="$emit('toggle-archive', project)">
+      <el-button link @click.stop="$emit('toggle-archive', project)">
         {{ project.isArchived ? 'Unarchive' : 'Archive' }}
       </el-button>
     </div>

@@ -338,17 +338,34 @@ export default {
       }
     },
 
-    updateTaskStatus(task) {
-      const taskIndex = this.tasks.findIndex(t => t.task_id === task.task_id)
-      if (taskIndex !== -1) {
+    async updateTaskStatus(task) {
+      try {
+        const taskIndex = this.tasks.findIndex(t => t.task_id === task.task_id)
+        let newStatus = 'todo';
         if (task.status === 'done') {
-          this.tasks[taskIndex].status = 'done'
-          this.tasks[taskIndex].completed_at = new Date().toISOString()
-        } else {
+          newStatus = 'todo';
           this.tasks[taskIndex].status = 'todo'
           this.tasks[taskIndex].completed_at = null
+        } else {
+          newStatus = 'done';
+          this.tasks[taskIndex].status = 'done'
+          this.tasks[taskIndex].completed_at = new Date().toISOString()
         }
+        
+        // 调用后端API更新状态，传递JSON请求体
+        await reminderTaskAPI.updateTaskStatus({ taskId: task.task_id, status: newStatus });
         this.showToast('success', 'Task status updated successfully')
+      } catch (error) {
+        console.error('Failed to update task status:', error);
+        this.showToast('error', 'Failed to update task status')
+        // 回滚本地状态
+        if (task.status === 'done') {
+          this.tasks[this.tasks.findIndex(t => t.task_id === task.task_id)].status = 'done'
+          this.tasks[this.tasks.findIndex(t => t.task_id === task.task_id)].completed_at = new Date().toISOString()
+        } else {
+          this.tasks[this.tasks.findIndex(t => t.task_id === task.task_id)].status = 'todo'
+          this.tasks[this.tasks.findIndex(t => t.task_id === task.task_id)].completed_at = null
+        }
       }
     },
     editTask(task) {
@@ -363,6 +380,7 @@ export default {
         if (this.isEditMode) {
           // 编辑任务
           taskData.taskId = this.taskToEdit.task_id;
+          taskData.status = taskData.status || this.taskToEdit.status || 'todo';
           const response = await reminderTaskAPI.updateTask(taskData);
           if (response?.code === 200) {
             savedTask = response.data || {};

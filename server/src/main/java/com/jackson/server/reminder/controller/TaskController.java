@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 
 import com.jackson.server.reminder.dto.CreateTaskRequest;
 import com.jackson.server.reminder.dto.UpdateTaskRequest;
+import com.jackson.server.reminder.dto.UpdateTaskStatusRequest;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -66,6 +67,27 @@ public class TaskController {
         }
     }
 
+    // 更新任务状态
+    @PutMapping("update-status")
+    public Map<String, Object> updateStatus(
+            @RequestBody UpdateTaskStatusRequest dto,
+            HttpServletRequest request
+    ) {
+        try {
+            Long userId = tokenService.getUserIdFromRequest(request);
+            taskService.verifyTaskOwnership(dto.getTaskId(), userId);
+            boolean updated = taskService.updateStatus(dto.getTaskId(), dto.getStatus());
+            if (updated) {
+                return ResponseUtils.buildSuccessResponse(null, "任务状态更新成功");
+            } else {
+                return ResponseUtils.buildErrorResponse("任务状态更新失败");
+            }
+        } catch (Exception e) {
+            log.error("更新任务状态失败: {}", e.getMessage(), e);
+            return ResponseUtils.buildErrorResponse(e.getMessage());
+        }
+    }
+
     // 获取用户所有任务
     @GetMapping("get-all")
     public Map<String, Object> getAll(HttpServletRequest request) {
@@ -91,28 +113,6 @@ public class TaskController {
             return ResponseUtils.buildSuccessResponse(task, "任务查询成功");
         } catch (Exception e) {
             log.error("获取任务失败: {}", e.getMessage(), e);
-            return ResponseUtils.buildErrorResponse(e.getMessage());
-        }
-    }
-
-    // 更新任务状态
-    @PutMapping("update-status/{id}")
-    public Map<String, Object> updateStatus(@PathVariable("id") Long taskId, 
-                                         @RequestParam("status") String status, 
-                                         HttpServletRequest request) {
-        try {
-            Long userId = tokenService.getUserIdFromRequest(request);
-            // 验证任务归属
-            taskService.verifyTaskOwnership(taskId, userId);
-            
-            boolean updated = taskService.updateStatus(taskId, status);
-            if (updated) {
-                return ResponseUtils.buildSuccessResponse(null, "任务状态更新成功");
-            } else {
-                return ResponseUtils.buildErrorResponse("任务状态更新失败");
-            }
-        } catch (Exception e) {
-            log.error("更新任务状态失败: {}", e.getMessage(), e);
             return ResponseUtils.buildErrorResponse(e.getMessage());
         }
     }

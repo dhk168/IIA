@@ -37,36 +37,36 @@
         </div>
       </template>
     </el-table-column>
-    <el-table-column prop="title" label="Task Name" min-width="100" max-width="140">
+    <el-table-column prop="title" label="Task Name" min-width="80" max-width="140">
       <template #default="scope">
         <div class="task-title-container">
-          <el-checkbox v-model="scope.row.status" :checked="scope.row.status === 'done'" @change="updateTaskStatus(scope.row)">
+          <el-checkbox :checked="scope.row.status === 'done'" @change="handleCheckboxChange(scope.row)">
             <span :class="{ 'task-completed': scope.row.status === 'done' }" :style="{ paddingLeft: scope.row.level * 20 + 'px' }">{{ scope.row.title }}</span>
           </el-checkbox>
           <el-tag v-if="scope.row.category === 'note'" size="small" type="info" style="margin-left: 10px;">Note</el-tag>
         </div>
       </template>
     </el-table-column>
-    <el-table-column label="Project" width="120">
+    <el-table-column label="Project" width="100">
       <template #default="scope">
         {{ getProjectName(scope.row.project_id) }}
       </template>
     </el-table-column>
-    <el-table-column prop="due_date" label="Due Date" width="180">
+    <el-table-column prop="due_date" label="Due Date" width="200">
       <template #default="scope">
         <el-tag :type="getTaskDueType(scope.row)">
           {{ formatDate(scope.row.due_date) }}
         </el-tag>
       </template>
     </el-table-column>
-    <el-table-column prop="priority" label="Priority" width="100">
+    <el-table-column prop="priority" label="Priority" width="120">
       <template #default="scope">
         <el-tag :type="getPriorityType(scope.row.priority)">
           {{ getPriorityText(scope.row.priority) }}
         </el-tag>
       </template>
     </el-table-column>
-    <el-table-column label="Operation" width="150" fixed="right">
+    <el-table-column label="Operation" width="180" fixed="right">
       <template #default="scope">
         <el-button size="small" @click="editTask(scope.row)">Edit</el-button>
         <el-button size="small" type="danger" @click="deleteTask(scope.row.task_id)">Delete</el-button>
@@ -187,7 +187,8 @@ export default {
       this.$emit('delete-task', taskId);
     },
     
-    updateTaskStatus(task) {
+    handleCheckboxChange(task) {
+      // 不使用checked参数，而是根据任务当前状态进行切换
       this.$emit('update-task-status', task);
     }
   }
