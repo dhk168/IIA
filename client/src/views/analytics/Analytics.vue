@@ -24,7 +24,7 @@ import StatsCard from './components/StatsCard.vue'
 import ProgressCard from './components/ProgressCard.vue'
 import CategoryDistributionCard from './components/CategoryDistributionCard.vue'
 import RecentTasks from './components/RecentTasks.vue'
-import { reminderTaskAPI, reminderProjectAPI, tagAPI } from '@/api/reminder.js'
+import { reminderTaskAPI, reminderProjectAPI, tagAPI, taskTagAPI } from '@/api/reminder.js'
 
 export default {
   name: 'Analytics',
@@ -90,7 +90,7 @@ export default {
         
         // 任务数据处理完成
         if (this.tasks.length > 0) {
-          this.generateTaskCategories()
+          await this.generateTaskCategories()
           this.generateRecentCompletedTasks()
         }
         
@@ -143,7 +143,7 @@ export default {
     },
     
     // 生成任务类别分布
-    generateTaskCategories() {
+    async generateTaskCategories() {
       // 颜色映射
       const colors = ['#409eff', '#67c23a', '#e6a23c', '#f56c6c', '#909399']
       
@@ -160,21 +160,56 @@ export default {
         })
       })
       
-      // 统计每个任务的标签情况
-      this.tasks.forEach(task => {
-        const hasTags = task.tags && Array.isArray(task.tags) && task.tags.length > 0
+      // 处理没有标签的任务的初始化
+      const noTagKey = 'no_tags'
+      tagStatsMap.set(noTagKey, {
+        id: noTagKey,
+        name: 'No Tags',
+        count: 0,
+        completedCount: 0,
+        color: colors[tagStatsMap.size % colors.length]
+      })
+      
+      // 创建任务ID到标签ID的映射，避免重复查询
+      const taskTagsMap = new Map()
+      
+      // 首先查询所有任务的标签
+      for (const task of this.tasks) {
         const isCompleted = task.status === 'done' || task.completedAt
+        let taskTagIds = []
         
-        if (hasTags) {
-          // 遍历任务的所有标签进行统计
-          task.tags.forEach(taskTag => {
-            const tagId = String(taskTag.id || taskTag.tagId)
+        // 直接通过taskId从API查询标签，因为任务对象中没有直接的标签信息
+        if (task.taskId) {
+          try {
+            // 检查缓存，避免重复查询
+            if (taskTagsMap.has(task.taskId)) {
+              taskTagIds = taskTagsMap.get(task.taskId)
+            } else {
+              // 调用API根据taskId获取标签关联
+              const response = await taskTagAPI.getTaskTagsByTaskId(task.taskId)
+              if (response && response.code === 200 && Array.isArray(response.data)) {
+                taskTagIds = response.data.map(tt => String(tt.tagId))
+                // 缓存结果
+                taskTagsMap.set(task.taskId, taskTagIds)
+              }
+            }
+          } catch (error) {
+            console.error(`获取任务 ${task.taskId} 的标签失败:`, error)
+          }
+        }
+        
+        // 处理有标签的任务
+        if (taskTagIds.length > 0) {
+          // 遍历任务的所有标签ID进行统计
+          for (const tagId of taskTagIds) {
+            // 确保标签ID是字符串类型以匹配tagMap的键
+            const stringTagId = String(tagId)
             
-            if (!tagStatsMap.has(tagId)) {
-              // 处理可能存在的未知标签（不在tagMap中的标签）
-              const tagName = taskTag.name || this.tagMap?.[tagId] || `Unnamed Tag ${tagId}`
-              tagStatsMap.set(tagId, {
-                id: tagId,
+            if (!tagStatsMap.has(stringTagId)) {
+              // 从tagMap获取标签名称，如果没有则使用默认名称
+              const tagName = this.tagMap?.[stringTagId] || `标签${stringTagId}`
+              tagStatsMap.set(stringTagId, {
+                id: stringTagId,
                 name: tagName,
                 count: 0,
                 completedCount: 0,
@@ -183,32 +218,21 @@ export default {
             }
             
             // 更新标签统计数据
-            const stats = tagStatsMap.get(tagId)
+            const stats = tagStatsMap.get(stringTagId)
             stats.count++
             if (isCompleted) {
               stats.completedCount++
             }
-          })
+          }
         } else {
           // 处理没有标签的任务
-          const noTagKey = 'no_tags'
-          if (!tagStatsMap.has(noTagKey)) {
-            tagStatsMap.set(noTagKey, {
-              id: noTagKey,
-              name: 'No Tags',
-              count: 0,
-              completedCount: 0,
-              color: colors[tagStatsMap.size % colors.length]
-            })
-          }
-          
           const stats = tagStatsMap.get(noTagKey)
           stats.count++
           if (isCompleted) {
             stats.completedCount++
           }
         }
-      })
+      }
       
       // 转换为数组并计算完成率，然后排序
       this.taskCategories = Array.from(tagStatsMap.values())
@@ -222,7 +246,13 @@ export default {
             completionRate
           }
         })
-        .sort((a, b) => b.count - a.count)
+        .sort((a, b) => {
+          // 确保没有标签的分类总是在最后
+          if (a.id === noTagKey) return 1
+          if (b.id === noTagKey) return -1
+          // 其他分类按任务数量降序排序
+          return b.count - a.count
+        })
     },
     
     // 生成最近完成的任务

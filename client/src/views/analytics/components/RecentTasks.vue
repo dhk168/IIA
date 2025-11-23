@@ -63,6 +63,12 @@ export default {
 <style scoped>
 .recent-tasks-card {
   border-radius: 8px;
+  /* 毛玻璃效果 */
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .card-header {
@@ -71,5 +77,27 @@ export default {
   align-items: center;
   font-weight: 500;
   color: #303133;
+}
+
+/* 为表格行也添加轻微的毛玻璃效果 */
+.el-table {
+  background: transparent;
+}
+
+.el-table__row {
+  transition: background-color 0.2s ease;
+}
+
+.el-table__row:hover {
+  background-color: rgba(255, 255, 255, 0.8);
+}
+
+/* 为表格的斑马纹样式添加毛玻璃效果 */
+.el-table--striped .el-table__row--striped {
+  background-color: rgba(255, 255, 255, 0.4);
+}
+
+.el-table--striped .el-table__row--striped:hover {
+  background-color: rgba(255, 255, 255, 0.7);
 }
 </style>
