@@ -161,7 +161,7 @@ public class AuthServiceImpl implements AuthService {
         }
 
         if (!correctCode.equals(inputCode)) {
-            throw new RuntimeException("验证码错误");
+            throw new RuntimeException("验证码错误: "+inputCode+"  "+correctCode);
         }
 
         redisTemplate.delete(key);
