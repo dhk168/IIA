@@ -16,7 +16,7 @@
     <el-card class="chart-card">
       <template #header>
         <div class="card-header">
-          <span>Task Category Distribution</span>
+          <span>Task Tag Distribution</span>
         </div>
       </template>
       <div class="chart-content">

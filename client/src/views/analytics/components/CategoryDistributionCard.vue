@@ -1,10 +1,10 @@
 <template>
   <el-card class="chart-card">
     <template #header>
-      <div class="card-header">
-        <span>Task Category Distribution</span>
-      </div>
-    </template>
+        <div class="card-header">
+          <span>Task Progress by Tag</span>
+        </div>
+      </template>
     <div class="chart-content">
       <div class="category-item" v-for="(category, index) in processedCategories" :key="index">
         <div class="category-label">
@@ -12,13 +12,13 @@
           <span class="category-name">{{ category.name }}</span>
         </div>
         <el-progress 
-          :percentage="category.percentage" 
+          :percentage="category.completionRate || 0" 
           :color="category.color" 
           :format="() => ''" 
         />
         <div class="category-stats">
-          <span class="category-count">{{ category.count }}</span>
-          <span class="category-percentage">{{ category.percentage }}%</span>
+          <span class="completion-rate">{{ category.completionRate || 0 }}%</span>
+          <span class="task-status">{{ category.completedCount || 0 }} / {{ category.count }} tasks completed</span>
         </div>
       </div>
     </div>
@@ -37,10 +37,32 @@ export default {
   computed: {
     // 计算每个类别的百分比
     processedCategories() {
-      const total = this.taskCategories.reduce((sum, cat) => sum + cat.count, 0)
-      return this.taskCategories.map(cat => ({
+      // 添加无标签任务的处理
+      const categoriesWithNoTag = [...this.taskCategories]
+      
+      // 检查是否已有无标签类别
+      const hasNoTagCategory = categoriesWithNoTag.some(cat => cat.id === 'no_tags')
+      
+      // 如果没有无标签类别，添加一个
+      if (!hasNoTagCategory) {
+        const colors = ['#409EFF', '#67C23A', '#E6A23C', '#F56C6C', '#909399', '#C0C4CC']
+        categoriesWithNoTag.push({
+          id: 'no_tags',
+          name: '没有标签',
+          count: 0,
+          completedCount: 0,
+          completionRate: 0,
+          color: colors[categoriesWithNoTag.length % colors.length]
+        })
+      }
+      
+      const total = categoriesWithNoTag.reduce((sum, cat) => sum + cat.count, 0)
+      return categoriesWithNoTag.map(cat => ({
         ...cat,
-        percentage: total > 0 ? Math.round((cat.count / total) * 100) : 0
+        percentage: total > 0 ? Math.round((cat.count / total) * 100) : 0,
+        // 确保completionRate存在
+        completionRate: cat.completionRate !== undefined ? cat.completionRate : 0,
+        completedCount: cat.completedCount || 0
       }))
     }
   }
@@ -92,9 +114,16 @@ export default {
   justify-content: space-between;
   margin-top: 4px;
   font-size: 12px;
+  color: #606266;
 }
 
-.category-count {
+.completion-rate {
+  font-weight: 500;
+  color: #303133;
+}
+
+.task-status {
+  font-size: 12px;
   color: #606266;
 }
 

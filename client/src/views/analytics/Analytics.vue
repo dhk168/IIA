@@ -7,9 +7,6 @@
     <div class="charts-container">
       <!-- Task Progress Component -->
       <ProgressCard 
-        :completion-rate="completionRate" 
-        :totalTasks="totalTasks"
-        :completedTasks="completedTasks"
         :projectProgress="projectProgress"
       />
       
@@ -49,7 +46,8 @@ export default {
       tasks: [],
       projects: [],
       tags: [],
-      projectMap: {} // 新增：{projectId: name} 格式的数据结构
+      projectMap: {},
+      tagMap: {}
     }
   },
   created() {
@@ -57,6 +55,10 @@ export default {
   },
   computed: {
     completionRate() {
+      // 防止除以零，当没有任务时返回0
+      if (this.totalTasks === 0) {
+        return 0
+      }
       return Math.round((this.completedTasks / this.totalTasks) * 100)
     }
   },
@@ -69,10 +71,28 @@ export default {
         if (tasksResponse && tasksResponse.code === 200 && Array.isArray(tasksResponse.data)) {
           this.tasks = tasksResponse.data
           this.calculateTaskStats()
+        }
+        
+        // 获取所有标签数据
+        const tagsResponse = await tagAPI.getAllTags()
+        
+        if (tagsResponse && tagsResponse.code === 200 && Array.isArray(tagsResponse.data)) {
+          this.tags = tagsResponse.data
+          // 构建 {tagId: name} 格式的数据结构
+          this.tagMap = {}
+          this.tags.forEach(tag => {
+            // 使用数字类型的tagId作为键，标签名称作为值
+            const tagId = Number(tag.tagId) || Number(tag.id) || tag.id
+            this.tagMap[tagId] = tag.name || 'Unnamed Tag'
+          })
+          console.log('标签映射数据结构:', JSON.stringify(this.tagMap))
+        }
+        
+        // 任务数据处理完成
+        if (this.tasks.length > 0) {
           this.generateTaskCategories()
           this.generateRecentCompletedTasks()
         }
-        // 任务数据处理完成
         
         // 获取所有项目数据
         const projectsResponse = await reminderProjectAPI.getAllProjects()
@@ -86,10 +106,9 @@ export default {
             const projectId = Number(project.projectId) || Number(project.id) || project.id
             this.projectMap[projectId] = project.name || 'Unnamed Project'
           })
-          console.log('项目映射数据结构:', JSON.stringify(this.projectMap))
           this.generateProjectProgress()
         }
-        
+      
       } catch (error) {
         console.error('加载分析数据失败:', error)
         this.resetAnalyticsData()
@@ -128,25 +147,82 @@ export default {
       // 颜色映射
       const colors = ['#409eff', '#67c23a', '#e6a23c', '#f56c6c', '#909399']
       
-      // 按标签或类别分组统计
-      const categoryMap = new Map()
+      const tagStatsMap = new Map()
       
-      this.tasks.forEach(task => {
-        // 优先使用标签名，如果没有标签则使用默认类别
-        const categoryName = task.tags && task.tags.length > 0 
-          ? task.tags[0].name 
-          : task.category || 'Others'
-        
-        categoryMap.set(categoryName, (categoryMap.get(categoryName) || 0) + 1)
+      // 初始化所有已知标签的统计数据
+      Object.entries(this.tagMap || {}).forEach(([tagId, tagName]) => {
+        tagStatsMap.set(tagId, {
+          id: tagId,
+          name: tagName,
+          count: 0,
+          completedCount: 0,
+          color: colors[tagStatsMap.size % colors.length]
+        })
       })
       
-      // 转换为所需格式
-      let colorIndex = 0
-      this.taskCategories = Array.from(categoryMap.entries()).map(([name, count]) => ({
-        name,
-        count,
-        color: colors[colorIndex++ % colors.length]
-      }))
+      // 统计每个任务的标签情况
+      this.tasks.forEach(task => {
+        const hasTags = task.tags && Array.isArray(task.tags) && task.tags.length > 0
+        const isCompleted = task.status === 'done' || task.completedAt
+        
+        if (hasTags) {
+          // 遍历任务的所有标签进行统计
+          task.tags.forEach(taskTag => {
+            const tagId = String(taskTag.id || taskTag.tagId)
+            
+            if (!tagStatsMap.has(tagId)) {
+              // 处理可能存在的未知标签（不在tagMap中的标签）
+              const tagName = taskTag.name || this.tagMap?.[tagId] || `Unnamed Tag ${tagId}`
+              tagStatsMap.set(tagId, {
+                id: tagId,
+                name: tagName,
+                count: 0,
+                completedCount: 0,
+                color: colors[tagStatsMap.size % colors.length]
+              })
+            }
+            
+            // 更新标签统计数据
+            const stats = tagStatsMap.get(tagId)
+            stats.count++
+            if (isCompleted) {
+              stats.completedCount++
+            }
+          })
+        } else {
+          // 处理没有标签的任务
+          const noTagKey = 'no_tags'
+          if (!tagStatsMap.has(noTagKey)) {
+            tagStatsMap.set(noTagKey, {
+              id: noTagKey,
+              name: 'No Tags',
+              count: 0,
+              completedCount: 0,
+              color: colors[tagStatsMap.size % colors.length]
+            })
+          }
+          
+          const stats = tagStatsMap.get(noTagKey)
+          stats.count++
+          if (isCompleted) {
+            stats.completedCount++
+          }
+        }
+      })
+      
+      // 转换为数组并计算完成率，然后排序
+      this.taskCategories = Array.from(tagStatsMap.values())
+        .map(category => {
+          // 计算完成率，防止除以零
+          const completionRate = category.count > 0 ? 
+            Math.round((category.completedCount / category.count) * 100) : 0
+          
+          return {
+            ...category,
+            completionRate
+          }
+        })
+        .sort((a, b) => b.count - a.count)
     },
     
     // 生成最近完成的任务
@@ -159,7 +235,9 @@ export default {
       
       this.recentCompletedTasks = completedTasks.map(task => ({
         title: task.title || 'Untitled Task',
-        category: task.tags && task.tags.length > 0 ? task.tags[0].name : task.category || 'Others',
+        category: task.tags && task.tags.length > 0 ? 
+          task.tags[0].name : // 对于表格显示，仍使用第一个标签
+          task.category || 'Others',
         completedTime: task.completedAt || task.updated_at,
         priority: this.getPriorityLabel(task.priority)
       }))
@@ -167,9 +245,9 @@ export default {
     
     // 生成项目进度数据
     generateProjectProgress() {
-      console.log('生成项目进度数据 - 开始')
-      console.log('当前项目数量:', this.projects.length)
-      console.log('当前任务数量:', this.tasks.length)
+      // console.log('生成项目进度数据 - 开始')
+      // console.log('当前项目数量:', this.projects.length)
+      // console.log('当前任务数量:', this.tasks.length)
       
       // 颜色映射
       const colors = ['#409eff', '#67c23a', '#e6a23c', '#f56c6c', '#909399']
@@ -179,13 +257,13 @@ export default {
       
       // 首先初始化所有项目，确保每个项目都有记录
       if (Object.keys(this.projectMap).length > 0) {
-        console.log('项目映射数据结构:', JSON.stringify(this.projectMap))
+        // console.log('项目映射数据结构:', JSON.stringify(this.projectMap))
         
         Object.entries(this.projectMap).forEach(([projectId, projectName]) => {
           // 确保key是数字类型
           const numProjectId = Number(projectId)
           
-          console.log('项目信息:', {name: projectName, key: numProjectId})
+          // console.log('项目信息:', {name: projectName, key: numProjectId})
           
           projectTaskMap.set(numProjectId, {
             projectId: numProjectId,
@@ -195,7 +273,7 @@ export default {
           }) // 初始化项目任务统计
         })
         
-        console.log('初始化后的项目映射:', Array.from(projectTaskMap.entries()).map(([key, proj]) => `${key}:${proj.projectName}`))
+        // console.log('初始化后的项目映射:', Array.from(projectTaskMap.entries()).map(([key, proj]) => `${key}:${proj.projectName}`))
       } else {
         console.log('未找到项目数据，使用默认演示项目')
         const defaultProjects = [
@@ -216,41 +294,41 @@ export default {
       }
       
       // 处理任务与项目的关联
-      console.log('开始处理任务关联')
-      console.log('任务数据结构:', JSON.stringify(this.tasks[0]))
+      // console.log('开始处理任务关联')
+      // console.log('任务数据结构:', JSON.stringify(this.tasks[0]))
       const taskWithProject = this.tasks.filter(t => t.projectId)
-      console.log(`有${taskWithProject.length}个任务关联了项目`) 
+      // console.log(`有${taskWithProject.length}个任务关联了项目`) 
       
       // 打印关联项目的任务详情
-      if (taskWithProject.length > 0) {
-        console.log('关联项目的任务详情:', taskWithProject.map(task => ({
-          taskId: task.taskId,
-          title: task.title,
-          projectId: task.projectId,
-          status: task.status,
-          completedAt: task.completedAt
-          })))
-      }
+      // if (taskWithProject.length > 0) {
+      //   console.log('关联项目的任务详情:', taskWithProject.map(task => ({
+      //     taskId: task.taskId,
+      //     title: task.title,
+      //     projectId: task.projectId,
+      //     status: task.status,
+      //     completedAt: task.completedAt
+      //     })))
+      // }
       
       // 不再需要单独的项目名称映射，直接使用projectMap
       
       this.tasks.forEach(task => {
           // 打印每个任务的完整信息
-          console.log('当前处理任务详情:', {
-            id: task.id,
-            title: task.title,
-            projectId: task.projectId,
-            status: task.status,
-            completed_at: task.completed_at,
-            tags: task.tags,
-            category: task.category
-          })
+          // console.log('当前处理任务详情:', {
+          //   id: task.id,
+          //   title: task.title,
+          //   projectId: task.projectId,
+          //   status: task.status,
+          //   completed_at: task.completed_at,
+          //   tags: task.tags,
+          //   category: task.category
+          // })
           
         if (task.projectId !== undefined && task.projectId !== null) {
           const projectId = Number(task.projectId) || task.projectId // 保持数字类型
           const projectIdStr = String(projectId)
           
-          console.log(`处理任务: ${task.title}, 项目ID: ${projectId} (原始类型: ${typeof projectId})`)
+          // console.log(`处理任务: ${task.title}, 项目ID: ${projectId} (原始类型: ${typeof projectId})`)
           
           // 查找匹配的项目 - 使用多种匹配策略
           let matchedProject = null
@@ -292,16 +370,16 @@ export default {
           }
           
           if (matchedProject) {
-            console.log(`找到匹配的项目: ${matchedProject.projectName}`)
-            console.log(`任务 ${task.title} (ID:${task.taskId}) 成功匹配到项目: ${matchedProject.projectName}`)
+            // console.log(`找到匹配的项目: ${matchedProject.projectName}`)
+            // console.log(`任务 ${task.title} (ID:${task.taskId}) 成功匹配到项目: ${matchedProject.projectName}`)
             const wasCompleted = task.status === 'done' || task.completedAt
-            console.log(`  - 匹配前项目统计: 完成=${matchedProject.completedTasks}, 总计=${matchedProject.totalTasks}`)
+            // console.log(`  - 匹配前项目统计: 完成=${matchedProject.completedTasks}, 总计=${matchedProject.totalTasks}`)
             matchedProject.totalTasks++
             
             if (wasCompleted) {
               matchedProject.completedTasks++
             }
-            console.log(`  - 匹配后项目统计: 完成=${matchedProject.completedTasks}, 总计=${matchedProject.totalTasks}`)
+            // console.log(`  - 匹配后项目统计: 完成=${matchedProject.completedTasks}, 总计=${matchedProject.totalTasks}`)
           } else {
             // 如果任务有projectId但找不到对应的项目，创建一个未分类项目
             console.log(`找到未分类项目的任务，projectId: ${task.projectId}`)
@@ -318,30 +396,41 @@ export default {
             })
           }
         } else {
-            // 处理没有projectId的任务，添加到"其他"项目
-            const otherProjectId = 'other'
-          if (!projectTaskMap.has(otherProjectId)) {
-            projectTaskMap.set(otherProjectId, {
-              projectId: 'other',
-              projectName: 'Other Tasks',
+            // 处理没有projectId的任务，添加到"没有归属项目"分类
+            const noProjectId = 'no_project'
+          if (!projectTaskMap.has(noProjectId)) {
+            projectTaskMap.set(noProjectId, {
+              projectId: 'no_project',
+              projectName: 'Default',
               totalTasks: 0,
               completedTasks: 0
             })
           }
-          const otherProject = projectTaskMap.get(otherProjectId)
-          console.log(`任务 ${task.title} (ID:${task.taskId}) 未匹配到任何项目，添加到其他任务`)
-          console.log(`  - 匹配前其他任务统计: 完成=${otherProject.completedTasks}, 总计=${otherProject.totalTasks}`)
-          otherProject.totalTasks++
+          const noProject = projectTaskMap.get(noProjectId)
+          noProject.totalTasks++
           if (task.status === 'done' || task.completedAt) {
-            otherProject.completedTasks++
+            noProject.completedTasks++
           }
-          console.log(`  - 匹配后其他任务统计: 完成=${otherProject.completedTasks}, 总计=${otherProject.totalTasks}`)
         }
       })
       
-      // 转换为所需格式并排序
+      // 获取所有项目
+      const projects = Array.from(projectTaskMap.values())
+      
+      // 将Default项目放在最前面
+      const defaultProject = projects.find(p => p.projectName === 'Default')
+      const otherProjects = projects.filter(p => p.projectName !== 'Default')
+      
+      // 构建项目进度数组
+      const projectProgress = []
+      if (defaultProject) {
+        projectProgress.push(defaultProject)
+      }
+      projectProgress.push(...otherProjects)
+      
+      // 转换为所需格式并添加颜色
       let colorIndex = 0
-      this.projectProgress = Array.from(projectTaskMap.values())
+      this.projectProgress = projectProgress
         .map(project => ({
           ...project,
           completionRate: project.totalTasks > 0 
@@ -349,8 +438,11 @@ export default {
             : 0,
           color: colors[colorIndex++ % colors.length]
         }))
-        // 修改排序逻辑，确保有任务的项目排在前面，但所有项目都显示
+        // 修改排序逻辑，确保有任务的非Default项目排在前面，但所有项目都显示
         .sort((a, b) => {
+          // Default项目已经在最前面，不需要再参与排序
+          if (a.projectName === 'Default' || b.projectName === 'Default') return 0
+          
           // 有任务的项目优先
           if (a.totalTasks > 0 && b.totalTasks === 0) return -1
           if (a.totalTasks === 0 && b.totalTasks > 0) return 1
@@ -358,7 +450,7 @@ export default {
           return b.completedTasks - a.completedTasks
         })
       
-      console.log('生成的项目进度数据:', this.projectProgress)
+      // console.log('生成的项目进度数据:', this.projectProgress)
     },
     
     // 获取优先级标签
