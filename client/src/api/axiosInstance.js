@@ -6,8 +6,10 @@ const api = axios.create({
   // Apifox提供的API地址
   // baseURL: 'http://127.0.0.1:4523/m1/7205231-6931300-default/api',
   // 部署到服务器后，需要修改为服务器地址
-  baseURL: 'http://127.0.0.1:8080/api',
-  timeout: 10000,
+  // baseURL: 'http://127.0.0.1:8080/api',
+  // 使用相对路径，通过Vite代理解决CORS问题
+    baseURL: '/api',
+    timeout: 10000,
   headers: {
     'Content-Type': 'application/json'
   }
