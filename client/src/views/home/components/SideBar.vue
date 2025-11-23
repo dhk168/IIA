@@ -127,19 +127,52 @@ export default {
 
 /* 响应式设计 */
 @media (max-width: 768px) {
+  /* 侧边栏整体样式调整为底部横向导航 */
   .sidebar {
-    width: 60px;
-    margin: 12px 0 12px 12px;
-    height: calc(100vh - 24px);
+    width: 100vw; /* 使用视口宽度确保全宽 */
+    height: 70px;
+    margin: 0;
+    border-radius: 0;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+    border-right: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    position: fixed; /* 固定在底部 */
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000; /* 确保在顶部 */
   }
   
+  /* 移除Element UI的容器限制 */
+  .el-aside {
+    width: 100% !important;
+    height: 100%;
+  }
+  
+  /* 菜单容器调整为横向布局 */
+  .el-menu-vertical {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    height: 100%;
+    width: 100%;
+    padding: 0 10px;
+    box-sizing: border-box;
+  }
+  
+  /* 菜单项调整为横向排列的圆圈按钮 */
   .el-menu-vertical .el-menu-item {
-    width: 48px;
-    height: 48px;
-    line-height: 48px;
-    margin: 8px auto;
+    width: 50px;
+    height: 50px;
+    line-height: 1;
+    margin: 10px 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
   }
   
+  /* 调整图标大小 */
   .menu-icon {
     font-size: 20px;
   }

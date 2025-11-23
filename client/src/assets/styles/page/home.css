@@ -15,6 +15,8 @@
   display: flex;
   height: 100vh;
   width: 100%;
+  max-width: 100%; /* 确保不被限制宽度 */
+  overflow-x: hidden; /* 防止横向滚动 */
 }
 
 .right-content {
@@ -67,26 +69,60 @@
 
 /* 响应式设计 */
 @media (max-width: 768px) {
-  .sidebar {
-    width: 60px;
-    margin: 12px 0 12px 12px;
-    height: calc(100vh - 24px);
+  /* 调整布局结构，让SideBar在底部 */
+  .layout-wrapper {
+    flex-direction: column;
+    width: 100vw; /* 确保使用视口宽度 */
   }
   
+  /* 调整右侧内容区域，使其占据大部分空间 */
+  .right-content {
+    flex: 1;
+    overflow: hidden;
+    width: 100%;
+    max-width: 100%;
+  }
+  
+  /* 侧边栏样式调整为底部导航样式 */
+  .sidebar {
+    width: 100%;
+    height: 60px;
+    margin: 0;
+    border-radius: 0;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* 水平菜单布局 */
+  .el-menu-vertical {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    height: 100%;
+    line-height: 60px;
+    width: 100%;
+  }
+  
+  /* 菜单项样式调整 */
   .el-menu-vertical .el-menu-item {
-    width: 48px;
-    height: 48px;
-    line-height: 48px;
-    margin: 8px auto;
+    width: auto;
+    height: 100%;
+    line-height: 60px;
+    padding: 0 16px;
+    margin: 0;
+    flex: 1;
+    text-align: center;
   }
   
   .menu-icon {
     font-size: 20px;
   }
   
+  /* 主内容区域样式调整 */
   .main-content {
     padding: 16px;
-    height: calc(100vh - 90px);
+    height: calc(100vh - 150px); /* 为底部导航留出空间 */
     margin: 6px 12px 12px 12px;
+    width: calc(100% - 24px); /* 确保宽度合适 */
+    box-sizing: border-box;
   }
 }
