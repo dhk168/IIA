@@ -17,9 +17,10 @@ export default defineConfig({
     // 配置代理解决CORS问题
     proxy: {
       '/api': {
-        target: 'https://10kb241io2970.vicp.fun',
+        // target: 'https://10kb241io2970.vicp.fun',
+        target: 'http://39.106.26.90:4480',
         changeOrigin: true,
-        secure: true,
+        secure: false,
         rewrite: (path) => path
       }
     }
