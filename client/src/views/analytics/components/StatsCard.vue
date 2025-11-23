@@ -58,11 +58,11 @@ export default {
   },
   data() {
     return {
-      totalTasks: 128, // 默认值，确保页面加载时有内容显示
-      completedTasks: 94,
-      pendingTasks: 25,
-      overdueTasks: 9,
-      tasks: [] // 存储所有任务数据
+        totalTasks: 0, // Default value to ensure content is displayed when page loads
+        completedTasks: 0,
+        pendingTasks: 0,
+        overdueTasks: 0,
+        tasks: [] // Store all task data
     }
   },
   mounted() {
@@ -71,48 +71,42 @@ export default {
   methods: {
     async loadTasksData() {
       try {
-        console.log('正在加载任务统计数据...')
-        
-        // 调用后端API获取任务数据
         const response = await reminderTaskAPI.getTasks()
         
-        // 检查响应是否成功
         if (response && response.code === 200 && Array.isArray(response.data)) {
           this.tasks = response.data
-          // 统计任务数据
-          this.calculateTaskStats()
-          console.log('任务统计数据加载完成:', this.tasks.length, '个任务')
+          this.calculateTaskStats() // Calculate task statistics
+          // console.log('任务统计数据加载完成:', this.tasks.length, '个任务')
         } else {
           console.warn('API返回非预期响应:', response)
           this.resetStats()
         }
       } catch (error) {
         console.error('加载任务数据失败:', error)
-        // 设置默认值以防止显示错误
-        this.resetStats()
+        this.resetStats() // Set default values to prevent display errors
       }
     },
     
-    // 计算任务统计数据
+    // Calculate task statistics
     calculateTaskStats() {
       const now = new Date()
       
-      // 总任务数
+      // Total tasks
       this.totalTasks = this.tasks.length
       
-      // 已完成任务数（status为'done'或completed_at不为空）
+      // Completed tasks (status is 'done' or completed_at is not empty)
       this.completedTasks = this.tasks.filter(task => 
-        task.status === 'done' || task.completed_at
+        task.status === 'done' || task.completedAt
       ).length
       
-      // 待处理任务数（状态不是done/abandoned且没有过期）
+      // Pending tasks (status is not done/abandoned and not overdue)
       this.pendingTasks = this.tasks.filter(task => {
-        const isCompletedOrAbandoned = task.status === 'done' || task.status === 'abandoned' || task.completed_at
+        const isCompletedOrAbandoned = task.status === 'done' || task.status === 'abandoned' || task.completedAt
         const isOverdue = task.dueDate && new Date(task.dueDate) < now
         return !isCompletedOrAbandoned && !isOverdue
       }).length
       
-      // 逾期任务数（状态不是done/abandoned但已过期）
+      // Overdue tasks (status is not done/abandoned but expired)
       this.overdueTasks = this.tasks.filter(task => {
         const isCompletedOrAbandoned = task.status === 'done' || task.status === 'abandoned' || task.completed_at
         const isOverdue = task.dueDate && new Date(task.dueDate) < now
@@ -120,7 +114,7 @@ export default {
       }).length
     },
     
-    // 重置统计数据为默认值
+    // Reset statistics to default values
     resetStats() {
       this.totalTasks = 0
       this.completedTasks = 0
@@ -143,7 +137,6 @@ export default {
   width: 100%;
 }
 
-/* 响应式设计 */
 @media (max-width: 768px) {
   .stats-cards {
     grid-template-columns: 1fr 1fr;
