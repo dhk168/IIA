@@ -1,25 +1,20 @@
-// 导入WebView模块
-import web_webview from '@ohos.web.webview';
+import { webview } from '@kit.ArkWeb';
 
 @Entry
 @Component
-struct Index {
-  // 创建WebView控制器
-  private webViewController: web_webview.WebviewController = new web_webview.WebviewController();
+struct HttpLoadTestPage {
+  controller: webview.WebviewController = new webview.WebviewController();
+  @State mode: MixedMode = MixedMode.All;
+  @State url: string = 'http://39.106.26.90:4488/';
 
   build() {
-    // 使用Column作为容器
     Column() {
-      // 添加WebView组件，设置为加载百度首页
-      Web({ 
-        src: 'https://www.baidu.com',
-        controller: this.webViewController
-      })
-      // 设置WebView占满整个屏幕
-      .width('100%')
-      .height('100%')
+      Web({ src: this.url, controller: this.controller })
+        .mixedMode(this.mode)
+        .fileAccess(true)
+        .javaScriptAccess(true)
+        .domStorageAccess(true)
+        .onlineImageAccess(true)
     }
-    .width('100%')
-    .height('100%')
   }
 }
