@@ -82,6 +82,21 @@ export default {
   z-index: 15000;
   text-align: left;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  /* 响应式设计 */
+  @media (max-width: 768px) {
+    width: 90px;
+    top: calc(100% + 8px);
+  }
+  
+  @media (max-width: 480px) {
+    width: 80px;
+    position: fixed;
+    right: 20px;
+    top: 80px;
+    left: auto;
+    transform: none;
+  }
 }
 
 :deep(.custom-dropdown-item) {

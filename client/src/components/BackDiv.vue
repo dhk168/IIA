@@ -52,4 +52,18 @@ export default {
   padding: 20px;
   color: #ffffff;
 }
+
+/* 响应式样式 - 调整移动设备上的内边距 */
+@media (max-width: 480px) {
+  .back-div {
+    padding: 15px;
+  }
+}
+
+/* 非常小的屏幕 - 进一步减小内边距 */
+@media (max-width: 360px) {
+  .back-div {
+    padding: 10px;
+  }
+}
 </style>

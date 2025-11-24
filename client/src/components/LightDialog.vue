@@ -90,6 +90,24 @@ export default {
   border: 1px solid rgba(255, 255, 255, 0.3) !important;
   border-radius: 14px !important;
   
+  /* 响应式设计 */
+  @media (max-width: 768px) {
+    width: 90% !important;
+    padding: 15px;
+  }
+  
+  @media (max-width: 480px) {
+    width: 95% !important;
+    padding: 12px;
+    margin: 0 auto;
+  }
+  
+  @media (max-width: 360px) {
+    width: 98% !important;
+    padding: 10px;
+    margin: 0 auto;
+  }
+  
   .el-dialog__header {
     border-bottom: none !important;
   }
@@ -139,6 +157,19 @@ export default {
     display: flex;
     justify-content: flex-end;
     gap: 10px;
+  }
+  
+  /* 移动设备上的按钮布局调整 */
+  @media (max-width: 480px) {
+    .el-dialog__footer {
+      flex-direction: column;
+      gap: 8px;
+    }
+    
+    .el-dialog__footer .el-button {
+      width: 100%;
+      margin-left: 0 !important;
+    }
   }
   .el-dialog__footer .el-button {
     background-color: rgba(255, 255, 255, 0.2) !important;

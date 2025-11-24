@@ -119,10 +119,10 @@
   
   /* 主内容区域样式调整 */
   .main-content {
-    padding: 16px;
+    padding: 0px; /* 减小内边距 */
     height: calc(100vh - 150px); /* 为底部导航留出空间 */
-    margin: 6px 12px 12px 12px;
-    width: calc(100% - 24px); /* 确保宽度合适 */
+    margin: 4px 8px 8px 8px; /* 减小外边距 */
+    width: calc(100% - 16px); /* 确保宽度合适 */
     box-sizing: border-box;
   }
 }

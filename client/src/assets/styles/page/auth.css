@@ -14,6 +14,22 @@
   z-index: 10; /* 确保表单在所有波浪纹理层之上 */
 }
 
+/* 响应式样式 - 减小移动设备上的宽度 */
+@media (max-width: 480px) {
+  .auth-form {
+    max-width: 320px;
+    padding: 20px;
+  }
+}
+
+/* 非常小的屏幕 - 进一步减小宽度 */
+@media (max-width: 360px) {
+  .auth-form {
+    max-width: 280px;
+    padding: 15px;
+  }
+}
+
 .auth-title {
   text-align: center;
   font-size: 32px;
