@@ -10,7 +10,9 @@
       <!-- 使用新的玻璃态下拉菜单组件 -->
       <GlassDropdown>
         <template #trigger>
-          <el-avatar :size="50" :icon="UserFilled" class="user-avatar" />
+          <el-avatar :size="50" class="user-avatar">
+            {{ userInitial.toUpperCase() }}
+          </el-avatar>
         </template>
         <template #menu>
           <div class="custom-dropdown-item">Profile</div>
@@ -48,9 +50,11 @@ export default {
       default: 'Blank Page'
     }
   },
-  data() {
-    return {
-    };
+  computed: {
+    // 获取用户名的第一个大写字母
+    userInitial() {
+      return this.username ? this.username.charAt(0).toUpperCase() : 'U';
+    }
   },
   methods: {
     handleLogout() {
@@ -124,6 +128,11 @@ export default {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(8px);
+  font-size: 24px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .user-avatar:hover {
